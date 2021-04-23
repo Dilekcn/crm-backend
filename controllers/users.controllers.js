@@ -42,7 +42,7 @@ exports.login = async (req, res)=> {
        res.json({status:false, message:"Wrong password"})
      }
   })
-  .catch(err => res.json({message: "Email not exist"}))
+  .catch(err => res.json({message: "Email does not exist"}))
 }
 
 exports.updateUser = async (req,res) => {       

@@ -1,6 +1,7 @@
+require("dotenv").config()
 const mongoose = require("mongoose");
 module.exports = () => {
-  mongoose.connect("mongodb+srv://blackeagle4894:blackeagle4894@blackeagle4894.uyz3k.mongodb.net/myFirstDatabase?retryWrites=true&w=majority", {useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex:true})
+  mongoose.connect(process.env.db_connection, {useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex:true})
   mongoose.connection.on("open", () => {
     console.log("DB connection established")
   })
