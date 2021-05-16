@@ -7,6 +7,7 @@ var logger = require('morgan');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users.routes');
 const postsRouter = require("./routes/posts.routes")
+const companyDescriptionRouter = require("./routes/companyDescription.routes")
 
 //middlewares
 const verifyToken = require("./auth/verifyToken")
@@ -29,7 +30,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/', usersRouter);
-app.use("/",verifyToken, postsRouter)
+app.use("/", postsRouter)
+app.use("/",companyDescriptionRouter)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
