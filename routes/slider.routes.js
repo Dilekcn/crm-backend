@@ -3,7 +3,7 @@ const router = express.Router();
 
 const SliderController = require('../controllers/slider.controller');
 
-router.get('/slider', SliderController.getAll);
-router.post('/slider', SliderController.create);
+router.get('/slider', SliderController.getAllSlides);
+router.post('/slider', SliderController.createSlide);
 
 module.exports = router;

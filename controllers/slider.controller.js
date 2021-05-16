@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const SliderModel = require('../model/Slider.model');
 
-exports.getAll = async (req, res) => {
+exports.getAllSlides = async (req, res) => {
 	try {
 		const response = await SliderModel.find();
 		res.json(response);
@@ -10,7 +10,7 @@ exports.getAll = async (req, res) => {
 	}
 };
 
-exports.create = async (req, res) => {
+exports.createSlide = async (req, res) => {
 	const {
 		title,
 		subtitle,
@@ -44,4 +44,14 @@ exports.create = async (req, res) => {
 			}),
 		)
 		.catch((error) => res.json({ status: false, message: error }));
+};
+
+exports.getSingleSlide = async (req, res) => {
+	await SliderModel.findById({ _id: req.params.slideid }, (err, data) => {
+		if (err) {
+			res.json({ message: err });
+		} else {
+			res.json(data);
+		}
+	});
 };
