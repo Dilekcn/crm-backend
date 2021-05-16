@@ -4,5 +4,6 @@ const router = express.Router();
 const SliderController = require('../controllers/slider.controller');
 
 router.get('/slider', SliderController.getAll);
+router.post('/slider', SliderController.create);
 
 module.exports = router;
