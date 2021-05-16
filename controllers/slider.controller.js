@@ -65,3 +65,12 @@ exports.getSingleSlideByTitle = async (req, res) => {
 		}
 	});
 };
+
+exports.updateSlider = async (req, res) => {
+	await SliderModel.findByIdAndUpdate(
+		{ _id: req.params.slideid },
+		{ $set: req.body },
+	)
+		.then((data) => res.json(data))
+		.catch((err) => res.json({ message: err }));
+};
