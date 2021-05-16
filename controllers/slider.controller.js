@@ -55,3 +55,13 @@ exports.getSingleSlide = async (req, res) => {
 		}
 	});
 };
+
+exports.getSingleSlideByTitle = async (req, res) => {
+	await SliderModel.findOne({ title: req.params.titletext }, (err, data) => {
+		if (err) {
+			res.json({ message: err });
+		} else {
+			res.json(data);
+		}
+	});
+};
