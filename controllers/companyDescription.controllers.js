@@ -42,8 +42,19 @@ exports.getCompanyDescriptionByTitle = async (req,res) => {
         res.json(data)
       }
     })
-      }
+      } 
 
+      
+
+exports.getCompanyDescriptionByAuthor = async (req,res) => {
+        await CompanyDescriptionModel.findOne({author: req.params.author}, (err,data) => {
+          if(err) {
+            res.json({message: err})
+          } else {
+            res.json(data)
+          }
+        })
+          }
 
 exports.updateCompanyDescription = async (req,res) => {       
   await CompanyDescriptionModel.findByIdAndUpdate({_id: req.params.id},{$set: req.body}).then(data => res.json({message:"Successfully updated.",data}))

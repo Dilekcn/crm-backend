@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema
 
 const CompanyDescriptionSchema = new Schema({
-  contentName:String,
+  contentName:String, 
   routeName:String,
   title:{type:String, required:true, unique:true},
   content:{type:String, required:true},
