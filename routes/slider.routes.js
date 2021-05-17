@@ -10,4 +10,4 @@ router.post('/slider', SliderController.createSlide);
 router.put('/slider/:slideid', SliderController.updateSlider);
 router.delete('/slider/:slideid', SliderController.removeSlide);
 
-module.exports = router; 
+module.exports = router;
