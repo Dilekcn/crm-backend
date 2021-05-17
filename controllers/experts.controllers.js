@@ -42,14 +42,31 @@ exports.getSingleExpert = async (req, res) => {
 };
 
 exports.getExpertsByFirstname = async (req, res) => {
-	await ExpertModel.findOne(
-		{ firstname: req.params.firstname },
-		(err, data) => {
-			if (err) {
-				res.json({ message: err });
-			} else {
-				res.json(data);
-			}
-		},
-	);
+	await ExpertModel.find({ firstname: req.params.firstname }, (err, data) => {
+		if (err) {
+			res.json({ message: err });
+		} else {
+			res.json(data);
+		}
+	});
+};
+
+exports.getExpertsByLastname = async (req, res) => {
+	await ExpertModel.find({ lastname: req.params.lastname }, (err, data) => {
+		if (err) {
+			res.json({ message: err });
+		} else {
+			res.json(data);
+		}
+	});
+};
+
+exports.getExpertsByExpertise = async (req, res) => {
+	await ExpertModel.find({ expertise: req.params.expertise }, (err, data) => {
+		if (err) {
+			res.json({ message: err });
+		} else {
+			res.json(data);
+		}
+	});
 };
