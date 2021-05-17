@@ -30,3 +30,26 @@ exports.createExpert = async (req, res) => {
 		)
 		.catch((error) => res.json({ status: false, message: error }));
 };
+
+exports.getSingleExpert = async (req, res) => {
+	await ExpertModel.findById({ _id: req.params.expertid }, (err, data) => {
+		if (err) {
+			res.json({ message: err });
+		} else {
+			res.json(data);
+		}
+	});
+};
+
+exports.getExpertsByFirstname = async (req, res) => {
+	await ExpertModel.findOne(
+		{ firstname: req.params.firstname },
+		(err, data) => {
+			if (err) {
+				res.json({ message: err });
+			} else {
+				res.json(data);
+			}
+		},
+	);
+};
