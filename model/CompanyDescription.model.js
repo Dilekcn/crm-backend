@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
-const Schema = mongoose.Schema
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
 const CompanyDescriptionSchema = new Schema({
   contentName:String, 
@@ -11,4 +11,4 @@ const CompanyDescriptionSchema = new Schema({
   isDeleted:{type:Boolean,default:false}
 }, {timestamps:true})
 
-module.exports = mongoose.model("companyDescription", CompanyDescriptionSchema)
+module.exports = mongoose.model('companyDescription', CompanyDescriptionSchema);
