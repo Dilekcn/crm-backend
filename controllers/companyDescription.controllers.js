@@ -26,18 +26,7 @@ exports.create = async (req, res) => {
 		.catch((err) => res.json(err));
 };
 
-exports.getSingleCompanyDescription = async (req, res) => {
-	await CompanyDescriptionModel.findById(
-		{ _id: req.params.id },
-		(err, data) => {
-			if (err) {
-				res.json({ message: err });
-			} else {
-				res.json(data);
-			}
-		},
-	);
-};
+
 
 exports.getSingleCompanyDescription = async (req,res) => {
 await CompanyDescriptionModel.findById({_id: req.params.id}, (err,data) => {
