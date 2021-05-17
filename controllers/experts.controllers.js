@@ -70,3 +70,12 @@ exports.getExpertsByExpertise = async (req, res) => {
 		}
 	});
 };
+
+exports.updateExpert = async (req, res) => {
+	await ExpertModel.findByIdAndUpdate(
+		{ _id: req.params.expertid },
+		{ $set: req.body },
+	)
+		.then((data) => res.json(data))
+		.catch((err) => res.json({ message: err }));
+};

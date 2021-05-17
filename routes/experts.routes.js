@@ -18,5 +18,6 @@ router.get(
 	ExpertsController.getExpertsByExpertise,
 );
 router.post('/experts', ExpertsController.createExpert);
+router.put('/experts/:expertid', ExpertsController.updateExpert);
 
 module.exports = router;
