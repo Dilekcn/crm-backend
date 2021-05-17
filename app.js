@@ -3,10 +3,13 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const fileUpload = require('express-fileupload')
+const cors = require('cors')
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users.routes');
 const postsRouter = require("./routes/posts.routes")
+const mediasRouter = require("./routes/medias.routes")
 
 //middlewares
 const verifyToken = require("./auth/verifyToken")
@@ -26,9 +29,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(fileUpload())
+app.use(cors())
 
 app.use('/', indexRouter);
 app.use('/', usersRouter);
+app.use('/', mediasRouter)
 app.use("/",verifyToken, postsRouter)
 
 // catch 404 and forward to error handler
