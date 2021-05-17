@@ -8,14 +8,10 @@ const cors = require('cors')
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users.routes');
-<<<<<<< HEAD
-const postsRouter = require("./routes/posts.routes")
 const mediasRouter = require("./routes/medias.routes")
-=======
 const postsRouter = require('./routes/posts.routes');
 const companyDescriptionRouter = require('./routes/companyDescription.routes');
 const sliderRouter = require('./routes/slider.routes');
->>>>>>> 88a189884aa1a27cbfff4b483bce45ea5ec6c165
 
 //middlewares
 const verifyToken = require('./auth/verifyToken');
