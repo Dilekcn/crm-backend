@@ -79,3 +79,9 @@ exports.updateExpert = async (req, res) => {
 		.then((data) => res.json(data))
 		.catch((err) => res.json({ message: err }));
 };
+
+exports.removeExpert = async (req, res) => {
+	await ExpertModel.findOneAndDelete({ _id: req.params.expertid })
+		.then((data) => res.json(data))
+		.catch((err) => res.json({ message: err }));
+};

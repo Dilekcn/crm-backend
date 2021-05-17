@@ -19,5 +19,6 @@ router.get(
 );
 router.post('/experts', ExpertsController.createExpert);
 router.put('/experts/:expertid', ExpertsController.updateExpert);
+router.delete('/experts/:expertid', ExpertsController.removeExpert);
 
 module.exports = router;
