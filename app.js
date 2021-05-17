@@ -8,17 +8,13 @@ const cors = require('cors')
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users.routes');
-<<<<<<< HEAD
-const postsRouter = require("./routes/posts.routes")
-const mediasRouter = require("./routes/medias.routes")
-=======
 const postsRouter = require('./routes/posts.routes');
 const companyDescriptionRouter = require('./routes/companyDescription.routes');
 const sliderRouter = require('./routes/slider.routes');
->>>>>>> 88a189884aa1a27cbfff4b483bce45ea5ec6c165
-
+const mediasRouter = require('./routes/medias.routes')
+ 
 //middlewares
-const verifyToken = require('./auth/verifyToken');
+// const verifyToken = require('./auth/verifyToken');
 
 var app = express();
 
@@ -40,7 +36,7 @@ app.use(cors())
 app.use('/', indexRouter);
 app.use('/', usersRouter);
 app.use('/', mediasRouter)
-app.use("/",verifyToken, postsRouter)
+app.use("/",postsRouter)
 app.use('/', postsRouter);
 app.use('/', companyDescriptionRouter);
 app.use('/', sliderRouter);
