@@ -6,10 +6,10 @@ exports.getAll = async (req, res) => {
 		const response = await CompanyDescriptionModel.find();
 		res.json({ message: 'Company Description', response });
 	} catch (error) {
-		res.status(500).json(error);
+		res.status(500).json(error); 
 	}
 };
-
+ 
 exports.create = async (req, res) => {
 	const newPost = await new CompanyDescriptionModel({
 		contentName: req.body.contentName,
@@ -70,6 +70,15 @@ exports.getCompanyDescriptionByAuthor = async (req,res) => {
           }
         })
           }
+		  
+exports.updateCompanyDescription = async (req, res) => {
+			await CompanyDescriptionModel.findByIdAndUpdate(
+				{ _id: req.params.id },
+				{ $set: req.body },
+			)
+				.then((data) => res.json(data))
+				.catch((err) => res.json({ message: err }));
+		};
 
 exports.removeSingleCompanyDescription = async (req, res) => {
 	await CompanyDescriptionModel.findByIdAndDelete({ _id: req.params.id })

@@ -8,7 +8,7 @@ router.get("/companydescription/:id",companyDescriptionControllers.getSingleComp
 router.get("/companydescription/title/:title",companyDescriptionControllers.getCompanyDescriptionByTitle)
 router.get("/companydescription/author/:author",companyDescriptionControllers.getCompanyDescriptionByAuthor)
 router.post("/companydescription",companyDescriptionControllers.create)
-// router.put("/companydescription/:id", companyDescriptionControllers.updateCompanyDescription)
+router.put("/companydescription/:id", companyDescriptionControllers.updateCompanyDescription)
 router.delete("/companydescription/:id", companyDescriptionControllers.removeSingleCompanyDescription)
 
 module.exports = router 
