@@ -18,15 +18,14 @@ exports.createProduct = async (req, res) => {
         coverImageId: req.body.coverImageId,
         isHomePage: req.body.isHomePage,
         title: req.body.title,
-        content:req.body.content,
-        createAt:req.body.createAt,
+        content:req.body.content,       
         shortDescription:req.body.shortDescription,
         buttonText:req.body.buttonText,
         userId:req.body. userId,
         isActive: req.body.isActive,
         isDeleted: req.body.isDeleted,
-        isBlog: req.body.isBlog,
-        updateAt: req.body.updateAt
+        isBlog: req.body.isBlog
+        
 
     })
 
