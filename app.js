@@ -13,6 +13,7 @@ const companyDescriptionRouter = require('./routes/companyDescription.routes');
 const sliderRouter = require('./routes/slider.routes');
 const mediasRouter = require('./routes/medias.routes');
 const expertsRouter = require('./routes/experts.routes');
+const messagesRouter = require('./routes/messages.routes')
 
 //middlewares
 // const verifyToken = require('./auth/verifyToken');
@@ -42,6 +43,8 @@ app.use('/', postsRouter);
 app.use('/', companyDescriptionRouter);
 app.use('/', sliderRouter);
 app.use('/', expertsRouter);
+app.use('/', messagesRouter);
+
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
