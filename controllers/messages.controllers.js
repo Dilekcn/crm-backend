@@ -4,7 +4,7 @@ const MessagesModel = require('../model/Messages.model');
 exports.getAll = async (req, res) => {
 	try {
 		const response = await MessagesModel.find();
-		res.json({ message: 'Messages', response });
+		res.json(response);
 	} catch (error) {
 		res.status(500).json(error); 
 	}

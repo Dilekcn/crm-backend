@@ -4,7 +4,7 @@ const CompanyDescriptionModel = require('../model/CompanyDescription.model');
 exports.getAll = async (req, res) => {
 	try {
 		const response = await CompanyDescriptionModel.find();
-		res.json({ message: 'Company Description', response });
+		res.json(response);
 	} catch (error) {
 		res.status(500).json(error); 
 	}
