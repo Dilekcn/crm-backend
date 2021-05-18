@@ -7,7 +7,7 @@ exports.getAllSlides = async (req, res) => {
 		res.json(response);
 	} catch (error) {
 		res.status(500).json(error);
-	} 
+	}
 };
 
 exports.createSlide = async (req, res) => {
