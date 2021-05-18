@@ -47,7 +47,7 @@ app.use('/', sliderRouter);
 app.use('/', expertsRouter);
 app.use('/', messagesRouter);
 app.use('/', footerRouter);
-app.use('/',productRouter);
+app.use('/', productRouter);
 
 
 // catch 404 and forward to error handler

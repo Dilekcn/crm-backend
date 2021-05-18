@@ -2,18 +2,15 @@ const mongoose = require('mongoose');
 const ProductModel = require("../model/Products.model");
 
 
-exports.getAllProduct = async (req, res) => {
-    try {
-        const response = await ProductModel.find()
-        res.json({message: 'All Products', response})
-    } catch (err) {
-        res.status(500).json(err)
-    }
-};
+exports.getAllProduct =  (req, res) => {
+  
+    ProductModel.find()
+    .then(data => res.json(data))
+    .catch(err => res.json({message: err, status:false}))
+}
 
-
-exports.createProduct = async (req, res) => {
-    const newProduct = await new ProductModel({
+exports.createProduct = (req, res) => {
+    const newProduct =  new ProductModel({
         order: req.body.order,
         coverImageId: req.body.coverImageId,
         isHomePage: req.body.isHomePage,
@@ -24,14 +21,16 @@ exports.createProduct = async (req, res) => {
         userId:req.body. userId,
         isActive: req.body.isActive,
         isDeleted: req.body.isDeleted,
-        isBlog: req.body.isBlog
-        
+        isBlog: req.body.isBlog,
+        isAboveFooter:req.body.isAboveFooter       
 
     })
 
-    newProduct.save()
-    .then(response => res.json({message:'Product Created', status:true, response}))
-    .catch(error => res.json({message:error, status:false}))
+    newProduct.save((err,data)=>{
+        if(err){res.json(err);}
+        res.json(data);
+    });
+   
 }
 
 
