@@ -7,7 +7,7 @@ const SliderSchema = new Schema(
 		subtitle: { type: String, required: true },
 		url: { type: String, required: true },
 		buttonText: { type: String, required: true },
-		order: { type: Number, required: true },
+		order: { type: Number, required: true }, 
 		isActive: { type: Boolean, default: true },
 		isDeleted: { type: Boolean, default: false },
 		mediaId: { type: String, required: true },
