@@ -15,6 +15,7 @@ const mediasRouter = require('./routes/medias.routes');
 const expertsRouter = require('./routes/experts.routes');
 const messagesRouter = require('./routes/messages.routes')
 const footerRouter = require('./routes/footer.routes')
+const subscribersRouter = require('./routes/subscribers.routes')
 
 //middlewares
 // const verifyToken = require('./auth/verifyToken');
@@ -46,6 +47,7 @@ app.use('/', sliderRouter);
 app.use('/', expertsRouter);
 app.use('/', messagesRouter);
 app.use('/', footerRouter)
+app.use('/', subscribersRouter)
 
 
 // catch 404 and forward to error handler
