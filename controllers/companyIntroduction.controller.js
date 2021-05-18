@@ -1,16 +1,16 @@
 const mongoose = require('mongoose');
-const SliderModel = require('../model/Slider.model');
+const CompanyIntroductionModel = require('../model/CompanyIntroduction.model');
 
-exports.getAllSlides = async (req, res) => {
+exports.getAll = async (req, res) => {
 	try {
-		const response = await SliderModel.find();
-		res.json(response);
+		const response = await CompanyIntroductionModel.find();
+		res.json(response);CompanyIntroductionModel
 	} catch (error) {
 		res.status(500).json(error);
-	}
+	} 
 };
 
-exports.createSlide = async (req, res) => {
+exports.createIntroduction = async (req, res) => {
 	const {
 		title,
 		subtitle,
@@ -23,7 +23,7 @@ exports.createSlide = async (req, res) => {
 		isVideo,
 	} = req.body;
 
-	const newSlide = await new SliderModel({
+	const newIntroduction = await new CompanyIntroductionModel({
 		title,
 		subtitle,
 		url,
@@ -34,20 +34,20 @@ exports.createSlide = async (req, res) => {
 		mediaId,
 		isVideo,
 	});
-	newSlide
+	newIntroduction
 		.save()
 		.then((response) =>
 			res.json({
 				status: true,
-				message: 'Added new slide successfully.',
+				message: 'Added new company introductions successfully.',
 				response,
 			}),
 		)
 		.catch((error) => res.json({ status: false, message: error }));
 };
 
-exports.getSingleSlide = async (req, res) => {
-	await SliderModel.findById({ _id: req.params.slideid }, (err, data) => {
+exports.getSingleIntroduction = async (req, res) => {
+	await CompanyIntroductionModel.findById({ _id: req.params.slideid }, (err, data) => {
 		if (err) {
 			res.json({ message: err });
 		} else {
@@ -57,7 +57,7 @@ exports.getSingleSlide = async (req, res) => {
 };
 
 exports.getSingleSlideByTitle = async (req, res) => {
-	await SliderModel.findOne({ title: req.params.titletext }, (err, data) => {
+	await CompanyIntroductionModel.findOne({ title: req.params.titletext }, (err, data) => {
 		if (err) {
 			res.json({ message: err });
 		} else {
@@ -67,7 +67,7 @@ exports.getSingleSlideByTitle = async (req, res) => {
 };
 
 exports.updateSlider = async (req, res) => {
-	await SliderModel.findByIdAndUpdate(
+	await CompanyIntroductionModel.findByIdAndUpdate(
 		{ _id: req.params.slideid },
 		{ $set: req.body },
 	)
@@ -76,7 +76,7 @@ exports.updateSlider = async (req, res) => {
 };
 
 exports.removeSlide = async (req, res) => {
-	await SliderModel.findByIdAndDelete({ _id: req.params.slideid })
+	await CompanyIntroductionModel.findByIdAndDelete({ _id: req.params.slideid })
 		.then((data) => res.json(data))
 		.catch((err) => res.json({ message: err }));
 };
