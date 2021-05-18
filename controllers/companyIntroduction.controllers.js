@@ -13,26 +13,20 @@ exports.getAll = async (req, res) => {
 exports.createIntroduction = async (req, res) => {
 	const {
 		title,
-		subtitle,
-		url,
-		buttonText,
-		order,
+		subTitle,
+		iconName,
+		shortDescription,
 		isActive,
-		isDeleted,
-		mediaId,
-		isVideo,
+		isDeleted
 	} = req.body;
 
 	const newIntroduction = await new CompanyIntroductionModel({
 		title,
-		subtitle,
-		url,
-		buttonText,
-		order,
+		subTitle,
+		iconName,
+		shortDescription,
 		isActive,
-		isDeleted,
-		mediaId,
-		isVideo,
+		isDeleted
 	});
 	newIntroduction
 		.save()
@@ -47,7 +41,7 @@ exports.createIntroduction = async (req, res) => {
 };
 
 exports.getSingleIntroduction = async (req, res) => {
-	await CompanyIntroductionModel.findById({ _id: req.params.slideid }, (err, data) => {
+	await CompanyIntroductionModel.findById({ _id: req.params.id }, (err, data) => {
 		if (err) {
 			res.json({ message: err });
 		} else {
@@ -56,8 +50,8 @@ exports.getSingleIntroduction = async (req, res) => {
 	});
 };
 
-exports.getSingleSlideByTitle = async (req, res) => {
-	await CompanyIntroductionModel.findOne({ title: req.params.titletext }, (err, data) => {
+exports.getSingleIntroductionByTitle = async (req, res) => {
+	await CompanyIntroductionModel.findOne({ title: req.params.title }, (err, data) => {
 		if (err) {
 			res.json({ message: err });
 		} else {
@@ -66,17 +60,17 @@ exports.getSingleSlideByTitle = async (req, res) => {
 	});
 };
 
-exports.updateSlider = async (req, res) => {
+exports.updateIntroductions = async (req, res) => {
 	await CompanyIntroductionModel.findByIdAndUpdate(
-		{ _id: req.params.slideid },
+		{ _id: req.params.id },
 		{ $set: req.body },
 	)
 		.then((data) => res.json(data))
 		.catch((err) => res.json({ message: err }));
 };
 
-exports.removeSlide = async (req, res) => {
-	await CompanyIntroductionModel.findByIdAndDelete({ _id: req.params.slideid })
+exports.removeIntroduction = async (req, res) => {
+	await CompanyIntroductionModel.findByIdAndDelete({ _id: req.params.id })
 		.then((data) => res.json(data))
 		.catch((err) => res.json({ message: err }));
 };
