@@ -4,5 +4,8 @@ const router = express.Router();
 const RolesController = require('../controllers/roles.controllers');
 
 router.get('/roles', RolesController.getAllRoles);
+router.get('/roles/:roleid', RolesController.getSingleRole);
+router.post('/roles', RolesController.createRole);
+router.put('/roles/roleid', RolesController.updateRole);
 
 module.exports = router;
