@@ -43,3 +43,9 @@ exports.updateRole = async (req, res) => {
 		{ $set: req.body },
 	);
 };
+
+exports.removeRole = async (req, res) => {
+	await RolesModel.findByIdAndDelete({ _id: req.params.roleid })
+		.then((data) => res.json(data))
+		.catch((err) => res.json({ message: err }));
+};
