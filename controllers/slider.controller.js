@@ -39,7 +39,7 @@ exports.createSlide = async (req, res) => {
 		.then((response) =>
 			res.json({
 				status: true,
-				message: 'Added new slide successfully.',
+				message: 'Added new role successfully.',
 				response,
 			}),
 		)
