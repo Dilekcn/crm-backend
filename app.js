@@ -18,6 +18,7 @@ const messagesRouter = require('./routes/messages.routes')
 const footerRouter = require('./routes/footer.routes')
 const subscribersRouter = require('./routes/subscribers.routes')
 const staticPagesRouter = require('./routes/staticPage.routes')
+const menusRouter = require('./routes/menus.routes')
 
 //middlewares
 // const verifyToken = require('./auth/verifyToken');
@@ -45,13 +46,16 @@ app.use('/', mediasRouter);
 app.use('/', postsRouter);
 app.use('/', postsRouter);
 app.use('/', companyDescriptionRouter);
-app.use('/', companyIntroductionRouter);
+app.use('/', companyIntroductionRouter); 
 app.use('/', sliderRouter);
 app.use('/', expertsRouter);
 app.use('/', messagesRouter);
 app.use('/', footerRouter)
 app.use('/', subscribersRouter)
 app.use('/', staticPagesRouter)
+app.use('/', menusRouter)
+
+
 
 
 // catch 404 and forward to error handler
