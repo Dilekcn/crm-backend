@@ -4,7 +4,7 @@ const RolesModel = require('../model/Roles.model');
 
 exports.getAllRoles = async (req, res) => {
 	try {
-		const response = RolesModel.find();
+		const response = await RolesModel.find();
 		res.json(response);
 	} catch (error) {
 		res.status(500).json(error);
@@ -30,7 +30,7 @@ exports.createRole = async (req, res) => {
 		.then((response) =>
 			res.json({
 				status: true,
-				message: 'Added new slide successfully.',
+				message: 'Added new role successfully.',
 				response,
 			}),
 		)
