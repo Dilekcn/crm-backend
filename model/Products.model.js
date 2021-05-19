@@ -1,11 +1,13 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const ProductsSchema = new Schema({
+const ProductsSchema = new Schema(
+  {
+    title:{type:String, required:true},
   order: { type: Number, required: true }, 
   coverImageId:Schema.Types.ObjectId, 
   isHomePage: { type: Boolean, default:false},
-  title:{type:String, required:true},
+ 
   content:{type:String, required:true}, 
   shortDescription:{type:String, required: true},
   buttonText:{type:String, required: true},
@@ -15,6 +17,8 @@ const ProductsSchema = new Schema({
   isBlog:{type:Boolean,default:false},
   isAboveFooter:{type:Boolean,default:false}
 
-}, {timestamps:true})
+}, 
+{timestamps:true}
+)
 
 module.exports = mongoose.model('product', ProductsSchema);

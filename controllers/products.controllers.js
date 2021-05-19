@@ -5,8 +5,8 @@ const ProductModel = require("../model/Products.model");
 exports.getAllProduct =  (req, res) => {
   
     ProductModel.find()
-    .then(data => res.json(data))
-    .catch(err => res.json({message: err, status:false}))
+    .then((data) =>{ res.json(data);})
+    .catch((err) => {res.json( err)});
 }
 
 exports.createProduct = (req, res) => {
@@ -26,11 +26,24 @@ exports.createProduct = (req, res) => {
 
     })
 
-    newProduct.save((err,data)=>{
-        if(err){res.json(err);}
-        res.json(data);
-    });
+    newProduct.save()
+    .then((data) =>{ res.json(data);})
+    .catch((err) => {res.json( err)});
    
 }
 
+exports.deleteProduct = (req,res,next)=>{
 
+    ProductModel.findByIdAndRemove({_id:req.params.productId})
+    .then((data)=>{res.json(data)})
+    .catch((err)=>{
+      next({message:'The product deleted.',code:99})
+      res.json(err)
+    })
+  }
+
+  exports.updateSingleProduct =  (req, res) => {
+    ProductModel.findByIdAndUpdate({_id: req.params.productId}, {$set: req.body})
+    .then(data => res.json({message:'Product updated', status:true, data}))
+    .catch(err => res.json({message: err, status:false}))
+}
