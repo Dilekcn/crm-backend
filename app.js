@@ -14,12 +14,13 @@ const companyIntroductionRouter = require('./routes/companyIntroductions.routes'
 const sliderRouter = require('./routes/slider.routes');
 const mediasRouter = require('./routes/medias.routes');
 const expertsRouter = require('./routes/experts.routes');
-const messagesRouter = require('./routes/messages.routes')
-const footerRouter = require('./routes/footer.routes')
-const subscribersRouter = require('./routes/subscribers.routes')
-const staticPagesRouter = require('./routes/staticPage.routes')
-const menusRouter = require('./routes/menus.routes')
-const googleMapsRouter = require('./routes/googleMaps.routes')
+const messagesRouter = require('./routes/messages.routes');
+const footerRouter = require('./routes/footer.routes');
+const subscribersRouter = require('./routes/subscribers.routes');
+const staticPagesRouter = require('./routes/staticPage.routes');
+const menusRouter = require('./routes/menus.routes');
+const googleMapsRouter = require('./routes/googleMaps.routes');
+const rolesRouter = require('./routes/roles.routes');
 
 //middlewares
 // const verifyToken = require('./auth/verifyToken');
@@ -47,18 +48,16 @@ app.use('/', mediasRouter);
 app.use('/', postsRouter);
 app.use('/', postsRouter);
 app.use('/', companyDescriptionRouter);
-app.use('/', companyIntroductionRouter); 
+app.use('/', companyIntroductionRouter);
 app.use('/', sliderRouter);
 app.use('/', expertsRouter);
 app.use('/', messagesRouter);
-app.use('/', footerRouter)
-app.use('/', subscribersRouter)
-app.use('/', staticPagesRouter)
-app.use('/', menusRouter)
-app.use('/', googleMapsRouter)
-
-
-
+app.use('/', footerRouter);
+app.use('/', subscribersRouter);
+app.use('/', staticPagesRouter);
+app.use('/', menusRouter);
+app.use('/', googleMapsRouter);
+app.use('/', rolesRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
