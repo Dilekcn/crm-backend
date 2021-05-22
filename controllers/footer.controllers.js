@@ -6,6 +6,14 @@ exports.getAll = (req, res) => {
         .catch(err => res.json({message: err, status:false}))
 }
 
+exports.getSingleFooterById = (req, res) => {
+    const id = req.params.id
+
+    FooterModel.findById({_id:id})
+    .then(data => res.json(data))
+    .catch(err => res.json({message: err, status:false}))
+}
+
 exports.createFooter = (req, res) => {
     const newFooter = new FooterModel({
         logo : req.body.logo,
