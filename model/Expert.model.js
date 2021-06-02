@@ -7,6 +7,7 @@ const ExpertSchema = new Schema(
 		lastname: { type: String, required: true },
 		expertise: { type: String, required: true },
 		mediaId: mongoose.Schema.Types.ObjectId,
+		socialMediaLinks: { type: Array },
 		isActive: { type: Boolean, default: true },
 		isDeleted: { type: Boolean, default: false },
 	},
