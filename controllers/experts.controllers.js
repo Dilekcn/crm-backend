@@ -11,11 +11,13 @@ exports.getAllExperts = async (req, res) => {
 };
 
 exports.createExpert = async (req, res) => {
-	const { firstname, lastname, expertise, isActive, isDeleted } = req.body;
+	const { firstname, lastname, expertise, mediaId, isActive, isDeleted } =
+		req.body;
 	const newExpert = await new ExpertModel({
 		firstname,
 		lastname,
 		expertise,
+		mediaId,
 		isActive,
 		isDeleted,
 	});
