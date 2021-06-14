@@ -63,7 +63,13 @@ exports.createComponent = async (req, res) => {
 };
 
 exports.updateComponent = async (req, res) => {
-	await new ComponentModel.findByIdAndUpdate({ _id: req.params.componentid }, { $set: req.body })
+	await ComponentModel.findByIdAndUpdate({ _id: req.params.componentid }, { $set: req.body })
+		.then((data) => res.json(data))
+		.catch((err) => res.json({ message: err }));
+};
+
+exports.removeComponent = async (req, res) => {
+	await ComponentModel.findByIdAndDelete({ _id: req.params.componentid })
 		.then((data) => res.json(data))
 		.catch((err) => res.json({ message: err }));
 };

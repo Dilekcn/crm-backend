@@ -80,7 +80,7 @@ exports.updateExpert = async (req, res) => {
 };
 
 exports.removeExpert = async (req, res) => {
-	await ExpertModel.findOneAndDelete({ _id: req.params.expertid })
+	await ExpertModel.findByIdAndDelete({ _id: req.params.expertid })
 		.then((data) => res.json(data))
 		.catch((err) => res.json({ message: err }));
 };
