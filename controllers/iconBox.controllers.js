@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
-const CompanyDescriptionModel = require('../model/CompanyDescription.model');
+const IconBoxModel = require('../model/IconBox.model');
 
 exports.getAll = async (req, res) => {
 	try {
-		const response = await CompanyDescriptionModel.find();
+		const response = await IconBoxModel.find();
 		res.json(response);
 	} catch (error) {
 		res.status(500).json(error); 
@@ -11,12 +11,13 @@ exports.getAll = async (req, res) => {
 };
  
 exports.create = async (req, res) => {
-	const newPost = await new CompanyDescriptionModel({
+	const newPost = await new IconBoxModel({
 		contentName: req.body.contentName,
 		routeName: req.body.routeName,
 		title: req.body.title,
 		content: req.body.content,
 		author: req.body.author,
+		iconName: req.body.iconName,
 		isActive: req.body.isActive,
 		isDeleted: req.body.isDeleted,
 	});
@@ -28,8 +29,8 @@ exports.create = async (req, res) => {
 
 
 
-exports.getSingleCompanyDescription = async (req,res) => {
-await CompanyDescriptionModel.findById({_id: req.params.id}, (err,data) => {
+exports.getSingleIconBox = async (req,res) => {
+await IconBoxModel.findById({_id: req.params.id}, (err,data) => {
   if(err) {
     res.json({message: err})
   } else {
@@ -38,8 +39,8 @@ await CompanyDescriptionModel.findById({_id: req.params.id}, (err,data) => {
 })
   }
  
-exports.getCompanyDescriptionByTitle = async (req,res) => {
-    await CompanyDescriptionModel.findOne({title: req.params.title}, (err,data) => {
+exports.getIconBoxByTitle = async (req,res) => {
+    await IconBoxModel.findOne({title: req.params.title}, (err,data) => {
       if(err) {
         res.json({message: err})
       } else {
@@ -50,8 +51,8 @@ exports.getCompanyDescriptionByTitle = async (req,res) => {
 
       
 
-exports.getCompanyDescriptionByAuthor = async (req,res) => {
-        await CompanyDescriptionModel.findOne({author: req.params.author}, (err,data) => {
+exports.getIconBoxByAuthor = async (req,res) => {
+        await IconBoxModel.findOne({author: req.params.author}, (err,data) => {
           if(err) {
             res.json({message: err})
           } else {
@@ -60,8 +61,8 @@ exports.getCompanyDescriptionByAuthor = async (req,res) => {
         })
           }
 		  
-exports.updateCompanyDescription = async (req, res) => {
-			await CompanyDescriptionModel.findByIdAndUpdate(
+exports.updateIconBox = async (req, res) => {
+			await IconBoxModel.findByIdAndUpdate(
 				{ _id: req.params.id },
 				{ $set: req.body },
 			)
@@ -69,8 +70,8 @@ exports.updateCompanyDescription = async (req, res) => {
 				.catch((err) => res.json({ message: err }));
 		};
 
-exports.removeSingleCompanyDescription = async (req, res) => {
-	await CompanyDescriptionModel.findByIdAndDelete({ _id: req.params.id })
+exports.removeSingleIconBox = async (req, res) => {
+	await IconBoxModel.findByIdAndDelete({ _id: req.params.id })
 		.then((data) => res.json(data))
 		.catch((err) => res.json({ message: err }));
 };
