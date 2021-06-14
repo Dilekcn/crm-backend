@@ -64,12 +64,12 @@ exports.createComponent = async (req, res) => {
 
 exports.updateComponent = async (req, res) => {
 	await ComponentModel.findByIdAndUpdate({ _id: req.params.componentid }, { $set: req.body })
-		.then((data) => res.json(data))
-		.catch((err) => res.json({ message: err }));
+		.then((data) => res.json({ status: true, message: 'Updated component successfully', data }))
+		.catch((err) => res.json({ status: false, message: err }));
 };
 
 exports.removeComponent = async (req, res) => {
 	await ComponentModel.findByIdAndDelete({ _id: req.params.componentid })
-		.then((data) => res.json(data))
-		.catch((err) => res.json({ message: err }));
+		.then((data) => res.json({ status: true, message: 'Deleted component successfully', data }))
+		.catch((err) => res.json({ status: false, message: err }));
 };
