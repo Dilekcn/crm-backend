@@ -11,7 +11,17 @@ exports.getAllComponents = async (req, res) => {
 };
 
 exports.getSingleComponent = async (req, res) => {
-	await ExpertModel.findById({ _id: req.params.componentid }, (err, data) => {
+	await ComponentModel.findById({ _id: req.params.componentid }, (err, data) => {
+		if (err) {
+			res.json({ message: err });
+		} else {
+			res.json(data);
+		}
+	});
+};
+
+exports.getComponentByName = async (req, res) => {
+	await ComponentModel.find({ name: req.params.componentname }, (err, data) => {
 		if (err) {
 			res.json({ message: err });
 		} else {
