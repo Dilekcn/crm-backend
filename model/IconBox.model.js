@@ -2,9 +2,9 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const IconBoxSchema = new Schema({
-  contentName:String, 
+  contentName:String,  
   routeName:String,
-  title:{type:String, required:true, unique:true},
+  title:{type:String, required:true},
   content:{type:String, required:true},
   author:{type:String, required:true},
   iconName:{type:String, required:true},
