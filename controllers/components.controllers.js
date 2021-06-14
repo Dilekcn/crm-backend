@@ -61,3 +61,9 @@ exports.createComponent = async (req, res) => {
 		)
 		.catch((error) => res.json({ status: false, message: error }));
 };
+
+exports.updateComponent = async (req, res) => {
+	await new ComponentModel.findByIdAndUpdate({ _id: req.params.componentid }, { $set: req.body })
+		.then((data) => res.json(data))
+		.catch((err) => res.json({ message: err }));
+};
