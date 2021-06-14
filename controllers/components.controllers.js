@@ -10,6 +10,16 @@ exports.getAllComponents = async (req, res) => {
 	}
 };
 
+exports.getSingleComponent = async (req, res) => {
+	await ExpertModel.findById({ _id: req.params.componentid }, (err, data) => {
+		if (err) {
+			res.json({ message: err });
+		} else {
+			res.json(data);
+		}
+	});
+};
+
 exports.createComponent = async (req, res) => {
 	const { name, componentId, description, isActive, isDeleted } = req.body;
 	const newComponent = await new ComponentModel({
