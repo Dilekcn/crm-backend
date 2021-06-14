@@ -30,6 +30,16 @@ exports.getComponentByName = async (req, res) => {
 	});
 };
 
+exports.getComponentByComponentId = async (req, res) => {
+	await ComponentModel.find({ componentId: req.params.componentId }, (err, data) => {
+		if (err) {
+			res.json({ message: err });
+		} else {
+			res.json(data);
+		}
+	});
+};
+
 exports.createComponent = async (req, res) => {
 	const { name, componentId, description, isActive, isDeleted } = req.body;
 	const newComponent = await new ComponentModel({
