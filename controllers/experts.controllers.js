@@ -11,15 +11,7 @@ exports.getAllExperts = async (req, res) => {
 };
 
 exports.createExpert = async (req, res) => {
-	const {
-		firstname,
-		lastname,
-		expertise,
-		mediaId,
-		socialMediaLinks,
-		isActive,
-		isDeleted,
-	} = req.body;
+	const { firstname, lastname, expertise, mediaId, socialMediaLinks, isActive, isDeleted } = req.body;
 	const newExpert = await new ExpertModel({
 		firstname,
 		lastname,
@@ -36,7 +28,7 @@ exports.createExpert = async (req, res) => {
 				status: true,
 				message: 'Added new expert successfully.',
 				response,
-			}),
+			})
 		)
 		.catch((error) => res.json({ status: false, message: error }));
 };
@@ -82,10 +74,7 @@ exports.getExpertsByExpertise = async (req, res) => {
 };
 
 exports.updateExpert = async (req, res) => {
-	await ExpertModel.findByIdAndUpdate(
-		{ _id: req.params.expertid },
-		{ $set: req.body },
-	)
+	await ExpertModel.findByIdAndUpdate({ _id: req.params.expertid }, { $set: req.body })
 		.then((data) => res.json(data))
 		.catch((err) => res.json({ message: err }));
 };
