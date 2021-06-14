@@ -15,15 +15,10 @@ const sliderRouter = require('./routes/slider.routes');
 const mediasRouter = require('./routes/medias.routes');
 const expertsRouter = require('./routes/experts.routes');
 const messagesRouter = require('./routes/messages.routes')
-<<<<<<< HEAD
-const footerRouter = require('./routes/footer.routes');
-const productRouter =require('./routes/products.routes');
-=======
 const footerRouter = require('./routes/footer.routes')
 const subscribersRouter = require('./routes/subscribers.routes')
 const staticPagesRouter = require('./routes/staticPage.routes')
 const menusRouter = require('./routes/menus.routes')
->>>>>>> 56c0e5f4a0e49ae178877b4d8cf76b8f488ee60a
 
 //middlewares
 // const verifyToken = require('./auth/verifyToken');
@@ -55,17 +50,12 @@ app.use('/', companyIntroductionRouter);
 app.use('/', sliderRouter);
 app.use('/', expertsRouter);
 app.use('/', messagesRouter);
-<<<<<<< HEAD
-app.use('/', footerRouter);
-app.use('/', productRouter);
-=======
 app.use('/', footerRouter)
 app.use('/', subscribersRouter)
 app.use('/', staticPagesRouter)
 app.use('/', menusRouter)
 
 
->>>>>>> 56c0e5f4a0e49ae178877b4d8cf76b8f488ee60a
 
 
 // catch 404 and forward to error handler
