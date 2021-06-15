@@ -11,12 +11,14 @@ exports.getAll = async (req, res) => {
 	}
 };
 
+ 
 exports.createPage = async (req, res) => {
-	const { name, content, isActive, isDeleted } = req.body;
+	const { name, content, isActive, isDeleted,imageId } = req.body;
 
 	const newPage = await new StaticPageModel({
 		name,
 		content,
+		imageId,
 		isActive,
 		isDeleted,
 	});
