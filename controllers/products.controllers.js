@@ -6,7 +6,7 @@ exports.getAllProduct =  (req, res) => {
   
     ProductModel.find()
     .then((data) =>{ res.json(data);})
-    .catch((err) => {res.json( err)});
+    .catch((err) => {res.json( err)}); 
 }
 
 exports.createProduct = (req, res) => {

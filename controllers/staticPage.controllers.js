@@ -4,25 +4,21 @@ const StaticPageModel = require('../model/StaticPage.model');
 exports.getAll = async (req, res) => {
 	try {
 		const response = await StaticPageModel.find();
-		res.json(response);StaticPageModel
+		res.json(response);
+		StaticPageModel;
 	} catch (error) {
 		res.status(500).json(error);
-	} 
+	}
 };
 
 exports.createPage = async (req, res) => {
-	const {
-		name,
-		content,
-		isActive,
-		isDeleted
-	} = req.body;
+	const { name, content, isActive, isDeleted } = req.body;
 
 	const newPage = await new StaticPageModel({
 		name,
 		content,
 		isActive,
-		isDeleted
+		isDeleted,
 	});
 	newPage
 		.save()
@@ -31,7 +27,7 @@ exports.createPage = async (req, res) => {
 				status: true,
 				message: 'Added new company introductions successfully.',
 				response,
-			}),
+			})
 		)
 		.catch((error) => res.json({ status: false, message: error }));
 };
@@ -57,10 +53,7 @@ exports.getSinglePageByName = async (req, res) => {
 };
 
 exports.updatePages = async (req, res) => {
-	await StaticPageModel.findByIdAndUpdate(
-		{ _id: req.params.id },
-		{ $set: req.body },
-	)
+	await StaticPageModel.findByIdAndUpdate({ _id: req.params.id }, { $set: req.body })
 		.then((data) => res.json(data))
 		.catch((err) => res.json({ message: err }));
 };

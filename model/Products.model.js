@@ -15,7 +15,7 @@ const ProductsSchema = new Schema(
   isActive:{type:Boolean,default:true},
   isDeleted:{type:Boolean,default:false},
   isBlog:{type:Boolean,default:false},
-  isAboveFooter:{type:Boolean,default:false}
+  isAboveFooter:{type:Boolean,default:false} 
 
 }, 
 {timestamps:true}
