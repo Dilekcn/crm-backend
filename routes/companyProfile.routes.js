@@ -6,7 +6,7 @@ const CompanyProfileControllers = require('../controllers/companyProfile.control
 router.get('/companyprofile', CompanyProfileControllers.getAll);
 router.get('/companyprofile/:id', CompanyProfileControllers.getSingle);
 router.post('/companyprofile', CompanyProfileControllers.create);
-router.post('/companyprofile/:id', CompanyProfileControllers.update);
-router.post('/companyprofile/:id', CompanyProfileControllers.delete);
+router.put('/companyprofile/:id', CompanyProfileControllers.update);
+router.delete('/companyprofile/:id', CompanyProfileControllers.delete);
 
 module.exports = router;

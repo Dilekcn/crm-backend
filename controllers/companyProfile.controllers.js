@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const CompanyProfileModel = require('../model/CompanyProfile');
+const CompanyProfileModel = require('../model/CompanyProfile.model');
 
 exports.getAll = async (req, res) => {
 	try {
