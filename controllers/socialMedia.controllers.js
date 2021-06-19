@@ -11,24 +11,24 @@ exports.getAllSocialMedia = (req,res)=>{
 
 };
 
-// exports.createSocialMedia =(req,res)=>{
-//     const newSocialMedia = new SocialMediaModel(req.body);
-//     newSocialMedia.save()
-//     .then((data)=>{res.json(data);})
-//     .catch((err)=>{res.json(err)});
-// }
-
-exports.createSocialMedia = (req, res) => {
-    const newSocialMedia=  new createSocialMedia({
-        title: req.body.title,
-        link:req.body.link,     
-        isActive: req.body.isActive,
-        isDeleted: req.body.isDeleted          
-
-    })
-
+exports.createSocialMedia =(req,res)=>{
+    const newSocialMedia = new SocialMediaModel(req.body);
     newSocialMedia.save()
-    .then((data) =>{ res.json(data);})
-    .catch((err) => {res.json( err)});
-   
+    .then((data)=>{res.json(data);})
+    .catch((err)=>{res.json(err)});
 }
+
+// exports.createSocialMedia = (req, res) => {
+//     const newSocialMedia=  new SocialMediaModel({
+//         title: req.body.title,
+//         link:req.body.link,     
+//         isActive: req.body.isActive,
+//         isDeleted: req.body.isDeleted          
+
+//     })
+
+//     newSocialMedia.save()
+//     .then((data) =>{ res.json(data);})
+//     .catch((err) => {res.json( err)});
+   
+// }
