@@ -3,11 +3,11 @@ const Schema = mongoose.Schema;
 
 const ExpertSchema = new Schema(
 	{
-		firstname: { type: String, required: true },
-		lastname: { type: String, required: true },
-		expertise: { type: String, required: true },
+		firstname: String,
+		lastname: String,
+		expertise: String,
 		mediaId: mongoose.Schema.Types.ObjectId,
-		socialMediaLinks: { type: Array },
+		socialMediaId: mongoose.Schema.Types.ObjectId,
 		isActive: { type: Boolean, default: true },
 		isDeleted: { type: Boolean, default: false },
 	},

@@ -3,15 +3,23 @@ const ExpertModel = require('../model/Expert.model');
 
 exports.getAllExperts = async (req, res) => {
 	try {
-		const response = await ExpertModel.find();
-		res.json(response);
+		const dataList = await ExpertModel.find();
+		res.json({ secTitle: 'Experts', isActive: true, isHomePage: false, dataList });
 	} catch (error) {
 		res.status(500).json(error);
 	}
 };
 
 exports.createExpert = async (req, res) => {
-	const { firstname, lastname, expertise, mediaId, socialMediaLinks, isActive, isDeleted } = req.body;
+	const {
+		firstname,
+		lastname,
+		expertise,
+		mediaId,
+		socialMediaLinks,
+		isActive,
+		isDeleted,
+	} = req.body;
 	const newExpert = await new ExpertModel({
 		firstname,
 		lastname,
