@@ -23,6 +23,7 @@ const googleMapsRouter = require('./routes/googleMaps.routes');
 const rolesRouter = require('./routes/roles.routes');
 const componentsRouter = require('./routes/components.routes');
 const parentMenuRouter =require('./routes/parentMenu.routes');
+const socialMediaRouter =require('./routes/socialMedia.routes');
 
 //middlewares
 // const verifyToken = require('./auth/verifyToken');
@@ -62,6 +63,7 @@ app.use('/', googleMapsRouter);
 app.use('/', rolesRouter);
 app.use('/', componentsRouter);
 app.use("/",parentMenuRouter);
+app.use("/",socialMediaRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
