@@ -11,7 +11,7 @@ exports.getAllParentMenu =  (req, res) => {
 
 exports.createParentMenu = (req, res) => {
     const newParentMenu=  new ParentMenuModel({
-        name: req.body.order,     
+        name: req.body.name,     
         isActive: req.body.isActive,
         isDeleted: req.body.isDeleted          
 
