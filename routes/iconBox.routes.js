@@ -9,6 +9,6 @@ router.get("/iconbox/title/:title",iconBoxControllers.getIconBoxByTitle)
 router.get("/iconbox/author/:author",iconBoxControllers.getIconBoxByAuthor)
 router.post("/iconbox",iconBoxControllers.create)
 router.put("/iconbox/:id", iconBoxControllers.updateIconBox)
-router.delete("/iconbox/:id", iconBoxControllers.removeSingleIconBox)
+router.delete("/iconbox/:id", iconBoxControllers.removeSingleIconBox) 
 
 module.exports = router 

@@ -10,7 +10,7 @@ exports.getAllUsers = async (req, res) => {
 };
 
 exports.createUser = async (req, res) => {
-	const { firstname, lastname, email, password } = req.body;
+	const { firstname, lastname, email, password,roleId,isActive,isDeleted } = req.body;
 	const salt = await bcrypt.genSalt();
 	const hashedPassword = await bcrypt.hash(password, salt);
 
@@ -18,6 +18,9 @@ exports.createUser = async (req, res) => {
 		firstname: firstname,
 		lastname: lastname,
 		email: email,
+		isActive:isActive,
+		isDeleted:isDeleted,
+		roleId:roleId,
 		password: hashedPassword,
 	});
 	newUser

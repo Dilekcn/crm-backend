@@ -61,7 +61,7 @@ exports.getIconBoxByAuthor = async (req,res) => {
         })
           }
 		  
-exports.updateIconBox = async (req, res) => {
+exports.updateIconBox = async (req, res) => { 
 			await IconBoxModel.findByIdAndUpdate(
 				{ _id: req.params.id },
 				{ $set: req.body },
