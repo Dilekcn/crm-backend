@@ -25,6 +25,8 @@ const componentsRouter = require('./routes/components.routes');
 const parentMenuRouter =require('./routes/parentMenu.routes');
 const socialMediaRouter =require('./routes/socialMedia.routes');
 
+const companyProfileRouter = require('./routes/companyProfile.routes');
+
 //middlewares
 // const verifyToken = require('./auth/verifyToken');
 
@@ -64,6 +66,8 @@ app.use('/', rolesRouter);
 app.use('/', componentsRouter);
 app.use("/",parentMenuRouter);
 app.use("/",socialMediaRouter);
+
+app.use('/', companyProfileRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
