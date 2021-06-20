@@ -39,7 +39,7 @@ exports.create = async (req, res) => {
 		.then((response) =>
 			res.json({
 				status: true,
-				message: 'Added new company profile successfully.',
+				message: 'Added a new company profile successfully.',
 				response,
 			})
 		)
