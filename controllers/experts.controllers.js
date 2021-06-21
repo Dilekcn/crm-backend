@@ -1,6 +1,9 @@
 const mongoose = require('mongoose');
 const ExpertModel = require('../model/Expert.model');
 
+const SocialMediaModel = require('../model/SocialMedia.model');
+const MediaModel = require('../model/Media.model');
+
 exports.getAllExperts = async (req, res) => {
 	try {
 		const dataList = await ExpertModel.find();
@@ -11,21 +14,31 @@ exports.getAllExperts = async (req, res) => {
 };
 
 exports.createExpert = async (req, res) => {
-	const {
-		firstname,
-		lastname,
-		expertise,
-		mediaId,
-		socialMediaLinks,
-		isActive,
-		isDeleted,
-	} = req.body;
+	const newSocialMedia = await req.body.socialMediaId.map((sm) => {
+		return new SocialMedia({
+			title: sm[0] || null,
+			link: sm[1] || null,
+		});
+	});
+
+	newSocialMedia.map((sm) => sm.save());
+
+	const socialMediaIds = newSocialMedia.map((sm) => sm._id);
+
+	const newMedia = await MediaModel({
+		url: req.body.url || null,
+		title: req.body.title || null,
+		description: req.body.description || null,
+	});
+	newMedia.save();
+
+	const { firstname, lastname, expertise, isActive, isDeleted } = req.body;
 	const newExpert = await new ExpertModel({
 		firstname,
 		lastname,
 		expertise,
-		mediaId,
-		socialMediaLinks,
+		mediaId: newMedia._id,
+		socialMediaId: socialMediaIds,
 		isActive,
 		isDeleted,
 	});

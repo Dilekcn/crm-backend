@@ -37,14 +37,15 @@ exports.create = async (req, res) => {
 
 	const socialMediaIds = newSocialMedia.map((sm) => sm._id);
 
+	//for Single ObjectId
 	// const newSocialMediaId = await new SocialMediaId({
 	// 	title: req.body.title || null,
 	// 	link: req.body.link || null,
 	// });
 
-	const { name, logo, phones, address, email, isActive, isDeleted } = req.body;
-
 	// newSocialMediaId.save(newSocialMediaId);
+
+	const { name, logo, phones, address, email, isActive, isDeleted } = req.body;
 
 	const companyProfile = await new CompanyProfileModel({
 		name,
@@ -75,11 +76,29 @@ exports.update = async (req, res) => {
 		{ _id: req.params.id },
 		{ $set: req.body }
 	)
-		.then((data) =>
+		.then((companyprofile) => {
+			companyprofile.socialMediaId.map((socialMediaId) => {
+				SocialMedia.findByIdAndUpdate(
+					socialMediaId,
+					{
+						$set: {
+							'companyprofile.socialMediaId.$.title': req.body.title,
+							'companyprofile.socialMediaId.$.link': req.body.link,
+						},
+					},
+					{ useFindAndModify: false, new: true }
+				).then((newSocialMediaId) => {
+					console.log(req.body.title);
+					console.log(req.body.link);
+					res.json(newSocialMediaId);
+				});
+			});
+		})
+		.then((companyprofile) =>
 			res.json({
 				status: true,
 				message: 'Updated company profile successfully',
-				data,
+				companyprofile,
 			})
 		)
 		.catch((err) => res.json({ status: false, message: err }));
