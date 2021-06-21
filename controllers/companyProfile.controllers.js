@@ -1,10 +1,14 @@
 const mongoose = require('mongoose');
 
 const CompanyProfileModel = require('../model/CompanyProfile.model');
+const SocialMediaId = require('../model/SocialMedia.model');
 
 exports.getAll = async (req, res) => {
 	try {
-		const response = await CompanyProfileModel.find();
+		const response = await CompanyProfileModel.find().populate(
+			'socialMediaId',
+			'title link'
+		);
 		res.json(response);
 	} catch (error) {
 		res.status(500).json(error);
@@ -22,13 +26,37 @@ exports.getSingle = async (req, res) => {
 };
 
 exports.create = async (req, res) => {
-	const { logo, phones, address, socialMediaId, email, isActive, isDeleted } = req.body;
+	const sm = req.body.sm;
+
+	const smArray = await sm.map((sm, index) => {
+		return (index = new SocialMediaId({
+			title: sm[0] || null,
+			link: sm[1] || null,
+		}));
+	});
+
+	smArray.map((sm) => sm.save());
+
+	console.log(sm);
+	console.log(smArray);
+	console.log(smArray.map((sm) => sm._id));
+
+	const smIDs = smArray.map((sm) => sm._id);
+
+	// const newSocialMediaId = await new SocialMediaId({
+	// 	title: req.body.title || null,
+	// 	link: req.body.link || null,
+	// });
+
+	const { logo, phones, address, email, isActive, isDeleted } = req.body;
+
+	// newSocialMediaId.save(newSocialMediaId);
 
 	const companyProfile = await new CompanyProfileModel({
 		logo,
 		phones,
 		address,
-		socialMediaId,
+		socialMediaId: smIDs,
 		email,
 		isActive,
 		isDeleted,
@@ -44,6 +72,7 @@ exports.create = async (req, res) => {
 			})
 		)
 		.catch((error) => res.json({ status: false, message: error }));
+	console.log(companyProfile);
 };
 
 exports.update = async (req, res) => {
