@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const ComponentModel = require('../model/Component');
+const ComponentModel = require('../model/Components.model');
 
 exports.getAllComponents = async (req, res) => {
 	try {
@@ -41,13 +41,12 @@ exports.getComponentByComponentId = async (req, res) => {
 };
 
 exports.createComponent = async (req, res) => {
-	const { name, componentId, description, isActive, isDeleted } = req.body;
+	const { title,subTitle, isActive, isDeleted } = req.body;
 	const newComponent = await new ComponentModel({
-		name,
-		componentId,
-		description,
+		title,
+		subTitle,
 		isActive,
-		isDeleted,
+		isDeleted
 	});
 
 	newComponent
