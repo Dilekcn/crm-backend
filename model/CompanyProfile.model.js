@@ -4,11 +4,12 @@ const Schema = mongoose.Schema;
 
 const CompanyProfileSchema = new Schema(
 	{
-		logo: { type: String },
-		phones: { type: Array },
-		address: { type: String },
-		socialMediaId: { type: Schema.Types.ObjectId, ref: 'media' },
-		email: { type: String },
+		name: String,
+		logo: String,
+		phones: Array,
+		address: String,
+		socialMediaId: [{ type: Schema.Types.ObjectId, ref: 'social' }],
+		email: String,
 		isActive: { type: Boolean, default: true },
 		isDeleted: { type: Boolean, default: false },
 	},
