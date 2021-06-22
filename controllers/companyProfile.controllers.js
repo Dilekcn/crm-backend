@@ -5,10 +5,9 @@ const SocialMedia = require('../model/SocialMedia.model');
 
 exports.getAll = async (req, res) => {
 	try {
-		const response = await CompanyProfileModel.find().populate(
-			'socialMediaId',
-			'title link'
-		);
+		const response = await CompanyProfileModel.find()
+			.sort({ createdAt: -1 })
+			.populate('socialMediaId', 'title link');
 		res.json(response);
 	} catch (error) {
 		res.status(500).json(error);
@@ -28,8 +27,8 @@ exports.getSingle = async (req, res) => {
 exports.create = async (req, res) => {
 	const newSocialMedia = await req.body.socialMediaId.map((sm) => {
 		return new SocialMedia({
-			title: sm[0] || null,
-			link: sm[1] || null,
+			title: sm.title || null,
+			link: sm.link || null,
 		});
 	});
 
@@ -79,6 +78,8 @@ exports.update = async (req, res) => {
 	)
 		.then(async (companyprofile) => {
 			await companyprofile.socialMediaId.map((socialMediaId, index) => {
+				console.log(socialMediaId);
+				console.log(req.body);
 				return SocialMedia.findByIdAndUpdate(
 					socialMediaId,
 					{

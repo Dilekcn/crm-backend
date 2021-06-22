@@ -20,8 +20,8 @@ exports.getAllExperts = async (req, res) => {
 exports.createExpert = async (req, res) => {
 	const newSocialMedia = await req.body.socialMediaId.map((sm) => {
 		return new SocialMediaModel({
-			title: sm[0] || null,
-			link: sm[1] || null,
+			title: sm.title || null,
+			link: sm.link || null,
 		});
 	});
 
@@ -103,32 +103,30 @@ exports.updateExpert = async (req, res) => {
 		{ _id: req.params.id },
 		{ $set: req.body },
 		{ useFindAndModify: false, new: true }
-	)
-		.then(async (expert) => {
-			await expert.socialMediaId.map((socialMediaId, index) => {
-				return SocialMedia.findByIdAndUpdate(
-					socialMediaId,
-					{
-						$set: {
-							title: req.body.socialMediaId[index].title,
-							link: req.body.socialMediaId[index].link,
-						},
+	).then(async (expert) => {
+		await expert.socialMediaId.map((socialMediaId, index) => {
+			return SocialMedia.findByIdAndUpdate(
+				socialMediaId,
+				{
+					$set: {
+						title: req.body.socialMediaId[index].title,
+						link: req.body.socialMediaId[index].link,
 					},
-					{ useFindAndModify: false, new: true }
-				).then((newSocialMediaId) => {
-					res.send(newSocialMediaId);
-				});
-			});
-		})
-		.then(async (expert) => {
-			await MediaModel.findByIdAndUpdate(expert.mediaId, {
-				$set: {
-					url: req.body.url,
-					title: req.body.title,
-					description: req.body.description,
 				},
+				{ useFindAndModify: false, new: true }
+			).then((newSocialMediaId) => {
+				res.send(newSocialMediaId);
 			});
-		})
+		});
+	});
+
+	await MediaModel.findByIdAndUpdate(expert.mediaId, {
+		$set: {
+			url: req.body.url,
+			title: req.body.title,
+			description: req.body.description,
+		},
+	})
 		.then((expert) =>
 			res.json({
 				status: true,
