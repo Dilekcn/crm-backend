@@ -114,9 +114,11 @@ exports.updateExpert = async (req, res) => {
 						},
 					},
 					{ useFindAndModify: false, new: true }
-				).then((newSocialMediaId) => {
-					res.send(newSocialMediaId);
-				});
+				)
+					.then((newSocialMediaId) => {
+						res.send(newSocialMediaId);
+					})
+					.catch((err) => console.log(err));
 			});
 			await MediaModel.findByIdAndUpdate(
 				expert.mediaId,
