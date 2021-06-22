@@ -74,23 +74,22 @@ exports.create = async (req, res) => {
 exports.update = async (req, res) => {
 	await CompanyProfileModel.findByIdAndUpdate(
 		{ _id: req.params.id },
-		{ $set: req.body }
+		{ $set: req.body },
+		{ useFindAndModify: false, new: true }
 	)
-		.then((companyprofile) => {
-			companyprofile.socialMediaId.map((socialMediaId) => {
-				SocialMedia.findByIdAndUpdate(
+		.then(async (companyprofile) => {
+			await companyprofile.socialMediaId.map((socialMediaId, index) => {
+				return SocialMedia.findByIdAndUpdate(
 					socialMediaId,
 					{
 						$set: {
-							'companyprofile.socialMediaId.$.title': req.body.title,
-							'companyprofile.socialMediaId.$.link': req.body.link,
+							title: req.body.socialMediaId[index].title,
+							link: req.body.socialMediaId[index].link,
 						},
 					},
 					{ useFindAndModify: false, new: true }
 				).then((newSocialMediaId) => {
-					console.log(req.body.title);
-					console.log(req.body.link);
-					res.json(newSocialMediaId);
+					res.send(newSocialMediaId);
 				});
 			});
 		})
