@@ -78,8 +78,8 @@ exports.update = async (req, res) => {
 	)
 		.then(async (companyprofile) => {
 			await companyprofile.socialMediaId.map((socialMediaId, index) => {
+				console.log(companyprofile.socialMediaId);
 				console.log(socialMediaId);
-				console.log(req.body);
 				return SocialMedia.findByIdAndUpdate(
 					socialMediaId,
 					{
