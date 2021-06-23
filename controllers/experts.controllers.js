@@ -24,16 +24,19 @@ exports.createExpert = async (req, res) => {
 		});
 	});
 
+	console.log(req.body);
+
 	newSocialMedia.map((sm) => sm.save());
 
 	const socialMediaIds = newSocialMedia.map((sm) => sm._id);
 
 	const newMedia = await MediaModel({
-		url: req.body.url || null,
-		title: req.body.title || null,
-		description: req.body.description || null,
+		url: req.body.mediaId.url || null,
+		title: req.body.mediaId.title || null,
+		description: req.body.mediaId.description || null,
 	});
-	newMedia.save(newMedia);
+
+	newMedia.save();
 
 	const { firstname, lastname, expertise, isActive, isDeleted } = req.body;
 	const newExpert = await new ExpertModel({
@@ -130,9 +133,11 @@ exports.updateExpert = async (req, res) => {
 					},
 				},
 				{ useFindAndModify: false, new: true }
-			).then((newMedia) => {
-				res.send(newMedia);
-			});
+			)
+				.then((newMedia) => {
+					res.send(newMedia);
+				})
+				.catch((err) => res.json({ message: err, status: false }));
 			res.send(expert);
 		})
 		.then((expert) =>

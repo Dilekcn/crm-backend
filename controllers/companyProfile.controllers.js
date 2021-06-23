@@ -32,6 +32,8 @@ exports.create = async (req, res) => {
 		});
 	});
 
+	console.log(req.body.socialMediaId);
+
 	newSocialMedia.map((sm) => sm.save());
 
 	const socialMediaIds = newSocialMedia.map((sm) => sm._id);
@@ -78,8 +80,6 @@ exports.update = async (req, res) => {
 	)
 		.then(async (companyprofile) => {
 			await companyprofile.socialMediaId.map((socialMediaId, index) => {
-				console.log(companyprofile.socialMediaId);
-				console.log(socialMediaId);
 				return SocialMedia.findByIdAndUpdate(
 					socialMediaId,
 					{
