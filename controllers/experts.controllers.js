@@ -38,7 +38,7 @@ exports.createExpert = async (req, res) => {
 
 	newMedia.save();
 
-	const { firstname, lastname, expertise, isActive, isDeleted } = req.body;
+	const { firstname, lastname,expertise, isActive, isDeleted } = req.body;
 	const newExpert = await new ExpertModel({
 		firstname,
 		lastname,
@@ -46,7 +46,8 @@ exports.createExpert = async (req, res) => {
 		mediaId: newMedia._id,
 		socialMediaId: socialMediaIds,
 		isActive,
-		isDeleted,
+		isDeleted
+		
 	});
 	newExpert
 		.save()

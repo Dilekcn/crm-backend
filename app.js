@@ -21,7 +21,7 @@ const staticPagesRouter = require('./routes/staticPage.routes');
 const menusRouter = require('./routes/menus.routes');
 const googleMapsRouter = require('./routes/googleMaps.routes');
 const rolesRouter = require('./routes/roles.routes');
-const componentsRouter = require('./routes/components.routes');
+
 const parentMenuRouter =require('./routes/parentMenu.routes');
 const socialMediaRouter =require('./routes/socialMedia.routes');
 
@@ -63,7 +63,7 @@ app.use('/', staticPagesRouter);
 app.use('/', menusRouter);
 app.use('/', googleMapsRouter);
 app.use('/', rolesRouter);
-app.use('/', componentsRouter);
+
 app.use("/",parentMenuRouter);
 app.use("/",socialMediaRouter);
 
