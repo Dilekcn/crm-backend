@@ -8,7 +8,7 @@ exports.getAllExperts = async (req, res) => {
 	try {
 		const dataList = await ExpertModel.find()
 			.sort({ createdAt: -1 })
-			.populate('socialMediaId', 'title link')
+			.populate('socialMediaId', 'title link description')
 			.populate('mediaId', 'url');
 		res.json(dataList);
 	} catch (error) {
@@ -24,15 +24,13 @@ exports.createExpert = async (req, res) => {
 		});
 	});
 
-	console.log(req.body);
-
 	newSocialMedia.map((sm) => sm.save());
 
 	const socialMediaIds = newSocialMedia.map((sm) => sm._id);
 
 	const newMedia = await MediaModel({
 		url: req.body.mediaId.url || null,
-		title: req.body.mediaId.title || null,
+		title: 'experts',
 		description: req.body.mediaId.description || null,
 	});
 
@@ -108,7 +106,6 @@ exports.updateExpert = async (req, res) => {
 	)
 		.then(async (expert) => {
 			await expert.socialMediaId.map((socialMediaId, index) => {
-				console.log(req.body);
 				return SocialMediaModel.findByIdAndUpdate(
 					socialMediaId,
 					{

@@ -3,11 +3,11 @@ const Schema = mongoose.Schema;
 
 const MenusSchema = new Schema(
 	{
-		parentId: { type: Schema.Types.ObjectId, required: true },
-		text: { type: String, required: true },
-		link: { type: String, required: true },
-		iconClassName: { type: String, required: true },
-		order: { type: Number, required: true },
+		parentId: { type: Number },
+		text: { type: String },
+		link: { type: String },
+		iconClassName: { type: String },
+		order: { type: Number },
 		isActive: { type: Boolean, default: true },
 		isDeleted: { type: Boolean, default: false },
 	},

@@ -4,21 +4,15 @@ const CompanyIntroductionModel = require('../model/CompanyIntroduction.model');
 exports.getAll = async (req, res) => {
 	try {
 		const response = await CompanyIntroductionModel.find();
-		res.json(response);CompanyIntroductionModel
+		res.json(response);
+		CompanyIntroductionModel;
 	} catch (error) {
 		res.status(500).json(error);
-	} 
+	}
 };
 
 exports.createIntroduction = async (req, res) => {
-	const {
-		title,
-		subTitle,
-		iconName,
-		shortDescription,
-		isActive,
-		isDeleted
-	} = req.body;
+	const { title, subTitle, iconName, shortDescription, isActive, isDeleted } = req.body;
 
 	const newIntroduction = await new CompanyIntroductionModel({
 		title,
@@ -26,7 +20,7 @@ exports.createIntroduction = async (req, res) => {
 		iconName,
 		shortDescription,
 		isActive,
-		isDeleted
+		isDeleted,
 	});
 	newIntroduction
 		.save()
@@ -35,7 +29,7 @@ exports.createIntroduction = async (req, res) => {
 				status: true,
 				message: 'Added new company introductions successfully.',
 				response,
-			}),
+			})
 		)
 		.catch((error) => res.json({ status: false, message: error }));
 };
@@ -63,7 +57,7 @@ exports.getSingleIntroductionByTitle = async (req, res) => {
 exports.updateIntroductions = async (req, res) => {
 	await CompanyIntroductionModel.findByIdAndUpdate(
 		{ _id: req.params.id },
-		{ $set: req.body },
+		{ $set: req.body }
 	)
 		.then((data) => res.json(data))
 		.catch((err) => res.json({ message: err }));
