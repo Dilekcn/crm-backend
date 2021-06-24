@@ -38,7 +38,7 @@ exports.createExpert = async (req, res) => {
 
 	newMedia.save();
 
-	const { firstname, lastname,expertise, isActive, isDeleted } = req.body;
+	const { firstname, lastname, expertise, isActive, isDeleted } = req.body;
 	const newExpert = await new ExpertModel({
 		firstname,
 		lastname,
@@ -46,8 +46,7 @@ exports.createExpert = async (req, res) => {
 		mediaId: newMedia._id,
 		socialMediaId: socialMediaIds,
 		isActive,
-		isDeleted
-		
+		isDeleted,
 	});
 	newExpert
 		.save()
@@ -109,6 +108,7 @@ exports.updateExpert = async (req, res) => {
 	)
 		.then(async (expert) => {
 			await expert.socialMediaId.map((socialMediaId, index) => {
+				console.log(req.body);
 				return SocialMediaModel.findByIdAndUpdate(
 					socialMediaId,
 					{
@@ -128,9 +128,9 @@ exports.updateExpert = async (req, res) => {
 				expert.mediaId,
 				{
 					$set: {
-						url: req.body.url,
-						title: req.body.title,
-						description: req.body.description,
+						url: req.body.mediaId.url,
+						title: req.body.mediaId.title,
+						description: req.body.mediaId.description,
 					},
 				},
 				{ useFindAndModify: false, new: true }
