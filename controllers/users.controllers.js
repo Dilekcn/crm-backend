@@ -15,7 +15,7 @@ exports.getAllUsers = async (req, res) => {
 exports.createUser = async (req, res) => {
 	const newMedia = await new MediaModel({
 		url: req.body.mediaId.url || null,
-		title: 'users',
+		title: 'user',
 		description: req.body.mediaId.description || null,
 	});
 
