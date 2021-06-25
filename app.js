@@ -8,7 +8,7 @@ const cors = require('cors');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users.routes');
-const postsRouter = require('./routes/posts.routes');
+
 const iconBoxRouter = require('./routes/iconBox.routes');
 const companyIntroductionRouter = require('./routes/companyIntroductions.routes');
 const sliderRouter = require('./routes/slider.routes');
@@ -21,8 +21,8 @@ const staticPagesRouter = require('./routes/staticPage.routes');
 const menusRouter = require('./routes/menus.routes');
 const googleMapsRouter = require('./routes/googleMaps.routes');
 const rolesRouter = require('./routes/roles.routes');
+const productsRouter =require('./routes/products.routes');
 
-const parentMenuRouter =require('./routes/parentMenu.routes');
 const socialMediaRouter =require('./routes/socialMedia.routes');
 
 const companyProfileRouter = require('./routes/companyProfile.routes');
@@ -50,8 +50,7 @@ app.use(cors());
 app.use('/', indexRouter);
 app.use('/', usersRouter);
 app.use('/', mediasRouter);
-app.use('/', postsRouter);
-app.use('/', postsRouter);
+
 app.use('/', iconBoxRouter);
 app.use('/', companyIntroductionRouter);
 app.use('/', sliderRouter);
@@ -63,11 +62,9 @@ app.use('/', staticPagesRouter);
 app.use('/', menusRouter);
 app.use('/', googleMapsRouter);
 app.use('/', rolesRouter);
-
-app.use("/",parentMenuRouter);
 app.use("/",socialMediaRouter);
-
 app.use('/', companyProfileRouter);
+app.use('/',productsRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
