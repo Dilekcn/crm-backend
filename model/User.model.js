@@ -7,10 +7,10 @@ const UserSchema = new Schema(
 		lastname: { type: String, required: true },
 		email: { type: String, required: true, unique: true },
 		password: { type: String, required: true },
-		roleId: mongoose.Schema.Types.ObjectId,
+		roleId: { type: Schema.Types.ObjectId, ref: 'role' },
 		isActive: { type: Boolean, default: true },
 		isDeleted: { type: Boolean, default: false },
-		//image ekle
+		mediaId: { type: Schema.Types.ObjectId, ref: 'media' },
 	},
 	{ timestamps: true }
 );

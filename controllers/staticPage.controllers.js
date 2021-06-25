@@ -37,7 +37,7 @@ exports.createPage = async (req, res) => {
 		.then((response) =>
 			res.json({
 				status: true,
-				message: 'Added new company introductions successfully.',
+				message: 'Added new static page successfully.',
 				response,
 			})
 		)
@@ -65,7 +65,11 @@ exports.getSinglePageByName = async (req, res) => {
 };
 
 exports.updatePages = async (req, res) => {
-	await StaticPageModel.findByIdAndUpdate({ _id: req.params.id }, { $set: req.body })
+	await StaticPageModel.findByIdAndUpdate(
+		{ _id: req.params.id },
+		{ $set: req.body },
+		{ useFindAndModify: false, new: true }
+	)
 		.then(async (staticpage) => {
 			await ImageModel.findByIdAndUpdate(
 				staticpage.imageId,
@@ -76,9 +80,16 @@ exports.updatePages = async (req, res) => {
 					},
 				},
 				{ useFindAndModify: false, new: true }
-			);
+			)
+				.then((newImage) => {
+					res.send(newImage);
+				})
+				.catch((err) => {
+					console.log(err);
+				});
+			res.send(staticpage);
 		})
-		.then((data) => res.json(data))
+		.then((data) => res.json({ message: 'Updated static page successfully', data }))
 		.catch((err) => res.json({ message: err }));
 };
 
