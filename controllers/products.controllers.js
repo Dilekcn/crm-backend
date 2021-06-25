@@ -1,10 +1,11 @@
 const mongoose = require('mongoose');
 const ProductModel = require('../model/Products.model');
-const Media =require('../model/Media.model')
-const User =require('../model/User.model')
- 
+const Media = require('../model/Media.model');
+
 exports.getAllProduct = (req, res) => {
 	ProductModel.find()
+		.populate('coverImageId', 'title url')
+		.populate('user', 'firstname lastname email')
 		.then((data) => {
 			res.json(data);
 		})
@@ -12,76 +13,42 @@ exports.getAllProduct = (req, res) => {
 			res.json(err);
 		});
 };
-// exports.createProduct = (req, res) => {
-// 	const newProduct = new ProductModel({
-// 		order: req.body.order,
-// 		coverImageId: req.body.coverImageId,
-// 		isHomePage: req.body.isHomePage,
-// 		title: req.body.title,
-// 		content: req.body.content,
-// 		shortDescription: req.body.shortDescription,
-// 		buttonText: req.body.buttonText,
-// 		userId: req.body.userId,
-// 		isActive: req.body.isActive,
-// 		isDeleted: req.body.isDeleted,
-// 		isBlog: req.body.isBlog,
-// 		isAboveFooter: req.body.isAboveFooter,
-// 	});
-
-// 	newProduct
-// 		.save()
-// 		.then((data) => {
-// 			res.json(data);
-// 		})
-// 		.catch((err) => {
-// 			res.json(err);
-// 		});
-// };
-/************************************* */
 
 exports.createProduct = async (req, res) => {
-	const newMedia = await  new Media({
-			url: req.body.url || null,
-			title: req.body.title || null,
-			description:req.body.description || null,
-		});
-
-
+	const newMedia = await new Media({
+		url: req.body.coverImageId.url || null,
+		title: 'products',
+		description: req.body.coverImageId.description || null,
+	});
 
 	newMedia.save();
 
 	const mediaIds = newMedia._id;
 
-/*****userId */
-const newUser = await new User({
-		firstname: req.body.firstname || null,
-		lastname: req.body.lastname || null,
-		email:req.body.email || null,
-		roleId:req.body.roleId || null,
-
-	});
-
-
-
-newUser.save();
-
-const UserIds = newUser._id;
-
-
-
-
-
-	const { title, order,coverImageId ,isHomePage,content,shortDescription,buttonText,userId, isActive, isDeleted,isBlog,isAboveFooter } = req.body;
-
-	const product = await new ProductModel({
+	const {
 		title,
-		order,	
-		coverImageId:mediaIds,
+		order,
+		coverImageId,
 		isHomePage,
 		content,
 		shortDescription,
 		buttonText,
-		userId:UserIds,
+		userId,
+		isActive,
+		isDeleted,
+		isBlog,
+		isAboveFooter,
+	} = req.body;
+
+	const product = await new ProductModel({
+		title,
+		order,
+		coverImageId: mediaIds,
+		isHomePage,
+		content,
+		shortDescription,
+		buttonText,
+		userId,
 		isActive,
 		isDeleted,
 		isBlog,
@@ -98,9 +65,7 @@ const UserIds = newUser._id;
 			})
 		)
 		.catch((error) => res.json({ status: false, message: error }));
-	
 };
-
 
 /************************************ */
 exports.deleteProduct = (req, res, next) => {
@@ -115,7 +80,23 @@ exports.deleteProduct = (req, res, next) => {
 };
 
 exports.updateSingleProduct = (req, res) => {
-	ProductModel.findByIdAndUpdate({ _id: req.params.productId }, { $set: req.body })
+	ProductModel.findByIdAndUpdate(
+		{ _id: req.params.productId },
+		{ $set: req.body },
+		{ useFindAndModify: false, new: true }
+	)
+		.then(async (product) => {
+			await Media.findByIdAndUpdate(
+				product.coverImageId,
+				{
+					$set: {
+						url: req.body.coverImageId.url,
+						description: req.body.coverImageId.description,
+					},
+				},
+				{ useFindAndModify: false, new: true }
+			);
+		})
 		.then((data) => res.json({ message: 'Product updated', status: true, data }))
 		.catch((err) => res.json({ message: err, status: false }));
 };
