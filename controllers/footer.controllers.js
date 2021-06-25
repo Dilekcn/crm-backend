@@ -1,4 +1,5 @@
 const FooterModel = require('../model/Footer.model')
+const SocialMediaModel = require('../model/SocialMedia.model');
 
 exports.getAll = (req, res) => {
     FooterModel.find()
@@ -14,13 +15,24 @@ exports.getSingleFooterById = (req, res) => {
     .catch(err => res.json({message: err, status:false}))
 }
 
-exports.createFooter = (req, res) => {
+exports.createFooter = async (req, res) => {
+    const newSocialMedia = await req.body.socialMediaId.map((sm) => {
+		return new SocialMediaModel({
+			title: sm.title || null,
+			link: sm.link || null,
+		});
+	});
+
+	newSocialMedia.map((sm) => sm.save());
+
+	const socialMediaIds = newSocialMedia.map((sm) => sm._id);
+
     const newFooter = new FooterModel({
         logo : req.body.logo,
         address : req.body.address,
         email : req.body.email,
         phone : req.body.phone,
-        socialMediaLinks : req.body.socialMediaLinks,
+        socialMediaLinks : socialMediaIds,
         copyright : req.body.copyright
     })
 

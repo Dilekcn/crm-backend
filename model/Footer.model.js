@@ -7,7 +7,7 @@ const FooterSchema = new Schema(
 		address: { type: String },
 		email: { type: String },
 		phone: { type: String },
-		socialMediaLinks: { type: Array, required: true },
+		socialMediaLinks: [{ type: Schema.Types.ObjectId, ref: 'social' }],
 		copyright: { type: String },
 	},
 	{ timestamps: true }
