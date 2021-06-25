@@ -3,8 +3,8 @@ const Schema = mongoose.Schema;
 
 const StaticPageSchema = new Schema(
 	{
-		name: { type: String, required: true, unique: true },
-		content: { type: String, required: true },
+		name: { type: String, unique: true },
+		content: String,
 		imageId: { type: Schema.Types.ObjectId, ref: 'media' },
 		isActive: { type: Boolean, default: true },
 		isDeleted: { type: Boolean, default: false },
