@@ -60,9 +60,9 @@ exports.updateFooterById = async (req, res) => {
 exports.removeFooterById = (req, res) => {
     const id = req.params.id
     FooterModel.findByIdAndDelete({_id:id}).then(async(data) => {
-       await data.socialMediaId.map(async(socialMediaid, index) => {
-           await SocialMediaModel.findByIdAndRemove({_id:socialMediaid})
-       })
+    //    await data.socialMediaId.map(async(socialMediaid, index) => {
+    //        await SocialMediaModel.findByIdAndRemove({_id:socialMediaid})
+    //    })
        res.json({status:true, data})
     }).catch(err => res.json({message: err, status:false}))
 }

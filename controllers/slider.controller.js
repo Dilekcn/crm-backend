@@ -108,10 +108,16 @@ exports.updateSlider = async (req, res) => {
 };
 
 exports.removeSlide = async (req, res) => {
+
 	await SliderModel.findByIdAndDelete({ _id: req.params.slideid })
-		.then(async(data) => {
-			await MediaModel.findByIdAndRemove({_id:data.mediaId}).then(data => data).catch(err => res.json(err))
-			return res.json(data)
-		})
+		.then((data) => res.json(data))
 		.catch((err) => res.json({ message: err }));
+
+
+	// await SliderModel.findByIdAndDelete({ _id: req.params.slideid })
+	// 	.then(async(data) => {
+	// 		await MediaModel.findByIdAndRemove({_id:data.mediaId}).then(data => data).catch(err => res.json(err))
+	// 		return res.json(data)
+	// 	})
+	// 	.catch((err) => res.json({ message: err }));
 };
