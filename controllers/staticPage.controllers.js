@@ -65,59 +65,38 @@ exports.getSinglePageByName = async (req, res) => {
 };
 
 exports.updatePages = async (req, res) => {
-
-	await StaticPageModel.findById({_id: req.params.id })
-		.then(async(data) => {
+	await StaticPageModel.findById({ _id: req.params.id })
+		.then(async (data) => {
 			const { name, content, isActive, isDeleted } = req.body;
-			await ImageModel.findByIdAndUpdate({_id: data.imageId}, {$set: {
-				url: req.body.imageId.url || null,
-				title: 'static-pages',
-				description: req.body.imageId.description || null,
-			}})
-			await StaticPageModel.findByIdAndUpdate({_id:req.params.id }, {$set: {
-				name,
-				content,
-				imageId: data.imageId,
-				isActive,
-				isDeleted,
-			}})
-				.then((data) => res.json({ message: 'Updated static page successfully', data }))
+			await ImageModel.findByIdAndUpdate(
+				{ _id: data.imageId },
+				{
+					$set: {
+						url: req.body.imageId.url || null,
+						title: 'static-pages',
+						description: req.body.imageId.description || null,
+					},
+				}
+			);
+			await StaticPageModel.findByIdAndUpdate(
+				{ _id: req.params.id },
+				{
+					$set: {
+						name,
+						content,
+						imageId: data.imageId,
+						isActive,
+						isDeleted,
+					},
+				}
+			)
+				.then((data) =>
+					res.json({ message: 'Updated static page successfully', data })
+				)
 				.catch((err) => res.json({ message: err }));
-		}).then(data => data)
-		.catch(err => res.json(err))
-
-
-
-
-
-
-
-	// await StaticPageModel.findByIdAndUpdate(
-	// 	{ _id: req.params.id },
-	// 	{ $set: req.body },
-	// 	{ useFindAndModify: false, new: true }
-	// )
-	// 	.then(async (staticpage) => {
-	// 		await ImageModel.findByIdAndUpdate(
-	// 			staticpage.imageId,
-	// 			{
-	// 				$set: {
-	// 					url: req.body.imageId.url,
-	// 					description: req.body.imageId.description,
-	// 				},
-	// 			},
-	// 			{ useFindAndModify: false, new: true }
-	// 		)
-	// 			.then((newImage) => {
-	// 				res.send(newImage);
-	// 			})
-	// 			.catch((err) => {
-	// 				console.log(err);
-	// 			});
-	// 		res.send(staticpage);
-	// 	})
-	// 	.then((data) => res.json({ message: 'Updated static page successfully', data }))
-	// 	.catch((err) => res.json({ message: err }));
+		})
+		.then((data) => data)
+		.catch((err) => res.json(err));
 };
 
 exports.removePage = async (req, res) => {
