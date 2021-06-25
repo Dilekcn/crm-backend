@@ -3,15 +3,15 @@ const Schema = mongoose.Schema;
 
 const SliderSchema = new Schema(
 	{
-		title: { type: String, required: true, unique: true },
-		subtitle: { type: String, required: true },
-		url: { type: String, required: true },
-		buttonText: { type: String, required: true },
-		order: { type: Number, required: true },
+		title: { type: String, unique: true },
+		subtitle: { type: String },
+		url: { type: String  },
+		buttonText: { type: String },
+		order: { type: Number },
 		isActive: { type: Boolean, default: true },
 		isDeleted: { type: Boolean, default: false },
-		mediaId: { type: String, required: true },
-		isVideo: { type: Boolean, required: true },
+		mediaId: { type: Schema.Types.ObjectId, ref:'media'},
+		isVideo: { type: Boolean, default:false },
 	},
 	{ timestamps: true },
 );

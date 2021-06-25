@@ -17,7 +17,6 @@ exports.createMedia = async (req, res) => {
 		isHomePage: req.body.isHomePage,
 		isActive: req.body.isActive,
 		isDeleted: req.body.isDeleted,
-		userId: req.body.userId,
 	});
 
 	newMovie
