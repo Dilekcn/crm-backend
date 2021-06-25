@@ -14,7 +14,7 @@ exports.getAllSlides = async (req, res) => {
 exports.createSlide = async (req, res) => {
 
 	const newMedia = await new MediaModel({
-		title: req.body.mediaId.title || 'slider',
+		title: 'slider',
 		url: req.body.mediaId.url || null,
 		description: req.body.mediaId.description || null
 	})

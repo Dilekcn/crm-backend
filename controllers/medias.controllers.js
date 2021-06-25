@@ -37,6 +37,18 @@ exports.getSingleMedia = async (req, res) => {
 	});
 };
 
+
+exports.getSingleMediaByTitle = async (req, res) => {
+	const title = req.params.title.toLowerCase()
+	await MediaModel.find({ title: title }, (err, data) => {
+		if (err) {
+			res.json({ message: err, status: false });
+		} else {
+			res.json({ data, status: true });
+		}
+	});
+};
+
 exports.updateSingleMedia = async (req, res) => {
 	await MediaModel.findByIdAndUpdate({ _id: req.params.mediaId }, { $set: req.body })
 		.then((data) => res.json({ message: 'Media updated', status: true, data }))
