@@ -19,6 +19,9 @@ exports.getAll = (req, res) => {
 exports.create = (req, res) => {
 	const newSubscriber = new SubscribersModel({
 		email: req.body.email,
+		name: req.body.email,
+		isActive: req.body.email,
+		isDeleted: req.body.email,
 	});
 
 	newSubscriber

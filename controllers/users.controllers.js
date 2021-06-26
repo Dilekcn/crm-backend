@@ -32,9 +32,9 @@ exports.createUser = async (req, res) => {
 		email: email,
 		isActive: isActive,
 		isDeleted: isDeleted,
-		roleId,
 		password: hashedPassword,
 		mediaId: newMedia._id,
+		roleId: roleId,
 	});
 	newUser
 		.save()
