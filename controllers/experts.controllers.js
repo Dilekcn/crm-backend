@@ -99,56 +99,59 @@ exports.getExpertsByExpertise = async (req, res) => {
 };
 
 exports.updateExpert = async (req, res) => {
-	await ExpertModel.findByIdAndUpdate(
-		{ _id: req.params.expertid },
-		{ $set: req.body },
-		{ useFindAndModify: false, new: true }
-	)
+	await ExpertModel.findById({ _id: req.params.expertid })
 		.then(async (expert) => {
-			await expert.socialMediaId.map((socialMediaId, index) => {
-				return SocialMediaModel.findByIdAndUpdate(
-					socialMediaId,
-					{
-						$set: {
-							title: req.body.socialMediaId[index].title,
-							link: req.body.socialMediaId[index].link,
-						},
-					},
-					{ useFindAndModify: false, new: true }
-				)
-					.then((newSocialMediaId) => {
-						res.send(newSocialMediaId);
-					})
-					.catch((err) => console.log(err));
-			});
 			await MediaModel.findByIdAndUpdate(
-				expert.mediaId,
+				{ _id: expert.mediaId },
 				{
 					$set: {
-						url: req.body.mediaId.url,
-						description: req.body.mediaId.description,
+						url: req.body.mediaId.url || null,
+						title: 'experts',
+						description: req.body.mediaId.description || null,
 					},
 				},
 				{ useFindAndModify: false, new: true }
+			);
+			await expert.socialMediaId.map(async (SMId, index) => {
+				await SocialMediaModel.findByIdAndUpdate(
+					{ _id: SMId },
+					{
+						$set: req.body.socialMediaId[index],
+					},
+					{ useFindAndModify: false, new: true }
+				);
+			});
+
+			const { firstname, lastname, expertise } = req.body;
+			await ExpertModel.findByIdAndUpdate(
+				{ _id: req.params.expertid },
+				{
+					firstname,
+					lastname,
+					expertise,
+					mediaId: expert.mediaId,
+					socialMediaId: expert.socialMediaId,
+					isActive: !req.body.isActive ? true : req.body.isActive,
+					isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
+				},
+				{ useFindAndModify: false, new: true }
 			)
-				.then((newMedia) => {
-					res.send(newMedia);
-				})
-				.catch((err) => res.json({ message: err, status: false }));
-			res.send(expert);
+
+				.then((data) =>
+					res.json({ message: 'Expert is updated successfully', data })
+				)
+				.catch((err) => res.json({ message: err }));
 		})
-		.then((expert) =>
-			res.json({
-				status: true,
-				message: 'Updated expert successfully',
-				expert,
-			})
-		)
-		.catch((err) => res.json({ status: false, message: err }));
+		.then((data) => res.json(data))
+		.catch((err) => res.json({ message: err }));
 };
 
 exports.removeExpert = async (req, res) => {
 	await ExpertModel.findByIdAndDelete({ _id: req.params.expertid })
-		.then((data) => res.json(data))
-		.catch((err) => res.json({ message: err }));
+		.then((data) => {
+			res.json({ message: 'Expert is deleted successfully', data });
+		})
+		.catch((err) => {
+			res.json({ message: err });
+		});
 };

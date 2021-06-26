@@ -21,7 +21,7 @@ exports.createUser = async (req, res) => {
 
 	newMedia.save();
 
-	const { firstname, lastname, email, password, isActive, isDeleted, roleId, mediaId } =
+	const { firstname, lastname, email, password, isActive, isDeleted, roleId } =
 		req.body;
 	const salt = await bcrypt.genSalt();
 	const hashedPassword = await bcrypt.hash(password, salt);
@@ -71,35 +71,48 @@ exports.login = async (req, res) => {
 };
 
 exports.updateUser = async (req, res) => {
-	await UserModel.findByIdAndUpdate(
-		{ _id: req.params.id },
-		{ $set: req.body },
-		{ useFindAndModify: false, new: true }
-	)
+	await UserModel.findById({ _id: req.params.id })
 		.then(async (user) => {
 			await MediaModel.findByIdAndUpdate(
-				user.mediaId,
+				{ _id: user.mediaId },
 				{
 					$set: {
-						url: req.body.imageId.url,
-						description: req.body.imageId.description,
+						url: req.body.mediaId.url,
+						title: 'users',
+						description: req.body.mediaId.description,
+					},
+				},
+				{ useFindAndModify: false, new: true }
+			);
+
+			const { firstname, lastname, email, password } = req.body;
+			await UserModel.findByIdAndUpdate(
+				{ _id: req.params.id },
+				{
+					$set: {
+						firstname,
+						lastname,
+						email,
+						password,
+						isActive: !req.body.isActive ? true : req.body.isActive,
+						isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
+						roleId: !req.body.roleId ? user.roleId : req.body.roleId,
+						mediaId: user.mediaId,
 					},
 				},
 				{ useFindAndModify: false, new: true }
 			)
-				.then((newImage) => {
-					res.send(newImage);
-				})
-				.catch((err) => {
-					console.log(err);
-				});
-			res.send(user);
+				.then((data) =>
+					res.json({ message: 'User is updated successfully', data })
+				)
+				.catch((err) => res.json({ message: err }));
 		})
-		.then((data) => res.json({ message: 'User is successfully updated.', data }))
-		.catch((err) => res.json({ message: err }));
+		.then((data) => data)
+		.catch((err) => res.json(err));
 };
+
 exports.deleteUser = async (req, res) => {
 	await UserModel.findByIdAndRemove({ _id: req.params.id })
-		.then((data) => res.json({ message: 'Successfully removed.', data }))
+		.then((data) => res.json({ message: 'User is removed successfully.', data }))
 		.catch((err) => res.json({ message: err }));
 };
