@@ -59,6 +59,7 @@ exports.createExpert = async (req, res) => {
 			newMedia.save();
 
 			const { firstname, lastname, expertise, isActive, isDeleted } = req.body;
+
 			const newExpert = await new ExpertModel({
 				firstname,
 				lastname,
