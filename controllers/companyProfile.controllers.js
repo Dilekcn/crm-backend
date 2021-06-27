@@ -8,7 +8,7 @@ exports.getAll = async (req, res) => {
 		const response = await CompanyProfileModel.find()
 			.sort({ createdAt: -1 })
 			.populate('socialMediaId', 'title link');
-		res.json(response);
+		res.json({ component_title: 'companyprofile', response });
 	} catch (error) {
 		res.status(500).json(error);
 	}

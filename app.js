@@ -23,9 +23,9 @@ const staticPagesRouter = require('./routes/staticPage.routes');
 const menusRouter = require('./routes/menus.routes');
 const googleMapsRouter = require('./routes/googleMaps.routes');
 const rolesRouter = require('./routes/roles.routes');
-const productsRouter =require('./routes/products.routes');
+const productsRouter = require('./routes/products.routes');
 
-const socialMediaRouter =require('./routes/socialMedia.routes');
+const socialMediaRouter = require('./routes/socialMedia.routes');
 
 const companyProfileRouter = require('./routes/companyProfile.routes');
 
@@ -69,9 +69,9 @@ app.use('/', staticPagesRouter);
 app.use('/', menusRouter);
 app.use('/', googleMapsRouter);
 app.use('/', rolesRouter);
-app.use("/",socialMediaRouter);
+app.use('/', socialMediaRouter);
 app.use('/', companyProfileRouter);
-app.use('/',productsRouter);
+app.use('/', productsRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

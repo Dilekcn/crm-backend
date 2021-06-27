@@ -1,8 +1,12 @@
 const mongoose = require('mongoose');
 const ExpertModel = require('../model/Expert.model');
-
 const SocialMediaModel = require('../model/SocialMedia.model');
 const MediaModel = require('../model/Media.model');
+const AWS = require('aws-sdk');
+require('dotenv').config();
+const Access_Key = process.env.Access_Key_ID;
+const Secret_Key = process.env.Secret_Access_Key;
+const Bucket_Name = process.env.Bucket_Name;
 
 exports.getAllExperts = async (req, res) => {
 	try {
@@ -28,34 +32,54 @@ exports.createExpert = async (req, res) => {
 
 	const socialMediaIds = newSocialMedia.map((sm) => sm._id);
 
-	const newMedia = await new MediaModel({
-		url: req.body.mediaId.url || null,
-		title: 'experts',
-		description: req.body.mediaId.description || null,
+	const mediaId = req.files.mediaId;
+
+	const s3 = new AWS.S3({
+		accessKeyId: Access_Key,
+		secretAccessKey: Secret_Key,
 	});
 
-	newMedia.save();
+	const params = {
+		Bucket: Bucket_Name,
+		Key: mediaId.name,
+		Body: mediaId.data,
+		ContentType: 'image/JPG',
+	};
 
-	const { firstname, lastname, expertise, isActive, isDeleted } = req.body;
-	const newExpert = await new ExpertModel({
-		firstname,
-		lastname,
-		expertise,
-		mediaId: newMedia._id,
-		socialMediaId: socialMediaIds,
-		isActive,
-		isDeleted,
+	await s3.upload(params, async (err, data) => {
+		if (err) {
+			console.log(err);
+		} else {
+			const newMedia = await new MediaModel({
+				url: req.body.mediaId.url || null,
+				title: 'experts',
+				description: req.body.mediaId.description || null,
+			});
+
+			newMedia.save();
+
+			const { firstname, lastname, expertise, isActive, isDeleted } = req.body;
+			const newExpert = await new ExpertModel({
+				firstname,
+				lastname,
+				expertise,
+				mediaId: newMedia._id,
+				socialMediaId: socialMediaIds,
+				isActive,
+				isDeleted,
+			});
+			newExpert
+				.save()
+				.then((response) =>
+					res.json({
+						status: true,
+						message: 'Added new expert successfully.',
+						response,
+					})
+				)
+				.catch((error) => res.json({ status: false, message: error }));
+		}
 	});
-	newExpert
-		.save()
-		.then((response) =>
-			res.json({
-				status: true,
-				message: 'Added new expert successfully.',
-				response,
-			})
-		)
-		.catch((error) => res.json({ status: false, message: error }));
 };
 
 exports.getSingleExpert = async (req, res) => {
