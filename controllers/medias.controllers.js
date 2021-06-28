@@ -104,7 +104,23 @@ exports.updateSingleMedia = async (req, res) => {
 };
 
 exports.removeSingleMedia = async (req, res) => {
-	await MediaModel.findByIdAndDelete({ _id: req.params.mediaId })
+	await MediaModel.findById({_id:req.params.mediaId}).then(async(response) => {
+		const s3 = new AWS.S3({
+			accessKeyId:Access_Key,
+			secretAccessKey:Secret_Key
+		})
+	
+		const params = {
+			Bucket:Bucket_Name,
+			Key:response.mediaKey,
+		}
+
+		s3.deleteObject(params).promise()
+
+		await MediaModel.findByIdAndDelete({ _id: req.params.mediaId })
 		.then((data) => res.json({ message: 'Media removed', status: true, data }))
 		.catch((err) => res.json({ message: err, status: false }));
+
+	}).catch((err) => res.json({ message: err, status: false }));
+	
 };
