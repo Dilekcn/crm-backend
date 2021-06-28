@@ -150,5 +150,5 @@ exports.updateExpert = async (req, res) => {
 exports.removeExpert = async (req, res) => {
 	await ExpertModel.findByIdAndDelete({ _id: req.params.expertid })
 		.then((data) => res.json(data))
-		.catch((err) => res.json({ message: err }));
+		.catch((err) => res.status(404).json({ message: err }));
 };
