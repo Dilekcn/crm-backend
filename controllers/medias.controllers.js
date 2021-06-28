@@ -4,6 +4,7 @@ require('dotenv').config()
 const Access_Key = process.env.Access_Key_ID
 const Secret_Key = process.env.Secret_Access_Key
 const Bucket_Name = process.env.Bucket_Name
+const uuid = require('uuid')
 
 exports.getAllMedia = async (req, res) => {
 	try {
@@ -25,7 +26,7 @@ exports.createMedia = async (req, res) => {
 
     const params = {
         Bucket:Bucket_Name,
-        Key:req.files.image.name,
+        Key:uuid(),
         Body:req.files.image.data,
         ContentType:'image/JPG'
     }
@@ -37,6 +38,7 @@ exports.createMedia = async (req, res) => {
             const newMedia = await new MediaModel({
                 url: data.Location,
 				title: req.body.title,
+				mediaKey:data.Key,
 				description: req.body.description,
 				isHomePage: req.body.isHomePage,
 				isActive: req.body.isActive,
@@ -72,9 +74,33 @@ exports.getSingleMediaByTitle = async (req, res) => {
 };
 
 exports.updateSingleMedia = async (req, res) => {
-	await MediaModel.findByIdAndUpdate({ _id: req.params.mediaId }, { $set: req.body })
-		.then((data) => res.json({ message: 'Media updated', status: true, data }))
-		.catch((err) => res.json({ message: err, status: false }));
+	await MediaModel.findById({_id: req.params.mediaId}).then(response => {
+		const s3 = new AWS.S3({
+			accessKeyId:Access_Key,
+			secretAccessKey:Secret_Key
+		})
+	
+		const params = {
+			Bucket:Bucket_Name,
+			Key:response.mediaKey,
+			Body:req.files.image.data,
+			ContentType:'image/JPG'
+		}
+
+		s3.upload(params, async(err, data) => {
+			await MediaModel.findByIdAndUpdate({ _id: req.params.mediaId }, { $set: {
+				url:data.Location,
+				mediaKey:data.Key,
+				title:req.body.title,
+				description:req.body.description,
+				isActive:req.body.isActive,
+				isDeleted:req.body.isDeleted
+			} })
+				.then((data) => res.json({ message: 'Media updated', status: true, data }))
+				.catch((err) => res.json({ message: err, status: false }));
+		})
+	}).catch((err) => res.json({ message: err, status: false }));
+	
 };
 
 exports.removeSingleMedia = async (req, res) => {
