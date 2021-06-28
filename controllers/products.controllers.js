@@ -43,7 +43,7 @@ s3.upload(params, async(err,data)=>{
 		const newMedia = await new Media({
 			url: data.Location || null,
 			title: 'products',
-			description: req.body.coverImageId.description || null,
+			description: JSON.parse(req.body.coverImageId.description) || null,
 		});
 	
 		newMedia.save();
