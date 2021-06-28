@@ -23,15 +23,8 @@ const staticPagesRouter = require('./routes/staticPage.routes');
 const menusRouter = require('./routes/menus.routes');
 const googleMapsRouter = require('./routes/googleMaps.routes');
 const rolesRouter = require('./routes/roles.routes');
-<<<<<<< HEAD
 const productsRouter =require('./routes/products.routes');
 const socialMediaRouter =require('./routes/socialMedia.routes');
-=======
-const productsRouter = require('./routes/products.routes');
-
-const socialMediaRouter = require('./routes/socialMedia.routes');
-
->>>>>>> a33ba7e003be18cf9337ef4de5bd2a002acb6211
 const companyProfileRouter = require('./routes/companyProfile.routes');
 const awsRouter = require('./routes/aws-imageupload.routes')
 
