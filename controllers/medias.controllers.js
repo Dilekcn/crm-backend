@@ -1,9 +1,6 @@
 const MediaModel = require('../model/Media.model');
-const AWS = require('aws-sdk')
-require('dotenv').config()
-const Access_Key = process.env.Access_Key_ID
-const Secret_Key = process.env.Secret_Access_Key
-const Bucket_Name = process.env.Bucket_Name
+const S3 = require('../config/aws.s3.config')
+
 
 exports.getAllMedia = async (req, res) => {
 	try {
@@ -15,38 +12,20 @@ exports.getAllMedia = async (req, res) => {
 };
 
 exports.createMedia = async (req, res) => {
-
-	const files = req.files.image
-    
-    const s3 = new AWS.S3({
-        accessKeyId:Access_Key,
-        secretAccessKey:Secret_Key
-    })
-
-    const params = {
-        Bucket:Bucket_Name,
-        Key:req.files.image.name,
-        Body:req.files.image.data,
-        ContentType:'image/JPG'
-    }
-
-	s3.upload(params, async (err, data) => {
-        if(err) {
-            res.json(err)
-        } else {
-            const newMedia = await new MediaModel({
-                url: data.Location,
-				title: req.body.title,
-				description: req.body.description,
-				isHomePage: req.body.isHomePage,
-				isActive: req.body.isActive,
-				isDeleted: req.body.isDeleted,
-            })
-        
-            newMedia.save().then(response => res.json({message:'Media Created', status:true, response})).catch(err => res.json({message:err, status:false}))
-        }
-    })
-
+	const data = async(data) => {
+		const newMedia = await new MediaModel({
+			url: data.Location,
+			title: req.body.title,
+			mediaKey:data.Key,
+			description: req.body.description,
+			isHomePage: req.body.isHomePage,
+			isActive: req.body.isActive,
+			isDeleted: req.body.isDeleted,
+		})
+	
+		newMedia.save().then(response => res.json({message:'Media Created', status:true, response})).catch(err => res.json({message:err, status:false}))
+	}
+	await S3.uploadNewMedia(req, res, data)
 };
 
 exports.getSingleMedia = async (req, res) => {
@@ -72,13 +51,31 @@ exports.getSingleMediaByTitle = async (req, res) => {
 };
 
 exports.updateSingleMedia = async (req, res) => {
-	await MediaModel.findByIdAndUpdate({ _id: req.params.mediaId }, { $set: req.body })
-		.then((data) => res.json({ message: 'Media updated', status: true, data }))
-		.catch((err) => res.json({ message: err, status: false }));
+	await MediaModel.findById({_id: req.params.mediaId}).then(async(response) => {
+		const data = async( data) => {
+			await MediaModel.findByIdAndUpdate({ _id: req.params.mediaId }, { $set: {
+				url:data.Location,
+				mediaKey:data.Key,
+				title:req.body.title,
+				description:req.body.description,
+				isActive:req.body.isActive,
+				isDeleted:req.body.isDeleted
+			} })
+				.then((data) => res.json({ message: 'Media updated', status: true, data }))
+				.catch((err) => res.json({ message: err, status: false }));
+		}
+		await S3.updateMedia(req, res, response.mediaKey, data)
+	}).catch((err) => res.json({ message: err, status: false }));
+	
 };
 
 exports.removeSingleMedia = async (req, res) => {
-	await MediaModel.findByIdAndDelete({ _id: req.params.mediaId })
+	await MediaModel.findById({_id:req.params.mediaId}).then(async(response) => {
+		S3.deleteMedia(response.mediaKey)
+		await MediaModel.findByIdAndDelete({ _id: req.params.mediaId })
 		.then((data) => res.json({ message: 'Media removed', status: true, data }))
 		.catch((err) => res.json({ message: err, status: false }));
+
+	}).catch((err) => res.json({ message: err, status: false }));
+	
 };

@@ -23,11 +23,10 @@ const staticPagesRouter = require('./routes/staticPage.routes');
 const menusRouter = require('./routes/menus.routes');
 const googleMapsRouter = require('./routes/googleMaps.routes');
 const rolesRouter = require('./routes/roles.routes');
-const productsRouter = require('./routes/products.routes');
-
-const socialMediaRouter = require('./routes/socialMedia.routes');
-
+const productsRouter =require('./routes/products.routes');
+const socialMediaRouter =require('./routes/socialMedia.routes');
 const companyProfileRouter = require('./routes/companyProfile.routes');
+const awsRouter = require('./routes/aws-imageupload.routes')
 
 //middlewares
 // const verifyToken = require('./auth/verifyToken');

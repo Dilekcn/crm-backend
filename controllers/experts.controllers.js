@@ -51,7 +51,7 @@ exports.createExpert = async (req, res) => {
 			console.log(err);
 		} else {
 			const newMedia = await new MediaModel({
-				url: req.body.mediaId.url || null,
+				url: data.Location || null,
 				title: 'experts',
 				description: req.body.mediaId.description || null,
 			});
