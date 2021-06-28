@@ -4,6 +4,7 @@ const Media = require('../model/Media.model');
 
 exports.getAllProduct = (req, res) => {
 	ProductModel.find()
+	    .sort({ createdAt: -1 })
 		.populate('coverImageId', 'title url')
 		.populate('user', 'firstname lastname email')
 		.then((data) => {
