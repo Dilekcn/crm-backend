@@ -1,8 +1,12 @@
 const mongoose = require('mongoose');
 const ExpertModel = require('../model/Expert.model');
-
 const SocialMediaModel = require('../model/SocialMedia.model');
 const MediaModel = require('../model/Media.model');
+const AWS = require('aws-sdk');
+require('dotenv').config();
+const Access_Key = process.env.Access_Key_ID;
+const Secret_Key = process.env.Secret_Access_Key;
+const Bucket_Name = process.env.Bucket_Name;
 
 exports.getAllExperts = async (req, res) => {
 	try {
@@ -28,34 +32,55 @@ exports.createExpert = async (req, res) => {
 
 	const socialMediaIds = newSocialMedia.map((sm) => sm._id);
 
-	const newMedia = await new MediaModel({
-		url: req.body.mediaId.url || null,
-		title: 'experts',
-		description: req.body.mediaId.description || null,
+	const mediaId = req.files.mediaId;
+
+	const s3 = new AWS.S3({
+		accessKeyId: Access_Key,
+		secretAccessKey: Secret_Key,
 	});
 
-	newMedia.save();
+	const params = {
+		Bucket: Bucket_Name,
+		Key: mediaId.name,
+		Body: mediaId.data,
+		ContentType: 'image/JPG',
+	};
 
-	const { firstname, lastname, expertise, isActive, isDeleted } = req.body;
-	const newExpert = await new ExpertModel({
-		firstname,
-		lastname,
-		expertise,
-		mediaId: newMedia._id,
-		socialMediaId: socialMediaIds,
-		isActive,
-		isDeleted,
+	await s3.upload(params, async (err, data) => {
+		if (err) {
+			console.log(err);
+		} else {
+			const newMedia = await new MediaModel({
+				url: req.body.mediaId.url || null,
+				title: 'experts',
+				description: req.body.mediaId.description || null,
+			});
+
+			newMedia.save();
+
+			const { firstname, lastname, expertise, isActive, isDeleted } = req.body;
+
+			const newExpert = await new ExpertModel({
+				firstname,
+				lastname,
+				expertise,
+				mediaId: newMedia._id,
+				socialMediaId: socialMediaIds,
+				isActive,
+				isDeleted,
+			});
+			newExpert
+				.save()
+				.then((response) =>
+					res.json({
+						status: true,
+						message: 'Added new expert successfully.',
+						response,
+					})
+				)
+				.catch((error) => res.json({ status: false, message: error }));
+		}
 	});
-	newExpert
-		.save()
-		.then((response) =>
-			res.json({
-				status: true,
-				message: 'Added new expert successfully.',
-				response,
-			})
-		)
-		.catch((error) => res.json({ status: false, message: error }));
 };
 
 exports.getSingleExpert = async (req, res) => {
@@ -99,56 +124,64 @@ exports.getExpertsByExpertise = async (req, res) => {
 };
 
 exports.updateExpert = async (req, res) => {
-	await ExpertModel.findByIdAndUpdate(
-		{ _id: req.params.expertid },
-		{ $set: req.body },
-		{ useFindAndModify: false, new: true }
-	)
+	await ExpertModel.findById({ _id: req.params.expertid })
 		.then(async (expert) => {
-			await expert.socialMediaId.map((socialMediaId, index) => {
-				return SocialMediaModel.findByIdAndUpdate(
-					socialMediaId,
-					{
-						$set: {
-							title: req.body.socialMediaId[index].title,
-							link: req.body.socialMediaId[index].link,
-						},
-					},
-					{ useFindAndModify: false, new: true }
-				)
-					.then((newSocialMediaId) => {
-						res.send(newSocialMediaId);
-					})
-					.catch((err) => console.log(err));
-			});
 			await MediaModel.findByIdAndUpdate(
-				expert.mediaId,
+				{ _id: expert.mediaId },
 				{
 					$set: {
-						url: req.body.mediaId.url,
-						description: req.body.mediaId.description,
+						url: req.body.mediaId.url || null,
+						title: 'experts',
+						description: req.body.mediaId.description || null,
 					},
 				},
 				{ useFindAndModify: false, new: true }
+			);
+			await expert.socialMediaId.map(async (SMId, index) => {
+				await SocialMediaModel.findByIdAndUpdate(
+					{ _id: SMId },
+					{
+						$set: req.body.socialMediaId[index],
+					},
+					{ useFindAndModify: false, new: true }
+				);
+			});
+
+			const { firstname, lastname, expertise } = req.body;
+			await ExpertModel.findByIdAndUpdate(
+				{ _id: req.params.expertid },
+				{
+					firstname,
+					lastname,
+					expertise,
+					mediaId: expert.mediaId,
+					socialMediaId: expert.socialMediaId,
+					isActive: !req.body.isActive ? true : req.body.isActive,
+					isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
+				},
+				{ useFindAndModify: false, new: true }
 			)
-				.then((newMedia) => {
-					res.send(newMedia);
-				})
-				.catch((err) => res.json({ message: err, status: false }));
-			res.send(expert);
+
+				.then((data) =>
+					res.json({ message: 'Expert is updated successfully', data })
+				)
+				.catch((err) => res.json({ message: err }));
 		})
-		.then((expert) =>
-			res.json({
-				status: true,
-				message: 'Updated expert successfully',
-				expert,
-			})
-		)
-		.catch((err) => res.json({ status: false, message: err }));
+		.then((data) => res.json(data))
+		.catch((err) => res.json({ message: err }));
 };
 
 exports.removeExpert = async (req, res) => {
 	await ExpertModel.findByIdAndDelete({ _id: req.params.expertid })
+<<<<<<< HEAD
 		.then((data) => res.json(data))
 		.catch((err) => res.status(404).json({ message: err }));
+=======
+		.then((data) => {
+			res.json({ message: 'Expert is deleted successfully', data });
+		})
+		.catch((err) => {
+			res.json({ message: err });
+		});
+>>>>>>> a33ba7e003be18cf9337ef4de5bd2a002acb6211
 };

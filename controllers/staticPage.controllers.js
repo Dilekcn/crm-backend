@@ -91,7 +91,7 @@ exports.updatePages = async (req, res) => {
 				}
 			)
 				.then((data) =>
-					res.json({ message: 'Updated static page successfully', data })
+					res.json({ message: 'Static page is updated  successfully', data })
 				)
 				.catch((err) => res.json({ message: err }));
 		})

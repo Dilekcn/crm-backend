@@ -8,7 +8,7 @@ exports.getAll = async (req, res) => {
 		const response = await CompanyProfileModel.find()
 			.sort({ createdAt: -1 })
 			.populate('socialMediaId', 'title link');
-		res.json(response);
+		res.json({ component_title: 'companyprofile', response });
 	} catch (error) {
 		res.status(500).json(error);
 	}
@@ -38,14 +38,6 @@ exports.create = async (req, res) => {
 
 	const socialMediaIds = newSocialMedia.map((sm) => sm._id);
 
-	//for Single ObjectId
-	// const newSocialMediaId = await new SocialMediaId({
-	// 	title: req.body.title || null,
-	// 	link: req.body.link || null,
-	// });
-
-	// newSocialMediaId.save(newSocialMediaId);
-
 	const { name, logo, phones, address, email, isActive, isDeleted } = req.body;
 
 	const companyProfile = await new CompanyProfileModel({
@@ -73,35 +65,44 @@ exports.create = async (req, res) => {
 };
 
 exports.update = async (req, res) => {
-	await CompanyProfileModel.findByIdAndUpdate(
-		{ _id: req.params.id },
-		{ $set: req.body },
-		{ useFindAndModify: false, new: true }
-	)
+	await CompanyProfileModel.findById({ _id: req.params.id })
 		.then(async (companyprofile) => {
-			await companyprofile.socialMediaId.map((socialMediaId, index) => {
-				return SocialMedia.findByIdAndUpdate(
-					socialMediaId,
+			await companyprofile.socialMediaId.map(async (SMId, index) => {
+				await SocialMedia.findByIdAndUpdate(
+					{ _id: SMId },
 					{
-						$set: {
-							title: req.body.socialMediaId[index].title,
-							link: req.body.socialMediaId[index].link,
-						},
+						$set: req.body.socialMediaId[index],
 					},
 					{ useFindAndModify: false, new: true }
-				).then((newSocialMediaId) => {
-					res.send(newSocialMediaId);
-				});
+				);
 			});
+
+			const { name, logo, phones, address, email } = req.body;
+
+			await CompanyProfileModel.findByIdAndUpdate(
+				{ _id: req.params.id },
+				{
+					name,
+					logo,
+					phones,
+					address,
+					socialMediaId: companyprofile.socialMediaId,
+					email,
+					isActive: !req.body.isActive ? true : req.body.isActive,
+					isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
+				}
+			)
+				.then((companyprofile) =>
+					res.json({
+						status: true,
+						message: 'Company profile is updated successfully',
+						companyprofile,
+					})
+				)
+				.catch((err) => res.json({ status: false, message: err }));
 		})
-		.then((companyprofile) =>
-			res.json({
-				status: true,
-				message: 'Updated company profile successfully',
-				companyprofile,
-			})
-		)
-		.catch((err) => res.json({ status: false, message: err }));
+		.then((data) => res.json(data))
+		.catch((err) => res.json({ message: err }));
 };
 
 exports.delete = async (req, res) => {
@@ -109,7 +110,7 @@ exports.delete = async (req, res) => {
 		.then((data) =>
 			res.json({
 				status: true,
-				message: 'Deleted company profile successfully',
+				message: 'Company profile is deleted successfully',
 				data,
 			})
 		)

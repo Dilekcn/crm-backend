@@ -1,4 +1,9 @@
 const MediaModel = require('../model/Media.model');
+const AWS = require('aws-sdk')
+require('dotenv').config()
+const Access_Key = process.env.Access_Key_ID
+const Secret_Key = process.env.Secret_Access_Key
+const Bucket_Name = process.env.Bucket_Name
 
 exports.getAllMedia = async (req, res) => {
 	try {
@@ -10,21 +15,38 @@ exports.getAllMedia = async (req, res) => {
 };
 
 exports.createMedia = async (req, res) => {
-	const newMovie = await new MediaModel({
-		url: req.body.url,
-		title: req.body.title,
-		description: req.body.description,
-		isHomePage: req.body.isHomePage,
-		isActive: req.body.isActive,
-		isDeleted: req.body.isDeleted,
-	});
 
-	newMovie
-		.save()
-		.then((response) =>
-			res.json({ message: 'Media Created', status: true, response })
-		)
-		.catch((err) => res.json({ message: err, status: false }));
+	const files = req.files.image
+    
+    const s3 = new AWS.S3({
+        accessKeyId:Access_Key,
+        secretAccessKey:Secret_Key
+    })
+
+    const params = {
+        Bucket:Bucket_Name,
+        Key:req.files.image.name,
+        Body:req.files.image.data,
+        ContentType:'image/JPG'
+    }
+
+	s3.upload(params, async (err, data) => {
+        if(err) {
+            res.json(err)
+        } else {
+            const newMedia = await new MediaModel({
+                url: data.Location,
+				title: req.body.title,
+				description: req.body.description,
+				isHomePage: req.body.isHomePage,
+				isActive: req.body.isActive,
+				isDeleted: req.body.isDeleted,
+            })
+        
+            newMedia.save().then(response => res.json({message:'Media Created', status:true, response})).catch(err => res.json({message:err, status:false}))
+        }
+    })
+
 };
 
 exports.getSingleMedia = async (req, res) => {
