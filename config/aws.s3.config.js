@@ -21,7 +21,6 @@ const uploadNewMedia = (req, res, callback) => {
         if(err) return res.json(err)
          callback(data)
     })
-   
 }
 
 const updateMedia = (req, res, mediaKey, callback) => {
@@ -32,7 +31,7 @@ const updateMedia = (req, res, mediaKey, callback) => {
         ContentType:'image/JPG'
     }
     S3.upload(params, (err, data) => {
-        if(err) return res.json(err)
+        if(err) return res.json({message: 'error from aws update', err})
          callback(data)
     })
 }
