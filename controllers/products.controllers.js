@@ -2,11 +2,11 @@ const mongoose = require('mongoose');
 const ProductModel = require('../model/Products.model');
 const Media = require('../model/Media.model');
 
-const S3 = require('../config/aws.s3.config')
+const S3 = require('../config/aws.s3.config');
 
 exports.getAllProduct = (req, res) => {
 	ProductModel.find()
-	    .sort({ createdAt: -1 })
+		.sort({ createdAt: -1 })
 		.populate('coverImageId', 'title url description')
 		.populate('user', 'firstname lastname email')
 		.then((data) => {
@@ -18,21 +18,18 @@ exports.getAllProduct = (req, res) => {
 };
 
 exports.createProduct = async (req, res) => {
-
-
-	const data = async(data)=>{
-		console.log(data)
+	const data = async (data) => {
+		console.log(data);
 		const newMedia = await new Media({
 			url: data.Location || null,
 			title: 'products',
-			mediaKey:data.Key,
-			 description: req.body.coverImageId.description || null,
+			mediaKey: data.Key,
 		});
-	
+
 		newMedia.save();
-	
+
 		const mediaIds = newMedia._id;
-	
+
 		const {
 			title,
 			order,
@@ -47,7 +44,7 @@ exports.createProduct = async (req, res) => {
 			isBlog,
 			isAboveFooter,
 		} = req.body;
-	
+
 		const product = await new ProductModel({
 			title,
 			order,
@@ -62,7 +59,7 @@ exports.createProduct = async (req, res) => {
 			isBlog,
 			isAboveFooter,
 		});
-	
+
 		product
 			.save()
 			.then((response) =>
@@ -73,12 +70,8 @@ exports.createProduct = async (req, res) => {
 				})
 			)
 			.catch((error) => res.json({ status: false, message: error }));
-
-	}
-	await S3.uploadNewMedia(req, res, data)
-
-
-
+	};
+	await S3.uploadNewMedia(req, res, data);
 };
 
 /************************************ */
@@ -105,7 +98,6 @@ exports.updateSingleProduct = (req, res) => {
 				{
 					$set: {
 						url: req.body.coverImageId.url,
-						description: req.body.coverImageId.description,
 					},
 				},
 				{ useFindAndModify: false, new: true }

@@ -2,11 +2,7 @@ const UserModel = require('../model/User.model');
 const MediaModel = require('../model/Media.model');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const AWS = require('aws-sdk');
-require('dotenv').config();
-const Access_Key = process.env.Access_Key_ID;
-const Secret_Key = process.env.Secret_Access_Key;
-const Bucket_Name = process.env.Bucket_Name;
+const S3 = require('../config/aws.s3.config');
 
 exports.getAllUsers = async (req, res) => {
 	await UserModel.find()
@@ -17,55 +13,38 @@ exports.getAllUsers = async (req, res) => {
 };
 
 exports.createUser = async (req, res) => {
-	const mediaId = req.files.mediaId;
+	const data = async (data) => {
+		const newMedia = await new MediaModel({
+			url: req.body.mediaId.url || null,
+			title: 'users',
+			mediaKey: data.Key,
+		});
 
-	const s3 = new AWS.S3({
-		accessKeyId: Access_Key,
-		secretAccessKey: Secret_Key,
-	});
+		newMedia.save();
 
-	const params = {
-		Bucket: Bucket_Name,
-		Key: mediaId.name,
-		Body: mediaId.data,
-		ContentType: 'image/JPG',
+		const { firstname, lastname, email, password, isActive, isDeleted, roleId } =
+			req.body;
+		const salt = await bcrypt.genSalt();
+		const hashedPassword = await bcrypt.hash(password, salt);
+
+		const newUser = await new UserModel({
+			firstname,
+			lastname,
+			email,
+			isActive,
+			isDeleted,
+			password: hashedPassword,
+			mediaId: newMedia._id,
+			roleId,
+		});
+		newUser
+			.save()
+			.then((data) =>
+				res.json({ status: true, message: 'Signed up successfully.', data })
+			)
+			.catch((err) => res.json({ status: false, message: err }));
 	};
-
-	await s3.upload(params, async (err, data) => {
-		if (err) {
-			console.log(err);
-		} else {
-			const newMedia = await new MediaModel({
-				url: req.body.mediaId.url || null,
-				title: 'users',
-				description: req.body.mediaId.description || null,
-			});
-
-			newMedia.save();
-
-			const { firstname, lastname, email, password, isActive, isDeleted, roleId } =
-				req.body;
-			const salt = await bcrypt.genSalt();
-			const hashedPassword = await bcrypt.hash(password, salt);
-
-			const newUser = await new UserModel({
-				firstname,
-				lastname,
-				email,
-				isActive,
-				isDeleted,
-				password: hashedPassword,
-				mediaId: newMedia._id,
-				roleId,
-			});
-			newUser
-				.save()
-				.then((data) =>
-					res.json({ status: true, message: 'Signed up successfully.', data })
-				)
-				.catch((err) => res.json({ status: false, message: err }));
-		}
-	});
+	await S3.uploadNewMedia(req, res, data);
 };
 
 exports.login = async (req, res) => {
@@ -103,7 +82,6 @@ exports.updateUser = async (req, res) => {
 					$set: {
 						url: req.body.mediaId.url,
 						title: 'users',
-						description: req.body.mediaId.description,
 					},
 				},
 				{ useFindAndModify: false, new: true }

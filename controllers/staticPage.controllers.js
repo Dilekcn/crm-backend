@@ -1,8 +1,7 @@
 const mongoose = require('mongoose');
 const StaticPageModel = require('../model/StaticPage.model');
 const ImageModel = require('../model/Media.model');
-const S3 = require('../config/aws.s3.config')
-
+const S3 = require('../config/aws.s3.config');
 
 exports.getAll = async (req, res) => {
 	try {
@@ -16,17 +15,17 @@ exports.getAll = async (req, res) => {
 };
 
 exports.createPage = async (req, res) => {
-	const data = async (data)=>{
+	const data = async (data) => {
 		const newImage = await new ImageModel({
 			url: data.Location || null,
 			title: 'static-pages',
-			description: req.body.imageId.description || null,
+			mediaKey: data.Key,
 		});
-	
+
 		newImage.save();
-	
+
 		const { name, content, isActive, isDeleted } = req.body;
-	
+
 		const newPage = await new StaticPageModel({
 			name,
 			content,
@@ -44,8 +43,8 @@ exports.createPage = async (req, res) => {
 				})
 			)
 			.catch((error) => res.json({ status: false, message: error }));
-	}
-	await S3.uploadNewMedia(req,res,data)
+	};
+	await S3.uploadNewMedia(req, res, data);
 };
 
 exports.getSinglePage = async (req, res) => {
