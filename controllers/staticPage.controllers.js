@@ -1,13 +1,14 @@
 const mongoose = require('mongoose');
 const StaticPageModel = require('../model/StaticPage.model');
-
 const ImageModel = require('../model/Media.model');
+const S3 = require('../config/aws.s3.config')
+
 
 exports.getAll = async (req, res) => {
 	try {
 		const response = await StaticPageModel.find()
 			.sort({ createdAt: -1 })
-			.populate('imageId', 'url title');
+			.populate('imageId', 'url title description');
 		res.json(response);
 	} catch (error) {
 		res.status(500).json(error);
@@ -15,33 +16,36 @@ exports.getAll = async (req, res) => {
 };
 
 exports.createPage = async (req, res) => {
-	const newImage = await new ImageModel({
-		url: req.body.imageId.url || null,
-		title: 'static-pages',
-		description: req.body.imageId.description || null,
-	});
-
-	newImage.save();
-
-	const { name, content, isActive, isDeleted } = req.body;
-
-	const newPage = await new StaticPageModel({
-		name,
-		content,
-		imageId: newImage._id,
-		isActive,
-		isDeleted,
-	});
-	newPage
-		.save()
-		.then((response) =>
-			res.json({
-				status: true,
-				message: 'Added new static page successfully.',
-				response,
-			})
-		)
-		.catch((error) => res.json({ status: false, message: error }));
+	const data = async (data)=>{
+		const newImage = await new ImageModel({
+			url: data.Location || null,
+			title: 'static-pages',
+			description: req.body.imageId.description || null,
+		});
+	
+		newImage.save();
+	
+		const { name, content, isActive, isDeleted } = req.body;
+	
+		const newPage = await new StaticPageModel({
+			name,
+			content,
+			imageId: newImage._id,
+			isActive,
+			isDeleted,
+		});
+		newPage
+			.save()
+			.then((response) =>
+				res.json({
+					status: true,
+					message: 'Added new static page successfully.',
+					response,
+				})
+			)
+			.catch((error) => res.json({ status: false, message: error }));
+	}
+	await S3.uploadNewMedia(req,res,data)
 };
 
 exports.getSinglePage = async (req, res) => {

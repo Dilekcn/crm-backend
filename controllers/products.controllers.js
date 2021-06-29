@@ -1,17 +1,13 @@
 const mongoose = require('mongoose');
 const ProductModel = require('../model/Products.model');
 const Media = require('../model/Media.model');
-const AWS = require('aws-sdk');
-require('dotenv').config();
-const Access_Key = process.env.Access_Key_ID;
-const Secret_Key = process.env.Secret_Access_Key;
-const Bucket_Name = process.env.Bucket_Name;
 
+const S3 = require('../config/aws.s3.config')
 
 exports.getAllProduct = (req, res) => {
 	ProductModel.find()
 	    .sort({ createdAt: -1 })
-		.populate('coverImageId', 'title url')
+		.populate('coverImageId', 'title url description')
 		.populate('user', 'firstname lastname email')
 		.then((data) => {
 			res.json(data);
@@ -22,28 +18,15 @@ exports.getAllProduct = (req, res) => {
 };
 
 exports.createProduct = async (req, res) => {
-	const files =req.files.image
-	
 
-const s3 = new AWS.S3({
-	accessKeyId:Access_Key,
-	secretAccessKey:Secret_Key
-})
-const params={
-	 Bucket:Bucket_Name,
-	Key:req.files.image.name,
-	Body:req.files.image.data,
-	ContentType:'image/JPG'
-}
 
-s3.upload(params, async(err,data)=>{
-	if(err){
-		res.json(err)
-	}else{
+	const data = async(data)=>{
+		console.log(data)
 		const newMedia = await new Media({
 			url: data.Location || null,
 			title: 'products',
-			description: JSON.parse(req.body.coverImageId.description) || null,
+			mediaKey:data.Key,
+			 description: req.body.coverImageId.description || null,
 		});
 	
 		newMedia.save();
@@ -90,11 +73,9 @@ s3.upload(params, async(err,data)=>{
 				})
 			)
 			.catch((error) => res.json({ status: false, message: error }));
+
 	}
-	
-
-})
-
+	await S3.uploadNewMedia(req, res, data)
 
 
 
