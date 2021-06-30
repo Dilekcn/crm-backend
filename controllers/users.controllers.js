@@ -129,14 +129,20 @@ exports.updateUser = async (req, res) => {
 };
 
 exports.deleteUser = async (req, res) => {
-	await UserModel.findByIdAndDelete({ _id: req.params.id }).then(async (user) => {
-		await MediaModel.findById({ _id: user.mediaId }).then(async (media) => {
-			S3.deleteMedia(media.mediaKey);
-			await MediaModel.findByIdAndDelete({ _id: user.mediaId });
-		});
-		res.json(user);
-	});
-	then((data) => res.json({ message: 'User is removed successfully.', data })).catch(
-		(err) => res.json({ message: err })
-	);
+	await UserModel.findByIdAndRemove({ _id: req.params.id })
+		.then((data) => res.json({ message: 'Successfully removed.', data }))
+		.catch((err) => res.json({ message: err }));
 };
+
+// exports.deleteUser = async (req, res) => {
+// 	await UserModel.findByIdAndDelete({ _id: req.params.id })
+// 		.then(async (user) => {
+// 			await MediaModel.findById({ _id: user.mediaId }).then(async (media) => {
+// 				S3.deleteMedia(media.mediaKey);
+// 				await MediaModel.findByIdAndDelete({ _id: user.mediaId });
+// 			});
+// 			res.json(user);
+// 		})
+// 		.then((data) => res.json({ message: 'User is removed successfully.', data }))
+// 		.catch((err) => res.json({ message: err }));
+// };

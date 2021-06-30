@@ -114,8 +114,10 @@ exports.updateExpert = async (req, res) => {
 							$set: {
 								url: data.Location || null,
 								title: 'experts',
+								mediaKey: data.Key,
 							},
-						}
+						},
+						{ useFindAndModify: false, new: true }
 					).catch((err) => res.json(err));
 				};
 				await S3.updateMedia(req, res, media.mediaKey, data);
@@ -133,18 +135,24 @@ exports.updateExpert = async (req, res) => {
 			await ExpertModel.findByIdAndUpdate(
 				{ _id: req.params.expertid },
 				{
-					firstname,
-					lastname,
-					expertise,
-					mediaId: expert.mediaId,
-					socialMediaId: expert.socialMediaId,
-					isActive: !req.body.isActive ? true : req.body.isActive,
-					isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
+					$set: {
+						firstname,
+						lastname,
+						expertise,
+						mediaId: expert.mediaId,
+						socialMediaId: expert.socialMediaId,
+						isActive: !req.body.isActive ? true : req.body.isActive,
+						isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
+					},
 				}
 			)
 
 				.then((data) =>
-					res.json({ message: 'Expert is updated successfully', data })
+					res.json({
+						status: true,
+						message: 'Expert is updated successfully',
+						data,
+					})
 				)
 				.catch((err) => res.json({ message: err }));
 		})
