@@ -7,7 +7,7 @@ exports.getAll = async (req, res) => {
 	try {
 		const response = await StaticPageModel.find()
 			.sort({ createdAt: -1 })
-			.populate('imageId', 'url title description');
+			.populate('imageId', 'url title alt');
 		res.json(response);
 	} catch (error) {
 		res.status(500).json(error);
@@ -20,6 +20,7 @@ exports.createPage = async (req, res) => {
 			url: data.Location || null,
 			title: 'static-pages',
 			mediaKey: data.Key,
+			alt: req.body.alt || null,
 		});
 
 		newImage.save();
@@ -77,7 +78,7 @@ exports.updatePages = async (req, res) => {
 					$set: {
 						url: req.body.imageId.url || null,
 						title: 'static-pages',
-						description: req.body.imageId.description || null,
+						alt: req.body.alt || null,
 					},
 				}
 			);

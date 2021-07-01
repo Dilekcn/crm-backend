@@ -4,6 +4,7 @@ const SocialMediaModel = require('../model/SocialMedia.model');
 
 exports.getAllSocialMedia = (req, res) => {
 	SocialMediaModel.find()
+		.sort({ createdAt: -1 })
 		.then((data) => {
 			res.json(data);
 		})

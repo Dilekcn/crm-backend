@@ -4,7 +4,7 @@ const RolesModel = require('../model/Roles.model');
 
 exports.getAllRoles = async (req, res) => {
 	try {
-		const response = await RolesModel.find();
+		const response = await RolesModel.find().sort({ createdAt: -1 });
 		res.json(response);
 	} catch (error) {
 		res.status(500).json(error);
@@ -32,16 +32,13 @@ exports.createRole = async (req, res) => {
 				status: true,
 				message: 'Added new role successfully.',
 				response,
-			}),
+			})
 		)
 		.catch((error) => res.json({ status: false, message: error }));
 };
 
 exports.updateRole = async (req, res) => {
-	await RolesModel.findByIdAndUpdate(
-		{ _id: req.params.roleid },
-		{ $set: req.body },
-	);
+	await RolesModel.findByIdAndUpdate({ _id: req.params.roleid }, { $set: req.body });
 };
 
 exports.removeRole = async (req, res) => {

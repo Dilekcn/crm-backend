@@ -12,6 +12,7 @@ const transporter = nodemailer.createTransport({
 
 exports.getAll = (req, res) => {
 	SubscribersModel.find()
+		.sort({ createdAt: -1 })
 		.then((data) => res.json(data))
 		.catch((err) => res.json({ message: err }));
 };
@@ -56,8 +57,6 @@ exports.delete = (req, res) => {
 	const { id } = req.params;
 
 	SubscribersModel.findByIdAndDelete({ _id: id })
-		.then((data) =>
-			res.json({ message: 'Deleted Successfully', status: true, data }),
-		)
+		.then((data) => res.json({ message: 'Deleted Successfully', status: true, data }))
 		.catch((err) => res.json({ error: err, status: false }));
 };

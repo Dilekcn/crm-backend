@@ -4,10 +4,9 @@ const S3 = require('../config/aws.s3.config');
 
 exports.getAllSlides = async (req, res) => {
 	try {
-		const response = await SliderModel.find().populate(
-			'mediaId',
-			'url title description'
-		);
+		const response = await SliderModel.find()
+			.sort({ createdAt: -1 })
+			.populate('mediaId', 'url title alt');
 		res.json(response);
 	} catch (error) {
 		res.status(500).json(error);
@@ -20,6 +19,7 @@ exports.createSlide = async (req, res) => {
 			title: 'slider',
 			url: data.Location || null,
 			mediaKey: data.Key,
+			alt: req.body.alt || null,
 		});
 
 		newMedia.save();
@@ -86,6 +86,7 @@ exports.updateSlider = async (req, res) => {
 									title: 'slider',
 									url: data.Location || null,
 									mediaKey: data.Key,
+									alt: req.body.alt || null,
 								},
 							}
 						)

@@ -9,7 +9,7 @@ exports.getAllExperts = async (req, res) => {
 		const dataList = await ExpertModel.find()
 			.sort({ createdAt: -1 })
 			.populate('socialMediaId', 'title link description')
-			.populate('mediaId', 'url title description');
+			.populate('mediaId', 'url title alt');
 		res.json(dataList);
 	} catch (error) {
 		res.status(500).json(error);
@@ -32,6 +32,7 @@ exports.createExpert = async (req, res) => {
 		const newMedia = await new MediaModel({
 			url: data.Location || null,
 			title: 'experts',
+			alt: req.body.alt || null,
 			mediaKey: data.Key,
 		});
 
@@ -115,6 +116,7 @@ exports.updateExpert = async (req, res) => {
 								url: data.Location || null,
 								title: 'experts',
 								mediaKey: data.Key,
+								alt: req.body.alt,
 							},
 						},
 						{ useFindAndModify: false, new: true }

@@ -7,7 +7,7 @@ const S3 = require('../config/aws.s3.config');
 exports.getAllProduct = (req, res) => {
 	ProductModel.find()
 		.sort({ createdAt: -1 })
-		.populate('coverImageId', 'title url description')
+		.populate('coverImageId', 'title url alt')
 		.populate('user', 'firstname lastname email')
 		.then((data) => {
 			res.json(data);
@@ -24,6 +24,7 @@ exports.createProduct = async (req, res) => {
 			url: data.Location || null,
 			title: 'products',
 			mediaKey: data.Key,
+			alt: req.body.alt || null,
 		});
 
 		newMedia.save();
@@ -33,7 +34,6 @@ exports.createProduct = async (req, res) => {
 		const {
 			title,
 			order,
-			coverImageId,
 			isHomePage,
 			content,
 			shortDescription,

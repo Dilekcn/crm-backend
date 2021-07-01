@@ -3,9 +3,8 @@ const CompanyIntroductionModel = require('../model/CompanyIntroduction.model');
 
 exports.getAll = async (req, res) => {
 	try {
-		const response = await CompanyIntroductionModel.find();
+		const response = await CompanyIntroductionModel.find().sort({ createdAt: -1 });
 		res.json(response);
-		CompanyIntroductionModel;
 	} catch (error) {
 		res.status(500).json(error);
 	}
@@ -26,8 +25,8 @@ exports.createIntroduction = async (req, res) => {
 		.save()
 		.then((response) =>
 			res.json({
-				status: true,
-				message: 'Added new company introductions successfully.',
+				status: 200,
+				message: 'Added new company introduction successfully',
 				response,
 			})
 		)
@@ -37,9 +36,9 @@ exports.createIntroduction = async (req, res) => {
 exports.getSingleIntroduction = async (req, res) => {
 	await CompanyIntroductionModel.findById({ _id: req.params.id }, (err, data) => {
 		if (err) {
-			res.json({ message: err });
+			res.json({ status: false, message: err });
 		} else {
-			res.json(data);
+			res.json({ status: 200, data });
 		}
 	});
 };
@@ -47,9 +46,9 @@ exports.getSingleIntroduction = async (req, res) => {
 exports.getSingleIntroductionByTitle = async (req, res) => {
 	await CompanyIntroductionModel.findOne({ title: req.params.title }, (err, data) => {
 		if (err) {
-			res.json({ message: err });
+			res.json({ status: false, message: err });
 		} else {
-			res.json(data);
+			res.json({ status: 200, data });
 		}
 	});
 };
@@ -59,12 +58,12 @@ exports.updateIntroductions = async (req, res) => {
 		{ _id: req.params.id },
 		{ $set: req.body }
 	)
-		.then((data) => res.json(data))
-		.catch((err) => res.json({ message: err }));
+		.then((data) => res.json({ status: 200, data }))
+		.catch((err) => res.json({ status: false, message: err }));
 };
 
 exports.removeIntroduction = async (req, res) => {
 	await CompanyIntroductionModel.findByIdAndDelete({ _id: req.params.id })
-		.then((data) => res.json(data))
-		.catch((err) => res.json({ message: err }));
+		.then((data) => res.json({ status: 200, data }))
+		.catch((err) => res.json({ status: false, message: err }));
 };
