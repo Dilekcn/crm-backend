@@ -4,8 +4,11 @@ const S3 = require('../config/aws.s3.config');
 exports.getAllMedia = async (req, res) => {
 	try {
 		const {page = 1, limit} = req.query
+		
 		const response = await MediaModel.find().limit(limit * 1).skip((page - 1) * limit).sort({ createdAt: -1 });
-		res.json({ message: 'All Medias', response });
+		const total = await MediaModel.find().count()
+		const pages = limit === undefined ? 1 : Math.ceil(total / limit)
+			res.json({message:'All Medias', total:total, pages, response,});
 	} catch (e) {
 		res.status(500).json(e);
 	}
