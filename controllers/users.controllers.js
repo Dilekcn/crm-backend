@@ -13,6 +13,66 @@ exports.getAllUsers = async (req, res) => {
 		.catch((err) => res.json({ message: err }));
 };
 
+exports.getSingleUserById = async (req, res) => {
+	await UserModel.findById({ _id: req.params.id }, (err, data) => {
+		if (err) {
+			res.json({ message: err });
+		} else {
+			res.json(data);
+		}
+	})
+		.populate('roleId', 'name')
+		.populate('mediaId', 'url title alt');
+};
+
+exports.getSingleUserByFirstName = async (req, res) => {
+	await UserModel.find({ firstname: req.params.firstname }, (err, data) => {
+		if (err) {
+			res.json({ message: err });
+		} else {
+			res.json(data);
+		}
+	})
+		.populate('roleId', 'name')
+		.populate('mediaId', 'url title alt');
+};
+
+exports.getSingleUserByLastName = async (req, res) => {
+	await UserModel.find({ lastname: req.params.lastname }, (err, data) => {
+		if (err) {
+			res.json({ message: err });
+		} else {
+			res.json(data);
+		}
+	})
+		.populate('roleId', 'name')
+		.populate('mediaId', 'url title alt');
+};
+
+exports.getSingleUserByEmail = async (req, res) => {
+	await UserModel.find({ email: req.params.email }, (err, data) => {
+		if (err) {
+			res.json({ message: err });
+		} else {
+			res.json(data);
+		}
+	})
+		.populate('roleId', 'name')
+		.populate('mediaId', 'url title alt');
+};
+
+exports.getSingleUserByRoleId = async (req, res) => {
+	await UserModel.find({ roleId: req.params.roleid }, (err, data) => {
+		if (err) {
+			res.json({ message: err });
+		} else {
+			res.json(data);
+		}
+	})
+		.populate('roleId', 'name')
+		.populate('mediaId', 'url title alt');
+};
+
 exports.createUser = async (req, res) => {
 	const data = async (data) => {
 		const newMedia = await new MediaModel({

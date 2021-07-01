@@ -55,7 +55,7 @@ exports.getSinglePage = async (req, res) => {
 		} else {
 			res.json(data);
 		}
-	});
+	}).populate('imageId', 'url title alt');
 };
 
 exports.getSinglePageByName = async (req, res) => {
@@ -65,7 +65,7 @@ exports.getSinglePageByName = async (req, res) => {
 		} else {
 			res.json(data);
 		}
-	});
+	}).populate('imageId', 'url title alt');
 };
 
 exports.updatePages = async (req, res) => {

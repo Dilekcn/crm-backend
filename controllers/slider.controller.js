@@ -60,7 +60,7 @@ exports.getSingleSlide = async (req, res) => {
 		} else {
 			res.json(data);
 		}
-	});
+	}).populate('mediaId', 'url title alt');
 };
 
 exports.getSingleSlideByTitle = async (req, res) => {
@@ -70,7 +70,7 @@ exports.getSingleSlideByTitle = async (req, res) => {
 		} else {
 			res.json(data);
 		}
-	});
+	}).populate('mediaId', 'url title alt');
 };
 
 exports.updateSlider = async (req, res) => {
