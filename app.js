@@ -4,7 +4,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const fileUpload = require('express-fileupload');
-const cors = require('cors');
+// const cors = require('cors');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users.routes');
@@ -24,7 +24,6 @@ const rolesRouter = require('./routes/roles.routes');
 const productsRouter = require('./routes/products.routes');
 const socialMediaRouter = require('./routes/socialMedia.routes');
 const companyProfileRouter = require('./routes/companyProfile.routes');
-const awsRouter = require('./routes/aws-imageupload.routes');
 
 //middlewares
 // const verifyToken = require('./auth/verifyToken');
@@ -52,7 +51,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(fileUpload());
-app.use(cors());
+// app.use(cors());
 
 app.use('/', indexRouter);
 app.use('/', usersRouter);

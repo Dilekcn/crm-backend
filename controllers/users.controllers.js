@@ -84,7 +84,7 @@ exports.getSingleUserByRoleId = async (req, res) => {
 exports.createUser = async (req, res) => {
 	const data = async (data) => {
 		const newMedia = await new MediaModel({
-			url: req.body.mediaId.url || null,
+			url: data.Location || null,
 			title: 'users',
 			mediaKey: data.Key,
 			alt: req.body.alt || null,
@@ -119,7 +119,6 @@ exports.createUser = async (req, res) => {
 
 exports.login = async (req, res) => {
 	const { email, password } = req.body;
-
 	await UserModel.findOne({ email: email })
 		.then(async (data) => {
 			if (await bcrypt.compare(password, data.password)) {
@@ -142,6 +141,7 @@ exports.login = async (req, res) => {
 		})
 		.catch((err) => res.json({ message: 'Email does not exist', err }));
 };
+
 
 exports.updateUser = async (req, res) => {
 	await UserModel.findById({ _id: req.params.id })
