@@ -8,7 +8,8 @@ exports.getAllSlides = async (req, res) => {
 		const response = await SliderModel.find().limit(limit * 1).skip((page - 1) * limit)
 			.sort({ createdAt: -1 })
 			.populate('mediaId', 'url title alt');
-		res.json(response);
+			const total = await SliderModel.find()
+			res.json({response, total:total.length});;
 	} catch (error) {
 		res.status(500).json(error);
 	}

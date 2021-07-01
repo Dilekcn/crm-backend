@@ -13,7 +13,8 @@ exports.getAllUsers = async (req, res) => {
 			.sort({ createdAt: -1 })
 			.populate('roleId', 'name')
 			.populate('mediaId', 'url title alt');
-		res.json(response);
+			const total = await UserModel.find()
+			res.json({response, total:total.length});;
 	} catch (err) {
 		res.json({ message: err });
 	}

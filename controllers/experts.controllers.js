@@ -13,7 +13,8 @@ exports.getAllExperts = async (req, res) => {
 			.sort({ createdAt: -1 })
 			.populate('socialMediaId', 'title link description')
 			.populate('mediaId', 'url title alt');
-		res.json(dataList);
+			const total = await ExpertModel.find()
+			res.json({response, total:total.length});
 	} catch (error) {
 		res.status(500).json(error);
 	}

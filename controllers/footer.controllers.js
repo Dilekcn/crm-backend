@@ -7,7 +7,8 @@ exports.getAll = async (req, res) => {
 		const response = await FooterModel.find().limit(limit * 1).skip((page - 1) * limit)
 		.sort({ createdAt: -1 })
 		.populate('socialMediaId', 'title link')
-		res.json(response)
+		const total = await FooterModel.find()
+			res.json({response, total:total.length});
 	} catch (err) {
 		res.json({ message: err, status: false })
 	}

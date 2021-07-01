@@ -5,7 +5,8 @@ exports.getAllMedia = async (req, res) => {
 	try {
 		const {page = 1, limit} = req.query
 		const response = await MediaModel.find().limit(limit * 1).skip((page - 1) * limit).sort({ createdAt: -1 });
-		res.json({ message: 'All Medias', response });
+		const total = await MediaModel.find()
+			res.json({message:'All Medias',response, total:total.length});
 	} catch (e) {
 		res.status(500).json(e);
 	}

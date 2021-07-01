@@ -9,7 +9,8 @@ exports.getAll = async (req, res) => {
 		const response = await StaticPageModel.find().limit(limit * 1).skip((page - 1) * limit)
 			.sort({ createdAt: -1 })
 			.populate('imageId', 'url title alt');
-		res.json(response);
+			const total = await StaticPageModel.find()
+			res.json({response, total:total.length});;
 	} catch (error) {
 		res.status(500).json(error);
 	}

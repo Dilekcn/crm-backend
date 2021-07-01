@@ -11,7 +11,8 @@ exports.getAllProduct = async (req, res) => {
 		.sort({ createdAt: -1 })
 		.populate('coverImageId', 'title url alt')
 		.populate('user', 'firstname lastname email')
-		res.json(response)
+		const total = await ProductModel.find()
+		res.json({response, total:total.length});;
 	} catch (err) {
 		res.json(err)
 	}
