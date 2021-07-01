@@ -7,7 +7,8 @@ exports.getAll = async (req, res) => {
 		const response = await GoogleMapsModel.find().limit(limit * 1).skip((page - 1) * limit)
 		.sort({ createdAt: -1 })
 		const total = await GoogleMapsModel.find()
-			res.json({response, total:total.length});
+		const pages = limit === undefined ? 1 : Math.ceil(total.length / limit)
+			res.json({response, total:total.length, pages});
 	} catch (err) {
 		res.json({ message: err, status: false })
 	}

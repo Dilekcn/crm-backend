@@ -10,7 +10,8 @@ exports.getAll = async (req, res) => {
 			.sort({ createdAt: -1 })
 			.populate('imageId', 'url title alt');
 			const total = await StaticPageModel.find()
-			res.json({response, total:total.length});;
+		const pages = limit === undefined ? 1 : Math.ceil(total.length / limit)
+			res.json({response, total:total.length, pages});;
 	} catch (error) {
 		res.status(500).json(error);
 	}

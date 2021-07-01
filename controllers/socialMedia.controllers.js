@@ -8,7 +8,8 @@ exports.getAllSocialMedia = async (req, res) => {
 		const response = await SocialMediaModel.find().limit(limit * 1).skip((page - 1) * limit)
 		.sort({ createdAt: -1 })
 		const total = await SocialMediaModel.find()
-			res.json({response, total:total.length});;
+		const pages = limit === undefined ? 1 : Math.ceil(total.length / limit)
+			res.json({response, total:total.length, pages});;
 	} catch (err) {
 		res.json(err)
 	}

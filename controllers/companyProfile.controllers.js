@@ -10,7 +10,8 @@ exports.getAll = async (req, res) => {
 			.sort({ createdAt: -1 })
 			.populate('socialMediaId', 'title link');
 			const total = await CompanyProfileModel.find()
-		res.json({response, total:total.length});
+		const pages = limit === undefined ? 1 : Math.ceil(total.length / limit)
+		res.json({response, total:total.length, pages});
 	} catch (error) {
 		res.status(500).json(error);
 	}

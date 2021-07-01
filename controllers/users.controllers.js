@@ -14,7 +14,8 @@ exports.getAllUsers = async (req, res) => {
 			.populate('roleId', 'name')
 			.populate('mediaId', 'url title alt');
 			const total = await UserModel.find()
-			res.json({response, total:total.length});;
+		const pages = limit === undefined ? 1 : Math.ceil(total.length / limit)
+			res.json({response, total:total.length, pages});
 	} catch (err) {
 		res.json({ message: err });
 	}

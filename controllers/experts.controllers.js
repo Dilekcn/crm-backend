@@ -14,7 +14,8 @@ exports.getAllExperts = async (req, res) => {
 			.populate('socialMediaId', 'title link description')
 			.populate('mediaId', 'url title alt');
 			const total = await ExpertModel.find()
-			res.json({response, total:total.length});
+			const pages = limit === undefined ? 1 : Math.ceil(total.length / limit)
+			res.json({response, total:total.length,pages});
 	} catch (error) {
 		res.status(500).json(error);
 	}
