@@ -13,6 +13,7 @@ exports.getSingleFooterById = (req, res) => {
 	const id = req.params.id;
 
 	FooterModel.findById({ _id: id })
+		.populate('socialMediaId', 'title link')
 		.then((data) => res.json(data))
 		.catch((err) => res.json({ message: err, status: false }));
 };

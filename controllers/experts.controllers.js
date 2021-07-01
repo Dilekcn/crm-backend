@@ -71,7 +71,9 @@ exports.getSingleExpert = async (req, res) => {
 		} else {
 			res.json(data);
 		}
-	});
+	})
+		.populate('socialMediaId', 'title link description')
+		.populate('mediaId', 'url title alt');
 };
 
 exports.getExpertsByFirstname = async (req, res) => {
@@ -81,7 +83,9 @@ exports.getExpertsByFirstname = async (req, res) => {
 		} else {
 			res.json(data);
 		}
-	});
+	})
+		.populate('socialMediaId', 'title link description')
+		.populate('mediaId', 'url title alt');
 };
 
 exports.getExpertsByLastname = async (req, res) => {
@@ -91,7 +95,9 @@ exports.getExpertsByLastname = async (req, res) => {
 		} else {
 			res.json(data);
 		}
-	});
+	})
+		.populate('socialMediaId', 'title link description')
+		.populate('mediaId', 'url title alt');
 };
 
 exports.getExpertsByExpertise = async (req, res) => {
@@ -101,7 +107,9 @@ exports.getExpertsByExpertise = async (req, res) => {
 		} else {
 			res.json(data);
 		}
-	});
+	})
+		.populate('socialMediaId', 'title link description')
+		.populate('mediaId', 'url title alt');
 };
 
 exports.updateExpert = async (req, res) => {
