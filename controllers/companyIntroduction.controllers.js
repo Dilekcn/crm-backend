@@ -3,7 +3,8 @@ const CompanyIntroductionModel = require('../model/CompanyIntroduction.model');
 
 exports.getAll = async (req, res) => {
 	try {
-		const response = await CompanyIntroductionModel.find().sort({ createdAt: -1 });
+		const {page = 1, limit} = req.query
+		const response = await CompanyIntroductionModel.find().limit(limit * 1).skip((page - 1) * limit).sort({ createdAt: -1 });
 		res.json(response);
 	} catch (error) {
 		res.status(500).json(error);

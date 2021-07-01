@@ -4,17 +4,17 @@ const Media = require('../model/Media.model');
 
 const S3 = require('../config/aws.s3.config');
 
-exports.getAllProduct = (req, res) => {
-	ProductModel.find()
+exports.getAllProduct = async (req, res) => {
+	try {
+		const {page = 1, limit} = req.query
+		const response = await ProductModel.find().limit(limit * 1).skip((page - 1) * limit)
 		.sort({ createdAt: -1 })
 		.populate('coverImageId', 'title url alt')
 		.populate('user', 'firstname lastname email')
-		.then((data) => {
-			res.json(data);
-		})
-		.catch((err) => {
-			res.json(err);
-		});
+		res.json(response)
+	} catch (err) {
+		res.json(err)
+	}
 };
 
 exports.getSingleProduct = (req, res) => {

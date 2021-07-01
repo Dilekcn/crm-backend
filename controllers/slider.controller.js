@@ -4,7 +4,8 @@ const S3 = require('../config/aws.s3.config');
 
 exports.getAllSlides = async (req, res) => {
 	try {
-		const response = await SliderModel.find()
+		const {page = 1, limit} = req.query
+		const response = await SliderModel.find().limit(limit * 1).skip((page - 1) * limit)
 			.sort({ createdAt: -1 })
 			.populate('mediaId', 'url title alt');
 		res.json(response);
