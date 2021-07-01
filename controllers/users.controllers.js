@@ -92,7 +92,7 @@ exports.createUser = async (req, res) => {
 
 		newMedia.save();
 
-		const { firstname, lastname, email, password, isActive, isDeleted, roleId } =
+		const { firstname, lastname, email, password, isActive, isDeleted, roleId} =
 			req.body;
 		const salt = await bcrypt.genSalt();
 		const hashedPassword = await bcrypt.hash(password, salt);
