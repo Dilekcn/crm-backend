@@ -5,7 +5,8 @@ const S3 = require('../config/aws.s3.config');
 
 exports.getAll = async (req, res) => {
 	try {
-		const response = await StaticPageModel.find()
+		const {page = 1, limit} = req.query
+		const response = await StaticPageModel.find().limit(limit * 1).skip((page - 1) * limit)
 			.sort({ createdAt: -1 })
 			.populate('imageId', 'url title alt');
 		res.json(response);

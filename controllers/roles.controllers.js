@@ -4,7 +4,8 @@ const RolesModel = require('../model/Roles.model');
 
 exports.getAllRoles = async (req, res) => {
 	try {
-		const response = await RolesModel.find().sort({ createdAt: -1 });
+		const {page = 1, limit} = req.query
+		const response = await RolesModel.find().limit(limit * 1).skip((page - 1) * limit).sort({ createdAt: -1 });
 		res.json(response);
 	} catch (error) {
 		res.status(500).json(error);

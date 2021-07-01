@@ -5,7 +5,8 @@ const SocialMedia = require('../model/SocialMedia.model');
 
 exports.getAll = async (req, res) => {
 	try {
-		const response = await CompanyProfileModel.find()
+		const {page = 1, limit} = req.query
+		const response = await CompanyProfileModel.find().limit(limit * 1).skip((page - 1) * limit)
 			.sort({ createdAt: -1 })
 			.populate('socialMediaId', 'title link');
 		res.json(response);

@@ -1,12 +1,16 @@
 const FooterModel = require('../model/Footer.model');
 const SocialMediaModel = require('../model/SocialMedia.model');
 
-exports.getAll = (req, res) => {
-	FooterModel.find()
+exports.getAll = async (req, res) => {
+	try {
+		const {page = 1, limit} = req.query
+		const response = await FooterModel.find().limit(limit * 1).skip((page - 1) * limit)
 		.sort({ createdAt: -1 })
 		.populate('socialMediaId', 'title link')
-		.then((data) => res.json(data))
-		.catch((err) => res.json({ message: err, status: false }));
+		res.json(response)
+	} catch (err) {
+		res.json({ message: err, status: false })
+	}
 };
 
 exports.getSingleFooterById = (req, res) => {

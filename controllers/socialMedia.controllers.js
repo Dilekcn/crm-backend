@@ -2,15 +2,15 @@ const mongoose = require('mongoose');
 
 const SocialMediaModel = require('../model/SocialMedia.model');
 
-exports.getAllSocialMedia = (req, res) => {
-	SocialMediaModel.find()
+exports.getAllSocialMedia = async (req, res) => {
+	try {
+		const {page = 1, limit} = req.query
+		const response = await SocialMediaModel.find().limit(limit * 1).skip((page - 1) * limit)
 		.sort({ createdAt: -1 })
-		.then((data) => {
-			res.json(data);
-		})
-		.catch((err) => {
-			res.json(err);
-		});
+		res.json(response)
+	} catch (err) {
+		res.json(err)
+	}
 };
 
 exports.createSocialMedia = (req, res) => {

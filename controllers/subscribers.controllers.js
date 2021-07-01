@@ -1,5 +1,6 @@
 const SubscribersModel = require('../model/Subscribers.model');
 const nodemailer = require('nodemailer');
+const { response } = require('express');
 require('dotenv').config();
 
 const transporter = nodemailer.createTransport({
@@ -10,11 +11,15 @@ const transporter = nodemailer.createTransport({
 	},
 });
 
-exports.getAll = (req, res) => {
-	SubscribersModel.find()
+exports.getAll = async (req, res) => {
+	try {
+		const {page = 1, limit} = req.query
+		const response = await SubscribersModel.find().limit(limit * 1).skip((page - 1) * limit)
 		.sort({ createdAt: -1 })
-		.then((data) => res.json(data))
-		.catch((err) => res.json({ message: err }));
+		res.json(response)
+	} catch (err) {
+		res.json({ message: err })
+	}
 };
 
 exports.create = (req, res) => {

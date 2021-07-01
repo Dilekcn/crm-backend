@@ -6,7 +6,8 @@ const S3 = require('../config/aws.s3.config');
 
 exports.getAllExperts = async (req, res) => {
 	try {
-		const dataList = await ExpertModel.find()
+		const {page = 1, limit} = req.query
+		const dataList = await ExpertModel.find().limit(limit * 1).skip((page - 1) * limit)
 			.sort({ createdAt: -1 })
 			.populate('socialMediaId', 'title link description')
 			.populate('mediaId', 'url title alt');

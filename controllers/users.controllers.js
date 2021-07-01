@@ -5,12 +5,16 @@ const jwt = require('jsonwebtoken');
 const S3 = require('../config/aws.s3.config');
 
 exports.getAllUsers = async (req, res) => {
-	await UserModel.find()
+	try {
+		const {page = 1, limit} = req.query
+		const response = await UserModel.find().limit(limit * 1).skip((page - 1) * limit)
 		.sort({ createdAt: -1 })
 		.populate('roleId', 'name')
 		.populate('mediaId', 'url title alt')
-		.then((data) => res.json(data))
-		.catch((err) => res.json({ message: err }));
+		res.json(response)
+	} catch (err) {
+		res.json({ message: err })
+	}
 };
 
 exports.getSingleUserById = async (req, res) => {

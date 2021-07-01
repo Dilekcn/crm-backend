@@ -1,10 +1,15 @@
 const GoogleMapsModel = require('../model/GoogleMaps.model');
 
-exports.getAll = (req, res) => {
-	GoogleMapsModel.find()
+exports.getAll = async (req, res) => {
+
+	try {
+		const {page = 1, limit} = req.query
+		const response = await GoogleMapsModel.find().limit(limit * 1).skip((page - 1) * limit)
 		.sort({ createdAt: -1 })
-		.then((data) => res.json(data))
-		.catch((err) => res.json({ message: err, status: false }));
+		res.json(res.json(data))
+	} catch (err) {
+		res.json({ message: err, status: false })
+	}
 };
 
 exports.createFooter = (req, res) => {
