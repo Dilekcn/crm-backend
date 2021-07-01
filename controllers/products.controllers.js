@@ -103,14 +103,14 @@ exports.updateSingleProduct = (req, res) => {
 	)
 		.then(async (product) => {
 
-						await MediaModel.findById({ _id: product.coverImageId }).then(async (media) => {
+						await Media.findById({ _id: product.coverImageId }).then(async (media) => {
 				const data = async (data) => {
-					await MediaModel.findByIdAndUpdate(
+					await Media.findByIdAndUpdate(
 						{ _id: product.coverImageId },
 						{
 							$set: {
 								url: data.Location || null,
-								title: 'products',
+								title: 'product',
 								mediaKey: data.Key,
 								alt: req.body.alt,
 							},
