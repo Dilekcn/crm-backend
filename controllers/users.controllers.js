@@ -84,7 +84,7 @@ exports.getSingleUserByRoleId = async (req, res) => {
 exports.createUser = async (req, res) => {
 	const data = async (data) => {
 		const newMedia = await new MediaModel({
-			url: req.body.mediaId.url || null,
+			url: data.Location || null,
 			title: 'users',
 			mediaKey: data.Key,
 			alt: req.body.alt || null,
