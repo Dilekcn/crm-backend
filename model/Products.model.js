@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const ProductsSchema = new Schema(
-	{ 
+	{
 		title: { type: String },
 		order: { type: Number },
 		coverImageId: { type: Schema.Types.ObjectId, ref: 'media' },
@@ -15,7 +15,7 @@ const ProductsSchema = new Schema(
 		isDeleted: { type: Boolean, default: false },
 		isBlog: { type: Boolean, default: false },
 		isAboveFooter: { type: Boolean, default: false },
-	}, 
+	},
 	{ timestamps: true }
 );
 
