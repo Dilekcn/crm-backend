@@ -17,6 +17,13 @@ exports.getAllProduct = (req, res) => {
 		});
 };
 
+exports.getSingleProduct = (req, res) => {
+	ProductModel.findById({ _id: req.params.productId })
+		.then((data) => res.json(data))
+		.catch((err) => res.json({ message: err }));
+	
+	};
+
 exports.createProduct = async (req, res) => {
 
 
@@ -100,17 +107,23 @@ exports.updateSingleProduct = (req, res) => {
 		{ useFindAndModify: false, new: true }
 	)
 		.then(async (product) => {
-			await Media.findByIdAndUpdate(
-				product.coverImageId,
-				{
-					$set: {
-						url: req.body.coverImageId.url,
-						description: req.body.coverImageId.description,
+			const data =async(data)=>{
+				await Media.findByIdAndUpdate(
+					product.coverImageId,
+					{
+						$set: {
+							url: data.Location,
+							description: req.body.coverImageId.description,
+						},
 					},
-				},
-				{ useFindAndModify: false, new: true }
-			);
+					{ useFindAndModify: false, new: true }
+				);
+			}
+			await S3.updateMedia(req, res, data)
+		
+
 		})
 		.then((data) => res.json({ message: 'Product updated', status: true, data }))
 		.catch((err) => res.json({ message: err, status: false }));
-};
+
+	};
