@@ -6,15 +6,16 @@ const S3 = require('../config/aws.s3.config');
 
 exports.getAllExperts = async (req, res) => {
 	try {
+		
 		const { page = 1, limit } = req.query;
-		const dataList = await ExpertModel.find()
+		const total = await ExpertModel.find().count()
+		 const dataList = await ExpertModel.find()
 			.limit(limit * 1)
 			.skip((page - 1) * limit)
 			.sort({ createdAt: -1 })
 			.populate('socialMediaId', 'title link description')
 			.populate('mediaId', 'url title alt');
-			const total = await ExpertModel.find()
-			res.json({response, total:total.length});
+		res.json({total,dataList});
 	} catch (error) {
 		res.status(500).json(error);
 	}
