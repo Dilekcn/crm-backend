@@ -6,8 +6,10 @@ const S3 = require('../config/aws.s3.config');
 
 exports.getAllExperts = async (req, res) => {
 	try {
-		const {page = 1, limit} = req.query
-		const dataList = await ExpertModel.find().limit(limit * 1).skip((page - 1) * limit)
+		const { page = 1, limit } = req.query;
+		const dataList = await ExpertModel.find()
+			.limit(limit * 1)
+			.skip((page - 1) * limit)
 			.sort({ createdAt: -1 })
 			.populate('socialMediaId', 'title link description')
 			.populate('mediaId', 'url title alt');
@@ -177,9 +179,9 @@ exports.removeExpert = async (req, res) => {
 				S3.deleteMedia(response.mediaKey);
 				await MediaModel.findByIdAndRemove({ _id: data.mediaId });
 			});
-			res.json({ message: 'Expert is deleted successfully', data });
+			res.json({ status: 200, message: 'Expert is deleted successfully', data });
 		})
 		.catch((err) => {
-			res.json({ message: err });
+			res.json({ status: 404, message: err });
 		});
 };
