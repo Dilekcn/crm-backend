@@ -2,14 +2,14 @@ const mongoose = require('mongoose');
 const ExpertModel = require('../model/Expert.model');
 const SocialMediaModel = require('../model/SocialMedia.model');
 const MediaModel = require('../model/Media.model');
-const S3 = require('../config/aws.s3.config')
+const S3 = require('../config/aws.s3.config');
 
 exports.getAllExperts = async (req, res) => {
 	try {
 		const dataList = await ExpertModel.find()
 			.sort({ createdAt: -1 })
 			.populate('socialMediaId', 'title link description')
-			.populate('mediaId', 'url title description');
+			.populate('mediaId', 'url title alt');
 		res.json(dataList);
 	} catch (error) {
 		res.status(500).json(error);
@@ -17,7 +17,6 @@ exports.getAllExperts = async (req, res) => {
 };
 
 exports.createExpert = async (req, res) => {
-	console.log(req.body)
 	const newSocialMedia = await JSON.parse(req.body.socialMediaId).map((sm) => {
 		return new SocialMediaModel({
 			title: sm.title || null,
@@ -29,13 +28,12 @@ exports.createExpert = async (req, res) => {
 
 	const socialMediaIds = newSocialMedia.map((sm) => sm._id);
 
-
-	const data = async(data) => {
+	const data = async (data) => {
 		const newMedia = await new MediaModel({
 			url: data.Location || null,
 			title: 'experts',
-			description: req.body.mediaId || null,
-			mediaKey:data.Key
+			alt: req.body.alt || null,
+			mediaKey: data.Key,
 		});
 
 		newMedia.save();
@@ -47,7 +45,7 @@ exports.createExpert = async (req, res) => {
 			lastname,
 			expertise,
 			mediaId: newMedia._id,
-			socialMediaId:socialMediaIds,
+			socialMediaId: socialMediaIds,
 			isActive,
 			isDeleted,
 		});
@@ -61,11 +59,9 @@ exports.createExpert = async (req, res) => {
 				})
 			)
 			.catch((error) => res.json({ status: false, message: error }));
-	}
+	};
 
-	await S3.uploadNewMedia(req, res, data)
-		
-	
+	await S3.uploadNewMedia(req, res, data);
 };
 
 exports.getSingleExpert = async (req, res) => {
@@ -75,7 +71,9 @@ exports.getSingleExpert = async (req, res) => {
 		} else {
 			res.json(data);
 		}
-	});
+	})
+		.populate('socialMediaId', 'title link description')
+		.populate('mediaId', 'url title alt');
 };
 
 exports.getExpertsByFirstname = async (req, res) => {
@@ -85,7 +83,9 @@ exports.getExpertsByFirstname = async (req, res) => {
 		} else {
 			res.json(data);
 		}
-	});
+	})
+		.populate('socialMediaId', 'title link description')
+		.populate('mediaId', 'url title alt');
 };
 
 exports.getExpertsByLastname = async (req, res) => {
@@ -95,7 +95,9 @@ exports.getExpertsByLastname = async (req, res) => {
 		} else {
 			res.json(data);
 		}
-	});
+	})
+		.populate('socialMediaId', 'title link description')
+		.populate('mediaId', 'url title alt');
 };
 
 exports.getExpertsByExpertise = async (req, res) => {
@@ -105,42 +107,45 @@ exports.getExpertsByExpertise = async (req, res) => {
 		} else {
 			res.json(data);
 		}
-	});
+	})
+		.populate('socialMediaId', 'title link description')
+		.populate('mediaId', 'url title alt');
 };
 
 exports.updateExpert = async (req, res) => {
 	await ExpertModel.findById({ _id: req.params.expertid })
 		.then(async (expert) => {
-			await MediaModel.findById({_id:expert.mediaId})
-				.then(async(media) => {
-					const data = async (data) => {
-						await MediaModel.findByIdAndUpdate(
-							{ _id: expert.mediaId },
-							{
-								$set: {
-									url: data.Location || null,
-									title: 'experts',
-									description: req.body.mediaId.description || null,
-								},
-							}
-						).catch(err => res.json(err))
-					}
-					await S3.updateMedia(req, res, media.mediaKey, data)
-					
-				})
-				await expert.socialMediaId.map(async (SMId, index) => {
-					await SocialMediaModel.findByIdAndUpdate(
-						{ _id: SMId },
+			await MediaModel.findById({ _id: expert.mediaId }).then(async (media) => {
+				const data = async (data) => {
+					await MediaModel.findByIdAndUpdate(
+						{ _id: expert.mediaId },
 						{
-							$set: JSON.parse(req.body.socialMediaId)[index],
-						}
-					);
-				});
-	
-				const { firstname, lastname, expertise } = req.body;
-				await ExpertModel.findByIdAndUpdate(
-					{ _id: req.params.expertid },
+							$set: {
+								url: data.Location || null,
+								title: 'experts',
+								mediaKey: data.Key,
+								alt: req.body.alt,
+							},
+						},
+						{ useFindAndModify: false, new: true }
+					).catch((err) => res.json(err));
+				};
+				await S3.updateMedia(req, res, media.mediaKey, data);
+			});
+			await expert.socialMediaId.map(async (SMId, index) => {
+				await SocialMediaModel.findByIdAndUpdate(
+					{ _id: SMId },
 					{
+						$set: JSON.parse(req.body.socialMediaId)[index],
+					}
+				);
+			});
+
+			const { firstname, lastname, expertise } = req.body;
+			await ExpertModel.findByIdAndUpdate(
+				{ _id: req.params.expertid },
+				{
+					$set: {
 						firstname,
 						lastname,
 						expertise,
@@ -148,26 +153,29 @@ exports.updateExpert = async (req, res) => {
 						socialMediaId: expert.socialMediaId,
 						isActive: !req.body.isActive ? true : req.body.isActive,
 						isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
-					}
+					},
+				}
+			)
+
+				.then((data) =>
+					res.json({
+						status: true,
+						message: 'Expert is updated successfully',
+						data,
+					})
 				)
-	
-					.then((data) =>
-						res.json({ message: 'Expert is updated successfully', data })
-					)
-					.catch((err) => res.json({ message: err }));
-			
+				.catch((err) => res.json({ message: err }));
 		})
-		.catch((err) => res.json({ message: err}));
+		.catch((err) => res.json({ message: err }));
 };
 
 exports.removeExpert = async (req, res) => {
 	await ExpertModel.findByIdAndDelete({ _id: req.params.expertid })
-		.then(async(data) => {
-			await MediaModel.findById({_id:data.mediaId})
-				.then(async(response) => {
-					S3.deleteMedia(response.mediaKey)
-					await MediaModel.findByIdAndRemove({_id:data.mediaId})
-				})
+		.then(async (data) => {
+			await MediaModel.findById({ _id: data.mediaId }).then(async (response) => {
+				S3.deleteMedia(response.mediaKey);
+				await MediaModel.findByIdAndRemove({ _id: data.mediaId });
+			});
 			res.json({ message: 'Expert is deleted successfully', data });
 		})
 		.catch((err) => {

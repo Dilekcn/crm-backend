@@ -3,6 +3,7 @@ const SocialMediaModel = require('../model/SocialMedia.model');
 
 exports.getAll = (req, res) => {
 	FooterModel.find()
+		.sort({ createdAt: -1 })
 		.populate('socialMediaId', 'title link')
 		.then((data) => res.json(data))
 		.catch((err) => res.json({ message: err, status: false }));
@@ -12,6 +13,7 @@ exports.getSingleFooterById = (req, res) => {
 	const id = req.params.id;
 
 	FooterModel.findById({ _id: id })
+		.populate('socialMediaId', 'title link')
 		.then((data) => res.json(data))
 		.catch((err) => res.json({ message: err, status: false }));
 };
