@@ -9,9 +9,9 @@ exports.getAll = async (req, res) => {
 		const response = await StaticPageModel.find().limit(limit * 1).skip((page - 1) * limit)
 			.sort({ createdAt: -1 })
 			.populate('imageId', 'url title alt');
-			const total = await StaticPageModel.find()
-		const pages = limit === undefined ? 1 : Math.ceil(total.length / limit)
-			res.json({response, total:total.length, pages});;
+			const total = await StaticPageModel.find().count()
+		const pages = limit === undefined ? 1 : Math.ceil(total / limit)
+			res.json({ total:total, pages, response});;
 	} catch (error) {
 		res.status(500).json(error);
 	}

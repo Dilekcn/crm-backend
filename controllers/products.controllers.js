@@ -11,9 +11,9 @@ exports.getAllProduct = async (req, res) => {
 		.sort({ createdAt: -1 })
 		.populate('coverImageId', 'title url alt')
 		.populate('user', 'firstname lastname email')
-		const total = await ProductModel.find()
-		const pages = limit === undefined ? 1 : Math.ceil(total.length / limit)
-		res.json({response, total:total.length, pages});;
+		const total = await ProductModel.find().count()
+		const pages = limit === undefined ? 1 : Math.ceil(total / limit)
+		res.json({total:total, pages, response});;
 	} catch (err) {
 		res.json(err)
 	}

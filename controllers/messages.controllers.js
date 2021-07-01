@@ -5,9 +5,9 @@ exports.getAll = async (req, res) => {
 	try {
 		const {page = 1, limit} = req.query
 		const response = await MessagesModel.find().limit(limit * 1).skip((page - 1) * limit).sort({ createdAt: -1 });
-		const total = await MessagesModel.find()
-		const pages = limit === undefined ? 1 : Math.ceil(total.length / limit)
-		res.json({response, total:total.length, pages});;
+		const total = await MessagesModel.find().count()
+		const pages = limit === undefined ? 1 : Math.ceil(total / limit)
+		res.json({total:total, pages, response});;
 	} catch (error) {
 		res.status(500).json(error);
 	}
