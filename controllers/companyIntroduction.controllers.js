@@ -3,11 +3,14 @@ const CompanyIntroductionModel = require('../model/CompanyIntroduction.model');
 
 exports.getAll = async (req, res) => {
 	try {
-		const {page = 1, limit} = req.query
-		const response = await CompanyIntroductionModel.find().limit(limit * 1).skip((page - 1) * limit).sort({ createdAt: -1 });
-		const total = await CompanyIntroductionModel.find().count()
-		const pages = limit === undefined ? 1 : Math.ceil(total / limit)
-		res.json({ total:total, pages, response});
+		const { page = 1, limit } = req.query;
+		const response = await CompanyIntroductionModel.find()
+			.limit(limit * 1)
+			.skip((page - 1) * limit)
+			.sort({ createdAt: -1 });
+		const total = await CompanyIntroductionModel.find().count();
+		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
+		res.json({ total: total, pages, response });
 	} catch (error) {
 		res.status(500).json(error);
 	}
@@ -33,13 +36,13 @@ exports.createIntroduction = async (req, res) => {
 				response,
 			})
 		)
-		.catch((error) => res.json({ status: false, message: error }));
+		.catch((error) => res.json({ status: 404, message: error }));
 };
 
 exports.getSingleIntroduction = async (req, res) => {
 	await CompanyIntroductionModel.findById({ _id: req.params.id }, (err, data) => {
 		if (err) {
-			res.json({ status: false, message: err });
+			res.json({ status: 404, message: err });
 		} else {
 			res.json({ status: 200, data });
 		}
@@ -49,7 +52,7 @@ exports.getSingleIntroduction = async (req, res) => {
 exports.getSingleIntroductionByTitle = async (req, res) => {
 	await CompanyIntroductionModel.findOne({ title: req.params.title }, (err, data) => {
 		if (err) {
-			res.json({ status: false, message: err });
+			res.json({ status: 404, message: err });
 		} else {
 			res.json({ status: 200, data });
 		}
@@ -62,11 +65,11 @@ exports.updateIntroductions = async (req, res) => {
 		{ $set: req.body }
 	)
 		.then((data) => res.json({ status: 200, data }))
-		.catch((err) => res.json({ status: false, message: err }));
+		.catch((err) => res.json({ status: 404, message: err }));
 };
 
 exports.removeIntroduction = async (req, res) => {
 	await CompanyIntroductionModel.findByIdAndDelete({ _id: req.params.id })
 		.then((data) => res.json({ status: 200, data }))
-		.catch((err) => res.json({ status: false, message: err }));
+		.catch((err) => res.json({ status: 404, message: err }));
 };

@@ -13,9 +13,9 @@ exports.getAllUsers = async (req, res) => {
 			.sort({ createdAt: -1 })
 			.populate('roleId', 'name')
 			.populate('mediaId', 'url title alt');
-			const total = await UserModel.find().count()
-		const pages = limit === undefined ? 1 : Math.ceil(total / limit)
-			res.json({ total:total, pages, response});
+		const total = await UserModel.find().count();
+		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
+		res.json({ total: total, pages, response });
 	} catch (err) {
 		res.json({ message: err });
 	}
@@ -83,6 +83,7 @@ exports.getSingleUserByRoleId = async (req, res) => {
 
 exports.createUser = async (req, res) => {
 	const data = async (data) => {
+		console.log(req.body);
 		const newMedia = await new MediaModel({
 			url: data.Location || null,
 			title: 'users',
