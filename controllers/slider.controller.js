@@ -4,15 +4,17 @@ const S3 = require('../config/aws.s3.config');
 
 exports.getAllSlides = async (req, res) => {
 	try {
-		const {page = 1, limit} = req.query
-		const response = await SliderModel.find().limit(limit * 1).skip((page - 1) * limit)
+		const { page = 1, limit } = req.query;
+		const response = await SliderModel.find()
+			.limit(limit * 1)
+			.skip((page - 1) * limit)
 			.sort({ createdAt: -1 })
 			.populate('mediaId', 'url title alt');
-			const total = await SliderModel.find().count()
-		const pages = limit === undefined ? 1 : Math.ceil(total / limit)
-			res.json({total:total, pages, response});;
+		const total = await SliderModel.find().count();
+		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
+		res.json({ total: total, pages, status: 200, response });
 	} catch (error) {
-		res.status(500).json(error);
+		res.json({ status: 404, error });
 	}
 };
 
@@ -45,12 +47,12 @@ exports.createSlide = async (req, res) => {
 			.save()
 			.then((response) =>
 				res.json({
-					status: true,
+					status: 200,
 					message: 'Added new slide successfully.',
 					response,
 				})
 			)
-			.catch((error) => res.json({ status: false, message: error }));
+			.catch((error) => res.json({ status: 404, message: error }));
 	};
 
 	await S3.uploadNewMedia(req, res, data);
@@ -59,9 +61,9 @@ exports.createSlide = async (req, res) => {
 exports.getSingleSlide = async (req, res) => {
 	await SliderModel.findById({ _id: req.params.slideid }, (err, data) => {
 		if (err) {
-			res.json({ message: err });
+			res.json({ status: 404, message: err });
 		} else {
-			res.json(data);
+			res.json({ status: 200, data });
 		}
 	}).populate('mediaId', 'url title alt');
 };
@@ -69,9 +71,9 @@ exports.getSingleSlide = async (req, res) => {
 exports.getSingleSlideByTitle = async (req, res) => {
 	await SliderModel.findOne({ title: req.params.titletext }, (err, data) => {
 		if (err) {
-			res.json({ message: err });
+			res.json({ status: 404, message: err });
 		} else {
-			res.json(data);
+			res.json({ status: 200, data });
 		}
 	}).populate('mediaId', 'url title alt');
 };
@@ -120,12 +122,14 @@ exports.updateSlider = async (req, res) => {
 										},
 									}
 								)
-									.then((data) => data)
-									.catch((err) => err);
+									.then((data) => res.json({ status: 200, data }))
+									.catch((err) =>
+										res.json({ status: 404, message: err })
+									);
 							})
 							.then((response) =>
 								res.json({
-									status: true,
+									status: 200,
 									message: 'Slide updated successfully',
 									response,
 								})
@@ -133,10 +137,10 @@ exports.updateSlider = async (req, res) => {
 					};
 					await S3.updateMedia(req, res, media.mediaKey, data);
 				})
-				.catch((err) => res.json({ message: err }));
+				.catch((err) => res.json({ status: 404, message: err }));
 		})
 
-		.catch((err) => res.json({ message: err }));
+		.catch((err) => res.json({ status: 404, message: err }));
 };
 
 exports.removeSlide = async (req, res) => {
@@ -147,7 +151,7 @@ exports.removeSlide = async (req, res) => {
 			});
 			res.json(slider);
 		})
-		.catch((err) => res.json({ message: err }));
+		.catch((err) => res.json({ status: 404, message: err }));
 
 	// await SliderModel.findByIdAndDelete({ _id: req.params.slideid })
 	// 	.then(async(data) => {

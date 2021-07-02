@@ -3,15 +3,17 @@ const SocialMediaModel = require('../model/SocialMedia.model');
 
 exports.getAll = async (req, res) => {
 	try {
-		const {page = 1, limit} = req.query
-		const response = await FooterModel.find().limit(limit * 1).skip((page - 1) * limit)
-		.sort({ createdAt: -1 })
-		.populate('socialMediaId', 'title link')
-		const total = await FooterModel.find().count()
-		const pages = limit === undefined ? 1 : Math.ceil(total / limit)
-			res.json({total:total, pages,response});
+		const { page = 1, limit } = req.query;
+		const response = await FooterModel.find()
+			.limit(limit * 1)
+			.skip((page - 1) * limit)
+			.sort({ createdAt: -1 })
+			.populate('socialMediaId', 'title link');
+		const total = await FooterModel.find().count();
+		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
+		res.json({ total: total, pages, status: 200, response });
 	} catch (err) {
-		res.json({ message: err, status: false })
+		res.json({ status: 404, message: err });
 	}
 };
 
@@ -20,8 +22,8 @@ exports.getSingleFooterById = (req, res) => {
 
 	FooterModel.findById({ _id: id })
 		.populate('socialMediaId', 'title link')
-		.then((data) => res.json(data))
-		.catch((err) => res.json({ message: err, status: false }));
+		.then((data) => res.json({ status: 200, data }))
+		.catch((err) => res.json({ status: 404, message: err }));
 };
 
 exports.createFooter = async (req, res) => {
@@ -47,8 +49,10 @@ exports.createFooter = async (req, res) => {
 
 	newFooter
 		.save()
-		.then((data) => res.json({ status: true, data }))
-		.catch((err) => res.json({ message: err, status: false }));
+		.then((data) =>
+			res.json({ status: 200, message: 'New footer is created successfully', data })
+		)
+		.catch((err) => res.json({ status: 404, message: err }));
 };
 
 exports.updateFooterById = async (req, res) => {
@@ -60,8 +64,8 @@ exports.updateFooterById = async (req, res) => {
 						{ _id: socialMediaid },
 						{ $set: req.body.socialMediaId[index] }
 					)
-						.then((data) => data)
-						.catch((err) => err)
+						.then((data) => res.json({ status: 200, data }))
+						.catch((err) => res.json({ status: 404, message: err }))
 			);
 
 			await FooterModel.findByIdAndUpdate(
@@ -75,10 +79,16 @@ exports.updateFooterById = async (req, res) => {
 					copyright: req.body.copyright,
 				}
 			)
-				.then((data) => res.json({ status: true, data }))
-				.catch((err) => res.json({ status: false, error: err }));
+				.then((data) =>
+					res.json({
+						status: 200,
+						message: 'Expert is updated successfully',
+						data,
+					})
+				)
+				.catch((err) => res.json({ status: 404, message: err }));
 		})
-		.catch((err) => res.json(err));
+		.catch((err) => res.json({ status: 404, message: err }));
 };
 
 exports.removeFooterById = (req, res) => {
@@ -88,7 +98,7 @@ exports.removeFooterById = (req, res) => {
 			//    await data.socialMediaId.map(async(socialMediaid, index) => {
 			//        await SocialMediaModel.findByIdAndRemove({_id:socialMediaid})
 			//    })
-			res.json({ status: true, data });
+			res.json({ status: 200, data });
 		})
-		.catch((err) => res.json({ message: err, status: false }));
+		.catch((err) => res.json({ status: 404, message: err }));
 };

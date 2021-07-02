@@ -1,15 +1,17 @@
-const mongoose = require('mongoose');
 const IconBoxModel = require('../model/IconBox.model');
 
 exports.getAll = async (req, res) => {
 	try {
-		const {page = 1, limit} = req.query
-		const response = await IconBoxModel.find().limit(limit * 1).skip((page - 1) * limit).sort({ createdAt: -1 });
-		const total = await IconBoxModel.find().count()
-		const pages = limit === undefined ? 1 : Math.ceil(total / limit)
-			res.json({total:total, pages, response});
+		const { page = 1, limit } = req.query;
+		const response = await IconBoxModel.find()
+			.limit(limit * 1)
+			.skip((page - 1) * limit)
+			.sort({ createdAt: -1 });
+		const total = await IconBoxModel.find().count();
+		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
+		res.json({ total: total, pages, status: 200, response });
 	} catch (error) {
-		res.status(500).json(error);
+		res.json({ status: 404, error });
 	}
 };
 
@@ -26,16 +28,22 @@ exports.create = async (req, res) => {
 	});
 	newPost
 		.save()
-		.then((response) => res.json(response))
-		.catch((err) => res.json(err));
+		.then((response) =>
+			res.json({
+				status: 200,
+				message: 'New iconbox is successfully created',
+				response,
+			})
+		)
+		.catch((err) => res.json({ status: 404, message: err }));
 };
 
 exports.getSingleIconBox = async (req, res) => {
 	await IconBoxModel.findById({ _id: req.params.id }, (err, data) => {
 		if (err) {
-			res.json({ message: err });
+			res.json({ status: 404, message: err });
 		} else {
-			res.json(data);
+			res.json({ status: 200, data });
 		}
 	});
 };
@@ -43,9 +51,9 @@ exports.getSingleIconBox = async (req, res) => {
 exports.getIconBoxByTitle = async (req, res) => {
 	await IconBoxModel.findOne({ title: req.params.title }, (err, data) => {
 		if (err) {
-			res.json({ message: err });
+			res.json({ status: 404, message: err });
 		} else {
-			res.json(data);
+			res.json({ status: 200, data });
 		}
 	});
 };
@@ -53,21 +61,25 @@ exports.getIconBoxByTitle = async (req, res) => {
 exports.getIconBoxByAuthor = async (req, res) => {
 	await IconBoxModel.findOne({ author: req.params.author }, (err, data) => {
 		if (err) {
-			res.json({ message: err });
+			res.json({ status: 404, message: err });
 		} else {
-			res.json(data);
+			res.json({ status: 200, data });
 		}
 	});
 };
 
 exports.updateIconBox = async (req, res) => {
 	await IconBoxModel.findByIdAndUpdate({ _id: req.params.id }, { $set: req.body })
-		.then((data) => res.json(data))
-		.catch((err) => res.json({ message: err }));
+		.then((data) =>
+			res.json({ status: 200, message: 'Iconbox is updated successfully', data })
+		)
+		.catch((err) => res.json({ status: 404, message: err }));
 };
 
 exports.removeSingleIconBox = async (req, res) => {
 	await IconBoxModel.findByIdAndDelete({ _id: req.params.id })
-		.then((data) => res.json(data))
-		.catch((err) => res.json({ message: err }));
+		.then((data) =>
+			res.json({ status: 200, message: 'Iconbox is deleted successfully', data })
+		)
+		.catch((err) => res.json({ status: 404, message: err }));
 };

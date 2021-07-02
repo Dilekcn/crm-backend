@@ -1,17 +1,17 @@
-const mongoose = require('mongoose');
-
 const SocialMediaModel = require('../model/SocialMedia.model');
 
 exports.getAllSocialMedia = async (req, res) => {
 	try {
-		const {page = 1, limit} = req.query
-		const response = await SocialMediaModel.find().limit(limit * 1).skip((page - 1) * limit)
-		.sort({ createdAt: -1 })
-		const total = await SocialMediaModel.find().count()
-		const pages = limit === undefined ? 1 : Math.ceil(total / limit)
-			res.json({ total:total, pages, response});;
+		const { page = 1, limit } = req.query;
+		const response = await SocialMediaModel.find()
+			.limit(limit * 1)
+			.skip((page - 1) * limit)
+			.sort({ createdAt: -1 });
+		const total = await SocialMediaModel.find().count();
+		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
+		res.json({ total: total, pages, status: 200, response });
 	} catch (err) {
-		res.json(err)
+		res.json({ status: 404, message: err });
 	}
 };
 
@@ -20,10 +20,14 @@ exports.createSocialMedia = (req, res) => {
 	newSocialMedia
 		.save()
 		.then((data) => {
-			res.json(data);
+			res.json({
+				status: 200,
+				message: 'New social media info is created successfully',
+				data,
+			});
 		})
 		.catch((err) => {
-			res.json(err);
+			res.json({ status: 404, message: err });
 		});
 };
 
@@ -40,24 +44,30 @@ exports.createSocialMedia = (req, res) => {
 
 // }
 
-exports.updateSocialMedia = (req, res, next) => {
+exports.updateSocialMedia = (req, res) => {
 	SocialMediaModel.findByIdAndUpdate(req.params.socialMediaId, req.body)
 		.then((data) => {
-			res.json(data);
+			res.json({
+				status: 200,
+				message: 'Social media info is updated successfully',
+				data,
+			});
 		})
 		.catch((err) => {
-			next({ message: 'The social media was not fund', code: 99 });
-			res.json(err);
+			res.json({ status: 404, message: err });
 		});
 };
 
-exports.removeSocialMedia = (req, res, next) => {
+exports.removeSocialMedia = (req, res) => {
 	SocialMediaModel.findByIdAndRemove(req.params.socialMediaId)
 		.then((data) => {
-			res.json(data);
+			res.json({
+				status: 200,
+				message: 'Social media info is removed successfully',
+				data,
+			});
 		})
 		.catch((err) => {
-			next({ message: 'The social media link deleted.', code: 99 });
-			res.json(err);
+			res.json({ status: 404, message: err });
 		});
 };

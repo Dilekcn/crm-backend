@@ -3,14 +3,17 @@ const S3 = require('../config/aws.s3.config');
 
 exports.getAllMedia = async (req, res) => {
 	try {
-		const {page = 1, limit} = req.query
-		
-		const response = await MediaModel.find().limit(limit * 1).skip((page - 1) * limit).sort({ createdAt: -1 });
-		const total = await MediaModel.find().count()
-		const pages = limit === undefined ? 1 : Math.ceil(total / limit)
-			res.json({message:'All Medias', total:total, pages, response,});
-	} catch (e) {
-		res.status(500).json(e);
+		const { page = 1, limit } = req.query;
+
+		const response = await MediaModel.find()
+			.limit(limit * 1)
+			.skip((page - 1) * limit)
+			.sort({ createdAt: -1 });
+		const total = await MediaModel.find().count();
+		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
+		res.json({ message: 'All Medias', total: total, pages, status: 200, response });
+	} catch (error) {
+		res.json({ status: 404, message: err });
 	}
 };
 
@@ -28,9 +31,9 @@ exports.createMedia = async (req, res) => {
 		newMedia
 			.save()
 			.then((response) =>
-				res.json({ message: 'Media Created', status: true, response })
+				res.json({ status: 200, message: 'Media Created', response })
 			)
-			.catch((err) => res.json({ message: err, status: false }));
+			.catch((err) => res.json({ status: 404, message: err }));
 	};
 	await S3.uploadNewMedia(req, res, data);
 };
@@ -38,9 +41,9 @@ exports.createMedia = async (req, res) => {
 exports.getSingleMedia = async (req, res) => {
 	await MediaModel.findById({ _id: req.params.mediaId }, (err, data) => {
 		if (err) {
-			res.json({ message: err, status: false });
+			res.json({ status: 404, message: err });
 		} else {
-			res.json({ data, status: true });
+			res.json({ status: 200, data });
 		}
 	});
 };
@@ -49,9 +52,9 @@ exports.getSingleMediaByTitle = async (req, res) => {
 	const title = req.params.title.toLowerCase();
 	await MediaModel.find({ title: title }, (err, data) => {
 		if (err) {
-			res.json({ message: err, status: false });
+			res.json({ status: 404, message: err });
 		} else {
-			res.json({ data, status: true });
+			res.json({ status: 200, data });
 		}
 	});
 };
@@ -73,13 +76,13 @@ exports.updateSingleMedia = async (req, res) => {
 					}
 				)
 					.then((data) =>
-						res.json({ message: 'Media updated', status: true, data })
+						res.json({ status: 200, message: 'Media updated', data })
 					)
-					.catch((err) => res.json({ message: err, status: false }));
+					.catch((err) => res.json({ status: 404, message: err }));
 			};
 			await S3.updateMedia(req, res, response.mediaKey, data);
 		})
-		.catch((err) => res.json({ message: err, status: false }));
+		.catch((err) => res.json({ status: 404, message: err }));
 };
 
 exports.removeSingleMedia = async (req, res) => {
@@ -87,10 +90,8 @@ exports.removeSingleMedia = async (req, res) => {
 		.then(async (response) => {
 			S3.deleteMedia(response.mediaKey);
 			await MediaModel.findByIdAndDelete({ _id: req.params.mediaId })
-				.then((data) =>
-					res.json({ message: 'Media removed', status: true, data })
-				)
-				.catch((err) => res.json({ message: err, status: false }));
+				.then((data) => res.json({ status: 200, message: 'Media removed', data }))
+				.catch((err) => res.json({ status: 404, message: err }));
 		})
-		.catch((err) => res.json({ message: err, status: false }));
+		.catch((err) => res.json({ status: 404, message: err }));
 };

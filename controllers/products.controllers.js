@@ -1,4 +1,3 @@
-const mongoose = require('mongoose');
 const ProductModel = require('../model/Products.model');
 const Media = require('../model/Media.model');
 
@@ -6,29 +5,29 @@ const S3 = require('../config/aws.s3.config');
 
 exports.getAllProduct = async (req, res) => {
 	try {
-		const {page = 1, limit} = req.query
-		const response = await ProductModel.find().limit(limit * 1).skip((page - 1) * limit)
-		.sort({ createdAt: -1 })
-		.populate('coverImageId', 'title url alt')
-		.populate('user', 'firstname lastname email')
-		const total = await ProductModel.find().count()
-		const pages = limit === undefined ? 1 : Math.ceil(total / limit)
-		res.json({total:total, pages, response});;
+		const { page = 1, limit } = req.query;
+		const response = await ProductModel.find()
+			.limit(limit * 1)
+			.skip((page - 1) * limit)
+			.sort({ createdAt: -1 })
+			.populate('coverImageId', 'title url alt')
+			.populate('user', 'firstname lastname email');
+		const total = await ProductModel.find().count();
+		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
+		res.json({ total: total, pages, status: 200, response });
 	} catch (err) {
-		res.json(err)
+		res.json({ status: 404, message: err });
 	}
 };
 
 exports.getSingleProduct = (req, res) => {
 	ProductModel.findById({ _id: req.params.productId })
-		.then((data) => res.json(data))
-		.catch((err) => res.json({ message: err }));
-	
-	};
+		.then((data) => res.json({ status: 200, data }))
+		.catch((err) => res.json({ status: 404, message: err }));
+};
 
 exports.createProduct = async (req, res) => {
 	const data = async (data) => {
-		console.log(data);
 		const newMedia = await new Media({
 			url: data.Location || null,
 			title: 'products',
@@ -73,12 +72,12 @@ exports.createProduct = async (req, res) => {
 			.save()
 			.then((response) =>
 				res.json({
-					status: true,
+					status: 200,
 					message: 'Added a new product successfully.',
 					response,
 				})
 			)
-			.catch((error) => res.json({ status: false, message: error }));
+			.catch((error) => res.json({ status: 404, message: error }));
 	};
 	await S3.uploadNewMedia(req, res, data);
 };
@@ -87,11 +86,10 @@ exports.createProduct = async (req, res) => {
 exports.deleteProduct = (req, res, next) => {
 	ProductModel.findByIdAndRemove({ _id: req.params.productId })
 		.then((data) => {
-			res.json(data);
+			res.json({ status: 200, message: 'Product is deleted successfully', data });
 		})
 		.catch((err) => {
-			next({ message: 'The product deleted.', code: 99 });
-			res.json(err);
+			res.json({ status: 404, message: err });
 		});
 };
 
@@ -102,8 +100,7 @@ exports.updateSingleProduct = (req, res) => {
 		{ useFindAndModify: false, new: true }
 	)
 		.then(async (product) => {
-
-						await Media.findById({ _id: product.coverImageId }).then(async (media) => {
+			await Media.findById({ _id: product.coverImageId }).then(async (media) => {
 				const data = async (data) => {
 					await Media.findByIdAndUpdate(
 						{ _id: product.coverImageId },
@@ -116,12 +113,11 @@ exports.updateSingleProduct = (req, res) => {
 							},
 						},
 						{ useFindAndModify: false, new: true }
-					).catch((err) => res.json(err));
+					).catch((err) => res.json({ status: 404, message: err }));
 				};
 				await S3.updateMedia(req, res, media.mediaKey, data);
 			});
 		})
-		.then((data) => res.json({ message: 'Product updated', status: true, data }))
-		.catch((err) => res.json({ message: err, status: false }));
-
-	};
+		.then((data) => res.json({ status: 200, message: 'Product updated', data }))
+		.catch((err) => res.json({ status: 404, message: err }));
+};

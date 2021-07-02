@@ -13,14 +13,16 @@ const transporter = nodemailer.createTransport({
 
 exports.getAll = async (req, res) => {
 	try {
-		const {page = 1, limit} = req.query
-		const response = await SubscribersModel.find().limit(limit * 1).skip((page - 1) * limit)
-		.sort({ createdAt: -1 })
-		const total = await SubscribersModel.find().count()
-		const pages = limit === undefined ? 1 : Math.ceil(total / limit)
-			res.json({ total:total, pages, response});;
+		const { page = 1, limit } = req.query;
+		const response = await SubscribersModel.find()
+			.limit(limit * 1)
+			.skip((page - 1) * limit)
+			.sort({ createdAt: -1 });
+		const total = await SubscribersModel.find().count();
+		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
+		res.json({ total: total, pages, status: 200, response });
 	} catch (err) {
-		res.json({ message: err })
+		res.json({ status: 404, message: err });
 	}
 };
 
@@ -45,7 +47,7 @@ exports.create = (req, res) => {
 
 			transporter.sendMail(option, (err, info) => {
 				if (err) {
-					res.json({ error: err, status: false });
+					res.json({ status: 404, message: err });
 					return;
 				} else {
 					res.json({
@@ -57,13 +59,15 @@ exports.create = (req, res) => {
 				}
 			});
 		})
-		.catch((err) => res.json(err));
+		.catch((err) => res.json({ status: 404, message: err }));
 };
 
 exports.delete = (req, res) => {
 	const { id } = req.params;
 
 	SubscribersModel.findByIdAndDelete({ _id: id })
-		.then((data) => res.json({ message: 'Deleted Successfully', status: true, data }))
-		.catch((err) => res.json({ error: err, status: false }));
+		.then((data) =>
+			res.json({ status: 200, message: 'Subscriber is deleted successfully', data })
+		)
+		.catch((err) => res.json({ status: 404, error: err }));
 };

@@ -1,16 +1,17 @@
 const GoogleMapsModel = require('../model/GoogleMaps.model');
 
 exports.getAll = async (req, res) => {
-
 	try {
-		const {page = 1, limit} = req.query
-		const response = await GoogleMapsModel.find().limit(limit * 1).skip((page - 1) * limit)
-		.sort({ createdAt: -1 })
-		const total = await GoogleMapsModel.find().count()
-		const pages = limit === undefined ? 1 : Math.ceil(total / limit)
-			res.json({total:total, pages, response});
+		const { page = 1, limit } = req.query;
+		const response = await GoogleMapsModel.find()
+			.limit(limit * 1)
+			.skip((page - 1) * limit)
+			.sort({ createdAt: -1 });
+		const total = await GoogleMapsModel.find().count();
+		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
+		res.json({ total: total, pages, status: 200, response });
 	} catch (err) {
-		res.json({ message: err, status: false })
+		res.json({ status: 404, message: err });
 	}
 };
 
@@ -25,20 +26,20 @@ exports.createFooter = (req, res) => {
 
 	newFooter
 		.save()
-		.then((data) => res.json({ status: true, data }))
-		.catch((err) => res.json({ message: err, status: false }));
+		.then((data) => res.json({ status: 200, data }))
+		.catch((err) => res.json({ status: 404, message: err }));
 };
 
 exports.updateFooterById = (req, res) => {
 	const id = req.params.id;
 	GoogleMapsModel.findByIdAndUpdate({ _id: id })
-		.then((data) => res.json({ status: true, data }))
-		.catch((err) => res.json({ message: err, status: false }));
+		.then((data) => res.json({ status: 200, data }))
+		.catch((err) => res.json({ status: 404, message: err }));
 };
 
 exports.removeFooterById = (req, res) => {
 	const id = req.params.id;
 	GoogleMapsModel.findByIdAndDelete({ _id: id })
-		.then((data) => res.json({ status: true, data }))
-		.catch((err) => res.json({ message: err, status: false }));
+		.then((data) => res.json({ status: 200, data }))
+		.catch((err) => res.json({ status: 404, message: err }));
 };
