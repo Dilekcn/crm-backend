@@ -1,4 +1,3 @@
-const mongoose = require('mongoose');
 const ExpertModel = require('../model/Expert.model');
 const SocialMediaModel = require('../model/SocialMedia.model');
 const MediaModel = require('../model/Media.model');
@@ -58,12 +57,12 @@ exports.createExpert = async (req, res) => {
 			.save()
 			.then((response) =>
 				res.json({
-					status: true,
+					status: 200,
 					message: 'Added new expert successfully.',
 					response,
 				})
 			)
-			.catch((error) => res.json({ status: false, message: error }));
+			.catch((error) => res.json({ status: 404, message: error }));
 	};
 
 	await S3.uploadNewMedia(req, res, data);
@@ -72,9 +71,9 @@ exports.createExpert = async (req, res) => {
 exports.getSingleExpert = async (req, res) => {
 	await ExpertModel.findById({ _id: req.params.expertid }, (err, data) => {
 		if (err) {
-			res.json({ message: err });
+			res.json({ status: 404, message: err });
 		} else {
-			res.json(data);
+			res.json({ status: 200, data });
 		}
 	})
 		.populate('socialMediaId', 'title link description')
@@ -84,9 +83,9 @@ exports.getSingleExpert = async (req, res) => {
 exports.getExpertsByFirstname = async (req, res) => {
 	await ExpertModel.find({ firstname: req.params.firstname }, (err, data) => {
 		if (err) {
-			res.json({ message: err });
+			res.json({ status: 404, message: err });
 		} else {
-			res.json(data);
+			res.json({ status: 200, data });
 		}
 	})
 		.populate('socialMediaId', 'title link description')
@@ -96,9 +95,9 @@ exports.getExpertsByFirstname = async (req, res) => {
 exports.getExpertsByLastname = async (req, res) => {
 	await ExpertModel.find({ lastname: req.params.lastname }, (err, data) => {
 		if (err) {
-			res.json({ message: err });
+			res.json({ status: 404, message: err });
 		} else {
-			res.json(data);
+			res.json({ status: 200, data });
 		}
 	})
 		.populate('socialMediaId', 'title link description')
@@ -108,9 +107,9 @@ exports.getExpertsByLastname = async (req, res) => {
 exports.getExpertsByExpertise = async (req, res) => {
 	await ExpertModel.find({ expertise: req.params.expertise }, (err, data) => {
 		if (err) {
-			res.json({ message: err });
+			res.json({ status: 404, message: err });
 		} else {
-			res.json(data);
+			res.json({ status: 200, data });
 		}
 	})
 		.populate('socialMediaId', 'title link description')
@@ -133,7 +132,7 @@ exports.updateExpert = async (req, res) => {
 							},
 						},
 						{ useFindAndModify: false, new: true }
-					).catch((err) => res.json(err));
+					).catch((err) => res.json({ status: 404, message: err }));
 				};
 				await S3.updateMedia(req, res, media.mediaKey, data);
 			});
@@ -164,14 +163,14 @@ exports.updateExpert = async (req, res) => {
 
 				.then((data) =>
 					res.json({
-						status: true,
+						status: 200,
 						message: 'Expert is updated successfully',
 						data,
 					})
 				)
-				.catch((err) => res.json({ message: err }));
+				.catch((err) => res.json({ status: 404, message: err }));
 		})
-		.catch((err) => res.json({ message: err }));
+		.catch((err) => res.json({ status: 404, message: err }));
 };
 
 exports.removeExpert = async (req, res) => {
