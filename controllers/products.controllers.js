@@ -102,21 +102,24 @@ exports.updateSingleProduct = (req, res) => {
 		{ useFindAndModify: false, new: true }
 	)
 		.then(async (product) => {
-			const data =async(data)=>{
-				await Media.findByIdAndUpdate(
-					product.coverImageId,
-					{
-						$set: {
-							url: data.Location,
-							description: req.body.coverImageId.description,
-						},
-					},
-					{ useFindAndModify: false, new: true }
-				);
-			}
-			await S3.updateMedia(req, res, data)
-		
 
+						await Media.findById({ _id: product.coverImageId }).then(async (media) => {
+				const data = async (data) => {
+					await Media.findByIdAndUpdate(
+						{ _id: product.coverImageId },
+						{
+							$set: {
+								url: data.Location || null,
+								title: 'product',
+								mediaKey: data.Key,
+								alt: req.body.alt,
+							},
+						},
+						{ useFindAndModify: false, new: true }
+					).catch((err) => res.json(err));
+				};
+				await S3.updateMedia(req, res, media.mediaKey, data);
+			});
 		})
 		.then((data) => res.json({ message: 'Product updated', status: true, data }))
 		.catch((err) => res.json({ message: err, status: false }));

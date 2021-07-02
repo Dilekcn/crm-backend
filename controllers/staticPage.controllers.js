@@ -79,8 +79,9 @@ exports.updatePages = async (req, res) => {
 				{ _id: data.imageId },
 				{
 					$set: {
-						url: req.body.imageId.url || null,
+						url: data.Location || null,
 						title: 'static-pages',
+						mediaKey: data.Key,
 						alt: req.body.alt || null,
 					},
 				}
