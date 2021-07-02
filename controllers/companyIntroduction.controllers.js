@@ -1,4 +1,3 @@
-const mongoose = require('mongoose');
 const CompanyIntroductionModel = require('../model/CompanyIntroduction.model');
 
 exports.getAll = async (req, res) => {

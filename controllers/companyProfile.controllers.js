@@ -1,17 +1,17 @@
-const mongoose = require('mongoose');
-
 const CompanyProfileModel = require('../model/CompanyProfile.model');
 const SocialMedia = require('../model/SocialMedia.model');
 
 exports.getAll = async (req, res) => {
 	try {
-		const {page = 1, limit} = req.query
-		const response = await CompanyProfileModel.find().limit(limit * 1).skip((page - 1) * limit)
+		const { page = 1, limit } = req.query;
+		const response = await CompanyProfileModel.find()
+			.limit(limit * 1)
+			.skip((page - 1) * limit)
 			.sort({ createdAt: -1 })
 			.populate('socialMediaId', 'title link');
-			const total = await CompanyProfileModel.find().count()
-		const pages = limit === undefined ? 1 : Math.ceil(total / limit)
-		res.json({ total:total, pages, response});
+		const total = await CompanyProfileModel.find().count();
+		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
+		res.json({ total: total, pages, response });
 	} catch (error) {
 		res.status(500).json(error);
 	}
@@ -20,9 +20,9 @@ exports.getAll = async (req, res) => {
 exports.getSingle = async (req, res) => {
 	await CompanyProfileModel.findById({ _id: req.params.id }, (err, data) => {
 		if (err) {
-			res.json({ message: err, status: false });
+			res.json({ message: err, status: 404 });
 		} else {
-			res.json({ data, status: true });
+			res.json({ data, status: 200 });
 		}
 	}).populate('socialMediaId', 'title link');
 };
@@ -58,12 +58,12 @@ exports.create = async (req, res) => {
 		.save()
 		.then((response) =>
 			res.json({
-				status: true,
+				status: 200,
 				message: 'Added a new company profile successfully.',
 				response,
 			})
 		)
-		.catch((error) => res.json({ status: false, message: error }));
+		.catch((error) => res.json({ status: 404, message: error }));
 	console.log(companyProfile);
 };
 
@@ -97,25 +97,25 @@ exports.update = async (req, res) => {
 			)
 				.then((companyprofile) =>
 					res.json({
-						status: true,
+						status: 200,
 						message: 'Company profile is updated successfully',
 						companyprofile,
 					})
 				)
-				.catch((err) => res.json({ status: false, message: err }));
+				.catch((err) => res.json({ status: 404, message: err }));
 		})
-		.then((data) => res.json(data))
-		.catch((err) => res.json({ message: err }));
+		.then((data) => res.json({ status: 200, data }))
+		.catch((err) => res.json({ status: 404, message: err }));
 };
 
 exports.delete = async (req, res) => {
 	await CompanyProfileModel.findByIdAndDelete({ _id: req.params.id })
 		.then((data) =>
 			res.json({
-				status: true,
+				status: 200,
 				message: 'Company profile is deleted successfully',
 				data,
 			})
 		)
-		.catch((err) => res.json({ status: false, message: err }));
+		.catch((err) => res.json({ status: 404, message: err }));
 };
