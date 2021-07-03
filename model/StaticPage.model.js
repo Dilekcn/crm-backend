@@ -8,6 +8,7 @@ const StaticPageSchema = new Schema(
 		imageId: { type: Schema.Types.ObjectId, ref: 'media' },
 		isActive: { type: Boolean, default: true },
 		isDeleted: { type: Boolean, default: false },
+		alt: String,
 	},
 	{ timestamps: true }
 );

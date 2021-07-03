@@ -15,6 +15,7 @@ const ProductsSchema = new Schema(
 		isDeleted: { type: Boolean, default: false },
 		isBlog: { type: Boolean, default: false },
 		isAboveFooter: { type: Boolean, default: false },
+		alt: String,
 	},
 	{ timestamps: true }
 );
