@@ -39,7 +39,7 @@ exports.createMedia = async (req, res) => {
 };
 
 exports.getSingleMedia = async (req, res) => {
-	await MediaModel.findById({ _id: req.params.mediaId }, (err, data) => {
+	await MediaModel.findById({ _id: req.params.mediaid }, (err, data) => {
 		if (err) {
 			res.json({ status: 404, message: err });
 		} else {
@@ -64,7 +64,7 @@ exports.updateSingleMedia = async (req, res) => {
 		.then(async (response) => {
 			const data = async (data) => {
 				await MediaModel.findByIdAndUpdate(
-					{ _id: req.params.mediaId },
+					{ _id: req.params.mediaid },
 					{
 						$set: {
 							url: data.Location,
@@ -89,7 +89,7 @@ exports.removeSingleMedia = async (req, res) => {
 	await MediaModel.findById({ _id: req.params.mediaId })
 		.then(async (response) => {
 			S3.deleteMedia(response.mediaKey);
-			await MediaModel.findByIdAndDelete({ _id: req.params.mediaId })
+			await MediaModel.findByIdAndDelete({ _id: req.params.mediaid })
 				.then((data) => res.json({ status: 200, message: 'Media removed', data }))
 				.catch((err) => res.json({ status: 404, message: err }));
 		})
