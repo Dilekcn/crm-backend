@@ -12,6 +12,7 @@ const SliderSchema = new Schema(
 		isDeleted: { type: Boolean, default: false },
 		mediaId: { type: Schema.Types.ObjectId, ref: 'media' },
 		isVideo: { type: Boolean, default: false },
+		alt:{ type: String}
 	},
 	{ timestamps: true }
 );
