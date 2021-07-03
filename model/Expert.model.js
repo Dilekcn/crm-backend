@@ -10,6 +10,7 @@ const ExpertSchema = new Schema(
 		socialMediaId: [{ type: Schema.Types.ObjectId, ref: 'social' }],
 		isActive: { type: Boolean, default: true },
 		isDeleted: { type: Boolean, default: false },
+		alt:{ type: String}
 	},
 	{ timestamps: true }
 );
