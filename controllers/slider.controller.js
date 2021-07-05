@@ -146,7 +146,7 @@ exports.updateSlider = async (req, res) => {
 exports.removeSlide = async (req, res) => {
 	await SliderModel.findByIdAndDelete({ _id: req.params.slideid })
 		.then(async (slider) => {
-			res.json(slider);
+			res.json({ status: 200, message: 'Slide is deleted successfully', slider });
 		})
 		.catch((err) => res.json({ status: 404, message: err }));
 

@@ -114,6 +114,12 @@ exports.updatePages = async (req, res) => {
 
 exports.removePage = async (req, res) => {
 	await StaticPageModel.findByIdAndDelete({ _id: req.params.id })
-		.then((data) => res.json({ status: 200, data }))
+		.then((data) =>
+			res.json({
+				status: 200,
+				message: 'Static page is deleted successfully',
+				data,
+			})
+		)
 		.catch((err) => res.json({ status: 404, message: err }));
 };
