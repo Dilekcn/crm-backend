@@ -7,11 +7,11 @@ const ExpertSchema = new Schema(
 		lastname: String,
 		expertise: String,
 		mediaId: { type: Schema.Types.ObjectId, ref: 'media' },
-		socialMediaId: [{ type: Schema.Types.ObjectId, ref: 'social' }],
+		socialMediaId: [{ type: Schema.Types.ObjectId, ref: 'social',default:[] }],
 		isActive: { type: Boolean, default: true },
 		isDeleted: { type: Boolean, default: false },
 		alt: { type: String },
-	},
+	}, 
 	{ timestamps: true }
 );
 
