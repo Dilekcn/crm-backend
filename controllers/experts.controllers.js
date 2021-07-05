@@ -21,33 +21,12 @@ exports.getAllExperts = async (req, res) => {
 };
 
 exports.createExpert = async (req, res) => {
-<<<<<<< HEAD
-	const newSocialMedia = await JSON.parse(req.body.socialMediaId).map((sm) => {
-		return new SocialMediaModel({
-			title: sm.title || null,
-			link: sm.link || null,
-		});
-	});
-
-	newSocialMedia.map((sm) => sm.save());
-
-	const socialMediaIds = newSocialMedia.map((sm) => sm._id);
-
-	const data = async (data) => {
-		const newMedia = await new MediaModel({
-			url: data.Location || null,
-			title: 'expert',
-			alt: req.body.alt || null,
-			mediaKey: data.Key,
-			alt: req.body.alt || null,
-=======
 	if(req.body.socialMediaId){
 		const newSocialMedia = await JSON.parse(req.body.socialMediaId).map((sm) => {
 			return new SocialMediaModel({
 				title: sm.title || null,
 				link: sm.link || null,
 			});
->>>>>>> ab2a23e43dd02bfefbeb6681e3fe354967e92d69
 		});
 	
 		newSocialMedia.map((sm) => sm.save()); 
@@ -56,7 +35,7 @@ exports.createExpert = async (req, res) => {
 		const data = async (data) => {
 			const newMedia = await new MediaModel({
 				url: data.Location || null,
-				title: 'experts',
+				title: 'expert',
 				alt: req.body.alt || null,
 				mediaKey: data.Key,
 				alt: req.body.alt || null,
@@ -92,7 +71,7 @@ exports.createExpert = async (req, res) => {
 		const data = async (data) => {
 			const newMedia = await new MediaModel({
 				url: data.Location || null,
-				title: 'experts',
+				title: 'expert',
 				alt: req.body.alt || null,
 				mediaKey: data.Key,
 				alt: req.body.alt || null,
