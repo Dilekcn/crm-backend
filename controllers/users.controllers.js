@@ -86,7 +86,7 @@ exports.createUser = async (req, res) => {
 		console.log(req.body);
 		const newMedia = await new MediaModel({
 			url: data.Location || null,
-			title: 'users',
+			title: 'user',
 			mediaKey: data.Key,
 			alt: req.body.alt || null,
 		});
@@ -154,7 +154,7 @@ exports.updateUser = async (req, res) => {
 							{
 								$set: {
 									url: data.Location || null,
-									title: 'users',
+									title: 'user',
 									mediaKey: data.Key,
 									alt: req.body.alt || null,
 								},
