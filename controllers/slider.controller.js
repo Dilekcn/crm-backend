@@ -146,9 +146,6 @@ exports.updateSlider = async (req, res) => {
 exports.removeSlide = async (req, res) => {
 	await SliderModel.findByIdAndDelete({ _id: req.params.slideid })
 		.then(async (slider) => {
-			await MediaModel.findByIdAndRemove({ _id: slider.mediaId }).then((media) => {
-				S3.deleteMedia(media.mediaKey);
-			});
 			res.json(slider);
 		})
 		.catch((err) => res.json({ status: 404, message: err }));
