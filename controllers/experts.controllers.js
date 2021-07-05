@@ -21,52 +21,90 @@ exports.getAllExperts = async (req, res) => {
 };
 
 exports.createExpert = async (req, res) => {
-	const newSocialMedia = await JSON.parse(req.body.socialMediaId).map((sm) => {
-		return new SocialMediaModel({
-			title: sm.title || null,
-			link: sm.link || null,
+	if(req.body.socialMediaId){
+		const newSocialMedia = await JSON.parse(req.body.socialMediaId).map((sm) => {
+			return new SocialMediaModel({
+				title: sm.title || null,
+				link: sm.link || null,
+			});
 		});
-	});
+	
+		newSocialMedia.map((sm) => sm.save()); 
+	
+		const socialMediaIds = newSocialMedia.map((sm) => sm._id);
+		const data = async (data) => {
+			const newMedia = await new MediaModel({
+				url: data.Location || null,
+				title: 'experts',
+				alt: req.body.alt || null,
+				mediaKey: data.Key,
+				alt: req.body.alt || null,
+			});
+	
+			newMedia.save();
+	
+			const { firstname, lastname, expertise, isActive, isDeleted } = req.body;
+	
+			const newExpert = await new ExpertModel({
+				firstname,
+				lastname,
+				expertise,
+				mediaId: newMedia._id,
+				socialMediaId: socialMediaIds,
+				isActive,
+				isDeleted,
+			});
+			newExpert
+				.save()
+				.then((response) =>
+					res.json({
+						status: 200,
+						message: 'Added new expert successfully.',
+						response,
+					})
+				)
+				.catch((error) => res.json({ status: 404, message: error }));
+		};
+	
+		await S3.uploadNewMedia(req, res, data);
+	} else{
+		const data = async (data) => {
+			const newMedia = await new MediaModel({
+				url: data.Location || null,
+				title: 'experts',
+				alt: req.body.alt || null,
+				mediaKey: data.Key,
+				alt: req.body.alt || null,
+			});
+	
+			newMedia.save();
+	
+			const { firstname, lastname, expertise, isActive, isDeleted } = req.body;
+	
+			const newExpert = await new ExpertModel({
+				firstname,
+				lastname,
+				expertise,
+				mediaId: newMedia._id,
+				isActive,
+				isDeleted,
+			});
+			newExpert
+				.save()
+				.then((response) =>
+					res.json({
+						status: 200,
+						message: 'Added new expert successfully.',
+						response,
+					})
+				)
+				.catch((error) => res.json({ status: 404, message: error }));
+		};
+	
+		await S3.uploadNewMedia(req, res, data);
+	}
 
-	newSocialMedia.map((sm) => sm.save());
 
-	const socialMediaIds = newSocialMedia.map((sm) => sm._id);
-
-	const data = async (data) => {
-		const newMedia = await new MediaModel({
-			url: data.Location || null,
-			title: 'experts',
-			alt: req.body.alt || null,
-			mediaKey: data.Key,
-			alt: req.body.alt || null,
-		});
-
-		newMedia.save();
-
-		const { firstname, lastname, expertise, isActive, isDeleted } = req.body;
-
-		const newExpert = await new ExpertModel({
-			firstname,
-			lastname,
-			expertise,
-			mediaId: newMedia._id,
-			socialMediaId: socialMediaIds,
-			isActive,
-			isDeleted,
-		});
-		newExpert
-			.save()
-			.then((response) =>
-				res.json({
-					status: 200,
-					message: 'Added new expert successfully.',
-					response,
-				})
-			)
-			.catch((error) => res.json({ status: 404, message: error }));
-	};
-
-	await S3.uploadNewMedia(req, res, data);
 };
 
 exports.getSingleExpert = async (req, res) => {
