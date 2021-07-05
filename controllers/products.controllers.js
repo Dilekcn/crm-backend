@@ -30,7 +30,7 @@ exports.createProduct = async (req, res) => {
 	const data = async (data) => {
 		const newMedia = await new Media({
 			url: data.Location || null,
-			title: 'products',
+			title: 'product',
 			mediaKey: data.Key,
 			alt: req.body.alt || null,
 		});

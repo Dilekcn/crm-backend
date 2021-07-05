@@ -35,7 +35,7 @@ exports.createExpert = async (req, res) => {
 		const data = async (data) => {
 			const newMedia = await new MediaModel({
 				url: data.Location || null,
-				title: 'experts',
+				title: 'expert',
 				alt: req.body.alt || null,
 				mediaKey: data.Key,
 				alt: req.body.alt || null,
@@ -71,7 +71,7 @@ exports.createExpert = async (req, res) => {
 		const data = async (data) => {
 			const newMedia = await new MediaModel({
 				url: data.Location || null,
-				title: 'experts',
+				title: 'expert',
 				alt: req.body.alt || null,
 				mediaKey: data.Key,
 				alt: req.body.alt || null,
@@ -163,7 +163,7 @@ exports.updateExpert = async (req, res) => {
 						{
 							$set: {
 								url: data.Location || null,
-								title: 'experts',
+								title: 'expert',
 								mediaKey: data.Key,
 								alt: req.body.alt,
 							},

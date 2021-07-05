@@ -22,7 +22,7 @@ exports.createPage = async (req, res) => {
 	const data = async (data) => {
 		const newImage = await new ImageModel({
 			url: data.Location || null,
-			title: 'static-pages',
+			title: 'static-page',
 			mediaKey: data.Key,
 			alt: req.body.alt || null,
 		});
@@ -81,7 +81,7 @@ exports.updatePages = async (req, res) => {
 				{
 					$set: {
 						url: data.Location || null,
-						title: 'static-pages',
+						title: 'static-page',
 						mediaKey: data.Key,
 						alt: req.body.alt || null,
 					},
