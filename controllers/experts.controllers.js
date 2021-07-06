@@ -38,7 +38,6 @@ exports.createExpert = async (req, res) => {
 				title: 'expert',
 				alt: req.body.alt || null,
 				mediaKey: data.Key,
-				alt: req.body.alt || null,
 			});
 
 			newMedia.save();
