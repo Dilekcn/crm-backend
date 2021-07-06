@@ -95,10 +95,7 @@ exports.removeFooterById = (req, res) => {
 	const id = req.params.id;
 	FooterModel.findByIdAndDelete({ _id: id })
 		.then(async (data) => {
-			//    await data.socialMediaId.map(async(socialMediaid, index) => {
-			//        await SocialMediaModel.findByIdAndRemove({_id:socialMediaid})
-			//    })
-			res.json({ status: 200, data });
+			res.json({ status: 200, message: 'Footer is deleted successfully', data });
 		})
 		.catch((err) => res.json({ status: 404, message: err }));
 };
