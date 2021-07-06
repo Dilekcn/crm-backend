@@ -162,6 +162,7 @@ exports.updateUser = async (req, res) => {
 							},
 							{ useFindAndModify: false, new: true }
 						)
+					
 					};
 					await S3.updateMedia(req, res, media.mediaKey, data);
 				
