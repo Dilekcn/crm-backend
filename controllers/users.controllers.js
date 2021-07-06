@@ -149,6 +149,7 @@ exports.updateUser = async (req, res) => {
 			await MediaModel.findById({ _id: user.mediaId })
 				.then(async (media) => {
 					const data = async (data) => {
+						console.log(data)
 						await MediaModel.findByIdAndUpdate(
 							{ _id: user.mediaId },
 							{

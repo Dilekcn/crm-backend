@@ -27,18 +27,38 @@ const uploadNewMedia = (req, res, callback) => {
 };
 
 const updateMedia = (req, res, mediaKey, callback) => {
-	const file = __dirname +  "/noImage.jpg"
-	const data = fs.readFileSync(file)
-	const params = {
-		Bucket: Bucket_Name,
-		Key: mediaKey,
-		Body: req.files ?  req.files.mediaId.data : data,
-		ContentType: 'image/JPG',
-	};
-	S3.upload(params, (err, data) => {
-		if (err) return res.json({ message: 'error from aws update', err });
-		callback(data);
-	});
+	if(req.files) {
+		const params = {
+			Bucket: Bucket_Name,
+			Key: mediaKey,
+			Body: req.files ?  req.files.mediaId.data : null,
+			ContentType: 'image/JPG',
+		};
+		S3.upload(params, (err, data) => {
+			if (err) return res.json({ message: 'error from aws update', err });
+			callback(data);
+		});
+	} else {
+		const params = {
+			Bucket: Bucket_Name,
+			Key: mediaKey
+		}
+
+		S3.getObject(params, (err, data) => {
+			if (err) return res.json({ message: 'error from aws update', err });
+
+			const updateParams = {
+				Bucket: Bucket_Name,
+				Key: mediaKey,
+				Body: data.Body,
+				ContentType: 'image/JPG',
+			};
+			S3.upload(updateParams, (err, updateData) => {
+				if (err) return res.json({ message: 'error from aws update', err });
+			callback(updateData);
+			})
+		})
+	}
 };
 
 const deleteMedia = (mediaKey) => {
