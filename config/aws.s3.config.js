@@ -4,6 +4,7 @@ const Access_Key = process.env.Access_Key_ID;
 const Secret_Key = process.env.Secret_Access_Key;
 const Bucket_Name = process.env.Bucket_Name;
 const uuid = require('uuid');
+const fs = require('fs')
 
 const S3 = new AWS.S3({
 	accessKeyId: Access_Key,
@@ -11,10 +12,12 @@ const S3 = new AWS.S3({
 });
 
 const uploadNewMedia = (req, res, callback) => {
+	const file = __dirname +  "/noImage.jpg"
+	const data = fs.readFileSync(file)
 	const params = {
 		Bucket: Bucket_Name,
 		Key: uuid(),
-		Body: req.files.mediaId.data,
+		Body: req.files ?  req.files.mediaId.data : data,
 		ContentType: 'image/JPG',
 	};
 	S3.upload(params, (err, data) => {
@@ -24,10 +27,12 @@ const uploadNewMedia = (req, res, callback) => {
 };
 
 const updateMedia = (req, res, mediaKey, callback) => {
+	const file = __dirname +  "/noImage.jpg"
+	const data = fs.readFileSync(file)
 	const params = {
 		Bucket: Bucket_Name,
 		Key: mediaKey,
-		Body: req.files.mediaId.data,
+		Body: req.files ?  req.files.mediaId.data : data,
 		ContentType: 'image/JPG',
 	};
 	S3.upload(params, (err, data) => {
