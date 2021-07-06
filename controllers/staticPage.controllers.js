@@ -22,7 +22,7 @@ exports.createPage = async (req, res) => {
 	const data = async (data) => {
 		const newImage = await new ImageModel({
 			url: data.Location || null,
-			title: 'static-pages',
+			title: 'static-page',
 			mediaKey: data.Key,
 			alt: req.body.alt || null,
 		});
@@ -81,7 +81,7 @@ exports.updatePages = async (req, res) => {
 				{
 					$set: {
 						url: data.Location || null,
-						title: 'static-pages',
+						title: 'static-page',
 						mediaKey: data.Key,
 						alt: req.body.alt || null,
 					},
@@ -114,6 +114,12 @@ exports.updatePages = async (req, res) => {
 
 exports.removePage = async (req, res) => {
 	await StaticPageModel.findByIdAndDelete({ _id: req.params.id })
-		.then((data) => res.json({ status: 200, data }))
+		.then((data) =>
+			res.json({
+				status: 200,
+				message: 'Static page is deleted successfully',
+				data,
+			})
+		)
 		.catch((err) => res.json({ status: 404, message: err }));
 };
