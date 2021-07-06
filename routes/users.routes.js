@@ -4,6 +4,7 @@ const userControllers = require('../controllers/users.controllers');
 const isAdmin = require('../auth/isAdmin');
 
 router.get('/users', userControllers.getAllUsers);
+router.get('/users/:id', userControllers.getSingleUserById);
 router.get('/users/firstname/:firstname', userControllers.getSingleUserByFirstName);
 router.get('/users/lastname/:lastname', userControllers.getSingleUserByLastName);
 router.get('/users/email/:email', userControllers.getSingleUserByEmail);
