@@ -147,7 +147,7 @@ exports.updateUser = async (req, res) => {
 	await UserModel.findById({ _id: req.params.id })
 		.then(async (user) => {
 			await MediaModel.findById({ _id: user.mediaId })
-				.then(async (media) => {
+				.then(async (media) => {	
 					const data = async (data) => {
 						console.log(data)
 						await MediaModel.findByIdAndUpdate(
@@ -161,43 +161,44 @@ exports.updateUser = async (req, res) => {
 								},
 							},
 							{ useFindAndModify: false, new: true }
-						).then(async (updatedMedia) => {
-							const { firstname, lastname, email, password } = req.body;
-							await UserModel.findByIdAndUpdate(
-								{ _id: req.params.id },
-								{
-									$set: {
-										firstname,
-										lastname,
-										email,
-										password,
-										isActive: !req.body.isActive
-											? true
-											: req.body.isActive,
-										isDeleted: !req.body.isDeleted
-											? false
-											: req.body.isDeleted,
-										roleId: !req.body.roleId
-											? user.roleId
-											: req.body.roleId,
-										mediaId: user.mediaId,
-									},
-								},
-								{ useFindAndModify: false, new: true }
-							).then((data) =>
-								res.json({
-									status: 200,
-									message: 'User is updated successfully',
-									data,
-								})
-							);
-						});
+						)
 					};
 					await S3.updateMedia(req, res, media.mediaKey, data);
+				
 				})
-				.catch((err) => res.json({ status: 404, message: err }));
+				.catch((err) => res.json({ status:200,message:"User updated without profile",user}))
+			
+				const { firstname, lastname, email, password } = req.body;
+				await UserModel.findByIdAndUpdate(
+					{ _id: req.params.id },
+					{
+						$set: {
+							firstname,
+							lastname,
+							email,
+							password,
+							isActive: !req.body.isActive
+								? true
+								: req.body.isActive,
+							isDeleted: !req.body.isDeleted
+								? false
+								: req.body.isDeleted,
+							roleId: !req.body.roleId
+								? user.roleId
+								: req.body.roleId,
+							mediaId: user.mediaId,
+						},
+					},
+					{ useFindAndModify: false, new: true }
+				).then((data) =>
+					res.json({
+						status: 200,
+						message: 'User is updated successfully',
+						data,
+					})
+				);
 		})
-		.catch((err) => res.json({ status: 404, message: err }));
+		.catch((err) => res.json({ status: 4042, message: err }));
 };
 
 exports.deleteUser = async (req, res) => {

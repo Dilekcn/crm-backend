@@ -1,5 +1,6 @@
 const AWS = require('aws-sdk');
 require('dotenv').config();
+const UserModel = require('../model/User.model')
 const Access_Key = process.env.Access_Key_ID;
 const Secret_Key = process.env.Secret_Access_Key;
 const Bucket_Name = process.env.Bucket_Name;
@@ -60,6 +61,7 @@ const updateMedia = (req, res, mediaKey, callback) => {
 		})
 	}
 };
+
 
 const deleteMedia = (mediaKey) => {
 	const params = {
