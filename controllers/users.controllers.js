@@ -149,7 +149,6 @@ exports.updateUser = async (req, res) => {
 			await MediaModel.findById({ _id: user.mediaId })
 				.then(async (media) => {	
 					const data = async (data) => {
-						console.log(data)
 						await MediaModel.findByIdAndUpdate(
 							{ _id: user.mediaId },
 							{
@@ -167,7 +166,7 @@ exports.updateUser = async (req, res) => {
 					await S3.updateMedia(req, res, media.mediaKey, data);
 				
 				})
-				.catch((err) => res.json({ status:200,message:"User updated without profile",user}))
+				// .catch((err) => res.json({ status:200,message:"User updated without profile photo.",user}))
 			
 				const { firstname, lastname, email, password } = req.body;
 				const salt = await bcrypt.genSalt();
@@ -199,7 +198,8 @@ exports.updateUser = async (req, res) => {
 						message: 'User is updated successfully',
 						data,
 					})
-				);
+				)
+				.catch((err) => res.json({ status: 404, message: err }));
 		})
 		.catch((err) => res.json({ status: 404, message: err }));
 };
