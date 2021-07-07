@@ -201,7 +201,7 @@ exports.updateUser = async (req, res) => {
 					})
 				);
 		})
-		.catch((err) => res.json({ status: 4042, message: err }));
+		.catch((err) => res.json({ status: 404, message: err }));
 };
 
 exports.deleteUser = async (req, res) => {
