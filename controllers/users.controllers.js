@@ -170,6 +170,8 @@ exports.updateUser = async (req, res) => {
 				.catch((err) => res.json({ status:200,message:"User updated without profile",user}))
 			
 				const { firstname, lastname, email, password } = req.body;
+				const salt = await bcrypt.genSalt();
+		        const hashedPassword = await bcrypt.hash(password, salt);
 				await UserModel.findByIdAndUpdate(
 					{ _id: req.params.id },
 					{
@@ -177,7 +179,7 @@ exports.updateUser = async (req, res) => {
 							firstname,
 							lastname,
 							email,
-							password,
+							password:hashedPassword,
 							isActive: !req.body.isActive
 								? true
 								: req.body.isActive,
