@@ -149,7 +149,6 @@ exports.updateUser = async (req, res) => {
 			await MediaModel.findById({ _id: user.mediaId })
 				.then(async (media) => {	
 					const data = async (data) => {
-						console.log(data)
 						await MediaModel.findByIdAndUpdate(
 							{ _id: user.mediaId },
 							{
@@ -167,9 +166,11 @@ exports.updateUser = async (req, res) => {
 					await S3.updateMedia(req, res, media.mediaKey, data);
 				
 				})
-				.catch((err) => res.json({ status:200,message:"User updated without profile",user}))
+				// .catch((err) => res.json({ status:200,message:"User updated without profile photo.",user}))
 			
 				const { firstname, lastname, email, password } = req.body;
+				const salt = await bcrypt.genSalt();
+		        const hashedPassword = await bcrypt.hash(password, salt);
 				await UserModel.findByIdAndUpdate(
 					{ _id: req.params.id },
 					{
@@ -177,7 +178,7 @@ exports.updateUser = async (req, res) => {
 							firstname,
 							lastname,
 							email,
-							password,
+							password:hashedPassword,
 							isActive: !req.body.isActive
 								? true
 								: req.body.isActive,
@@ -197,9 +198,10 @@ exports.updateUser = async (req, res) => {
 						message: 'User is updated successfully',
 						data,
 					})
-				);
+				)
+				.catch((err) => res.json({ status: 404, message: err }));
 		})
-		.catch((err) => res.json({ status: 4042, message: err }));
+		.catch((err) => res.json({ status: 404, message: err }));
 };
 
 exports.deleteUser = async (req, res) => {

@@ -4,7 +4,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const fileUpload = require('express-fileupload');
-const cors = require('cors');
+// const cors = require('cors');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users.routes');
@@ -31,6 +31,7 @@ const companyProfileRouter = require('./routes/companyProfile.routes');
 var app = express();
 app.use(function (req, res, next) {
 	res.header('Access-Control-Allow-Origin', '*');
+	res.header("Access-Control-Allow-Credentials", true);
 	res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
 	res.header(
 		'Access-Control-Allow-Headers',
@@ -38,6 +39,7 @@ app.use(function (req, res, next) {
 	);
 	next();
 });
+
 // app.use(function(req, res, next) {
 // 	res.header("Access-Control-Allow-Origin", '*');
 // 	res.header("Access-Control-Allow-Credentials", true);
@@ -59,7 +61,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(fileUpload());
-app.use(cors());
+// app.use(cors());
 
 app.use('/', indexRouter);
 app.use('/', usersRouter);
