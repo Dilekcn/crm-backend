@@ -144,6 +144,7 @@ exports.login = async (req, res) => {
 };
 
 exports.updateUser = async (req, res) => {
+	console.log(req.body)
 	await UserModel.findById({ _id: req.params.id })
 		.then(async (user) => {
 			await MediaModel.findById({ _id: user.mediaId })
