@@ -3,8 +3,8 @@ const router = express.Router();
 const googleMapsControllers = require('../controllers/googleMaps.controllers');
 
 router.get('/googlemaps', googleMapsControllers.getAll);
-router.post('/googlemaps', googleMapsControllers.createFooter);
-router.put('/googlemaps', googleMapsControllers.updateFooterById);
-router.delete('/googlemaps', googleMapsControllers.removeFooterById);
+router.post('/googlemaps', googleMapsControllers.createGoogleMaps);
+router.put('/googlemaps', googleMapsControllers.updateGoogleMapsById);
+router.delete('/googlemaps', googleMapsControllers.removeGoogleMapsById);
 
 module.exports = router;

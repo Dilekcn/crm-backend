@@ -15,8 +15,8 @@ exports.getAll = async (req, res) => {
 	}
 };
 
-exports.createFooter = (req, res) => {
-	const newFooter = new GoogleMapsModel({
+exports.createGoogleMaps = (req, res) => {
+	const newGoogleMaps = new GoogleMapsModel({
 		address: req.body.address,
 		lat: req.body.lat,
 		lng: req.body.lng,
@@ -24,20 +24,20 @@ exports.createFooter = (req, res) => {
 		markerName: req.body.markerName,
 	});
 
-	newFooter
+	newGoogleMaps
 		.save()
 		.then((data) => res.json({ status: 200, data }))
 		.catch((err) => res.json({ status: 404, message: err }));
 };
 
-exports.updateFooterById = (req, res) => {
+exports.updateGoogleMapsById = (req, res) => {
 	const id = req.params.id;
 	GoogleMapsModel.findByIdAndUpdate({ _id: id })
 		.then((data) => res.json({ status: 200, data }))
 		.catch((err) => res.json({ status: 404, message: err }));
 };
 
-exports.removeFooterById = (req, res) => {
+exports.removeGoogleMapsById = (req, res) => {
 	const id = req.params.id;
 	GoogleMapsModel.findByIdAndDelete({ _id: id })
 		.then((data) => res.json({ status: 200, data }))
