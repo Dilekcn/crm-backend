@@ -93,7 +93,7 @@ exports.createUser = async (req, res) => {
 
 		newMedia.save();
 
-		const { firstname, lastname, email, password, isActive, isDeleted, roleId } =
+		const { firstname, lastname, email, isActive, isDeleted, roleId } =
 			req.body;
 		const salt = await bcrypt.genSalt();
 		const hashedPassword = await bcrypt.hash(password, salt);
@@ -147,6 +147,7 @@ exports.updateUser = async (req, res) => {
 	console.log(req.body)
 	await UserModel.findById({ _id: req.params.id })
 		.then(async (user) => {
+		
 			await MediaModel.findById({ _id: user.mediaId })
 				.then(async (media) => {	
 					const data = async (data) => {
@@ -169,9 +170,9 @@ exports.updateUser = async (req, res) => {
 				})
 				// .catch((err) => res.json({ status:200,message:"User updated without profile photo.",user}))
 			
-				const { firstname, lastname, email, password } = req.body;
-				const salt = await bcrypt.genSalt();
-		        const hashedPassword = await bcrypt.hash(password, salt);
+                
+				const { firstname, lastname, email} = req.body;
+				
 				await UserModel.findByIdAndUpdate(
 					{ _id: req.params.id },
 					{
@@ -179,7 +180,6 @@ exports.updateUser = async (req, res) => {
 							firstname,
 							lastname,
 							email,
-							password:hashedPassword,
 							isActive: !req.body.isActive
 								? true
 								: req.body.isActive,
