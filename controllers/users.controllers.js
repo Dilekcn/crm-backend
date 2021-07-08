@@ -93,7 +93,7 @@ exports.createUser = async (req, res) => {
 
 		newMedia.save();
 
-		const { firstname, lastname, email, isActive, isDeleted, roleId } =
+		const { firstname, lastname, email, isActive, isDeleted, roleId, password } =
 			req.body;
 		const salt = await bcrypt.genSalt();
 		const hashedPassword = await bcrypt.hash(password, salt);
@@ -204,6 +204,26 @@ exports.updateUser = async (req, res) => {
 		})
 		.catch((err) => res.json({ status: 404, message: err }));
 };
+
+
+exports.changePassword = (req, res) => {
+	const {currentPassword, newPassword} = req.body
+
+	UserModel.findById({_id:req.params.id})
+		.then(async(response) => {
+			if(await bcrypt.compare(currentPassword, response.password)) {
+				const salt = await bcrypt.genSalt();
+			const hashedPassword = await bcrypt.hash(newPassword, salt);
+				UserModel.findByIdAndUpdate({_id:req.params.id}, {$set:{
+					password:hashedPassword
+				}}).then(data => res.json({status:200, message:'Password updated successfully'}))
+			}
+		})
+		.catch(err =>  res.json({ status: 404, message: err }))
+
+
+}
+
 
 exports.deleteUser = async (req, res) => {
 	await UserModel.findByIdAndRemove({ _id: req.params.id })
