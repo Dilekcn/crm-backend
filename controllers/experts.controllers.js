@@ -188,7 +188,7 @@ exports.updateExpert = async (req, res) => {
 						firstname,
 						lastname,
 						expertise,
-						mediaId: req.body.files ? expert.mediaId : req.body.mediaId,
+						mediaId: expert.mediaId,
 						socialMediaId: expert.socialMediaId,
 						isActive: !req.body.isActive ? true : req.body.isActive,
 						isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,

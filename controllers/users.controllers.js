@@ -189,7 +189,7 @@ exports.updateUser = async (req, res) => {
 							roleId: !req.body.roleId
 								? user.roleId
 								: req.body.roleId,
-							mediaId: req.body.files ? user.mediaId : req.body.mediaId,
+							mediaId:user.mediaId,
 						},
 					},
 					{ useFindAndModify: false, new: true }

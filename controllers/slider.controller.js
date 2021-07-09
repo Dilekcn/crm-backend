@@ -117,7 +117,7 @@ exports.updateSlider = async (req, res) => {
 											order,
 											isActive,
 											isDeleted,
-											mediaId: req.body.files ? slider.mediaId : req.body.mediaId,
+											mediaId: slider.mediaId,
 											isVideo,
 										},
 									}
