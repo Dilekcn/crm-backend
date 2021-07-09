@@ -87,9 +87,9 @@ exports.createUser = async (req, res) => {
 		const newMedia = await new MediaModel({
 			url: data.Location || null,
 			title: 'user',
-			mediaKey: data.Key,
+			mediaKey: data.Key, 
 			alt: req.body.alt || null,
-		});
+		}); 
 
 		newMedia.save();
 
@@ -168,10 +168,10 @@ exports.updateUser = async (req, res) => {
 					await S3.updateMedia(req, res, media.mediaKey, data);
 				
 				})
-				// .catch((err) => res.json({ status:200,message:"User updated without profile photo.",user}))
+	
 			
                 
-				const { firstname, lastname, email} = req.body;
+				const { firstname, lastname, email,mediaId} = req.body;
 				
 				await UserModel.findByIdAndUpdate(
 					{ _id: req.params.id },
@@ -189,7 +189,7 @@ exports.updateUser = async (req, res) => {
 							roleId: !req.body.roleId
 								? user.roleId
 								: req.body.roleId,
-							mediaId: user.mediaId,
+							mediaId: req.body.files ? user.mediaId : req.body.mediaId,
 						},
 					},
 					{ useFindAndModify: false, new: true }

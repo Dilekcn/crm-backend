@@ -19,7 +19,7 @@ exports.getAllExperts = async (req, res) => {
 		res.json({ status: 404, message: error });
 	}
 };
-
+ 
 exports.createExpert = async (req, res) => {
 	if (req.body.socialMediaId) {
 		const newSocialMedia = await JSON.parse(req.body.socialMediaId).map((sm) => {
@@ -188,7 +188,7 @@ exports.updateExpert = async (req, res) => {
 						firstname,
 						lastname,
 						expertise,
-						mediaId: expert.mediaId,
+						mediaId: req.body.files ? expert.mediaId : req.body.mediaId,
 						socialMediaId: expert.socialMediaId,
 						isActive: !req.body.isActive ? true : req.body.isActive,
 						isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,

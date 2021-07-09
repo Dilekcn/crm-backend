@@ -93,7 +93,7 @@ exports.updatePages = async (req, res) => {
 					$set: {
 						name,
 						content,
-						imageId: data.imageId,
+						imageId: req.body.files ? data.imageId : req.body.imageId,
 						isActive,
 						isDeleted,
 					},
