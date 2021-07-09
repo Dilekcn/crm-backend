@@ -21,11 +21,12 @@ exports.createMedia = async (req, res) => {
 	const data = async (data) => {
 		const newMedia = await new MediaModel({
 			url: data.Location,
-			title: req.body.title,
+			title: req.body.title, 
 			mediaKey: data.Key,
 			isHomePage: req.body.isHomePage,
 			isActive: req.body.isActive,
 			isDeleted: req.body.isDeleted,
+			alt:req.body.alt
 		});
 
 		newMedia
@@ -72,6 +73,7 @@ exports.updateSingleMedia = async (req, res) => {
 							title: req.body.title,
 							isActive: req.body.isActive,
 							isDeleted: req.body.isDeleted,
+							alt:req.body.update
 						},
 					}
 				)
