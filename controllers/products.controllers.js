@@ -10,8 +10,8 @@ exports.getAllProduct = async (req, res) => {
 			.limit(limit * 1)
 			.skip((page - 1) * limit)
 			.sort({ createdAt: -1 })
-			.populate('coverImageId', 'title url alt')
-			.populate('user', 'firstname lastname email');
+			.populate('mediaId', 'title url alt')
+			.populate('userId', 'firstname lastname email');
 		const total = await ProductModel.find().count();
 		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
 		res.json({ total: total, pages, status: 200, response });
@@ -21,7 +21,9 @@ exports.getAllProduct = async (req, res) => {
 };
 
 exports.getSingleProduct = (req, res) => {
-	ProductModel.findById({ _id: req.params.productId })
+	ProductModel.findById({ _id: req.params.productid })
+		.populate('mediaId', 'title url alt')
+		.populate('userId', 'firstname lastname email')
 		.then((data) => res.json({ status: 200, data }))
 		.catch((err) => res.json({ status: 404, message: err }));
 };
@@ -56,7 +58,7 @@ exports.createProduct = async (req, res) => {
 		const product = await new ProductModel({
 			title,
 			order,
-			coverImageId: mediaIds,
+			mediaId: mediaIds,
 			isHomePage,
 			content,
 			shortDescription,
@@ -84,7 +86,7 @@ exports.createProduct = async (req, res) => {
 
 /************************************ */
 exports.deleteProduct = (req, res, next) => {
-	ProductModel.findByIdAndRemove({ _id: req.params.productId })
+	ProductModel.findByIdAndRemove({ _id: req.params.productid })
 		.then((data) => {
 			res.json({ status: 200, message: 'Product is deleted successfully', data });
 		})
@@ -93,17 +95,13 @@ exports.deleteProduct = (req, res, next) => {
 		});
 };
 
-exports.updateSingleProduct = (req, res) => {
-	ProductModel.findByIdAndUpdate(
-		{ _id: req.params.productId },
-		{ $set: req.body },
-		{ useFindAndModify: false, new: true }
-	)
+exports.updateSingleProduct = async (req, res) => {
+	await ProductModel.findById({ _id: req.params.productid })
 		.then(async (product) => {
-			await Media.findById({ _id: product.coverImageId }).then(async (media) => {
+			await Media.findById({ _id: product.mediaId }).then(async (media) => {
 				const data = async (data) => {
 					await Media.findByIdAndUpdate(
-						{ _id: product.coverImageId },
+						{ _id: product.mediaId },
 						{
 							$set: {
 								url: data.Location || null,
@@ -113,11 +111,51 @@ exports.updateSingleProduct = (req, res) => {
 							},
 						},
 						{ useFindAndModify: false, new: true }
-					).catch((err) => res.json({ status: 404, message: err }));
+					).catch((err) => res.json({ status: 4040, message: err }));
 				};
 				await S3.updateMedia(req, res, media.mediaKey, data);
 			});
+
+			const {
+				title,
+				order,
+				isHomePage,
+				content,
+				shortDescription,
+				buttonText,
+				userId,
+			} = req.body;
+
+			await ProductModel.findByIdAndUpdate(
+				{ _id: req.params.productid },
+				{
+					$set: {
+						title,
+						order,
+						mediaId: product.mediaId,
+						isHomePage: !req.body.isHomePage ? false : req.body.isHome,
+						content,
+						shortDescription,
+						buttonText,
+						userId,
+						isActive: !req.body.isActive ? true : req.body.isActive,
+						isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
+						isBlog: !req.body.isBlog ? false : req.body.isBlog,
+						isAboveFooter: !req.body.isAboveFooter
+							? false
+							: req.body.isAboveFooter,
+					},
+				},
+				{ useFindAndModify: false, new: true }
+			)
+				.then((data) =>
+					res.json({
+						status: 200,
+						message: 'Product is updated successfully',
+						data,
+					})
+				)
+				.catch((err) => res.json({ status: 4041, message: err }));
 		})
-		.then((data) => res.json({ status: 200, message: 'Product updated', data }))
-		.catch((err) => res.json({ status: 404, message: err }));
+		.catch((err) => res.json({ status: 4042, message: err }));
 };
