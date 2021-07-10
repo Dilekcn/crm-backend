@@ -149,28 +149,26 @@ exports.updateUser = async (req, res) => {
 		.then(async (user) => {
 		
 			await MediaModel.findById({ _id: user.mediaId })
-				.then(async (media) => {	
-					const data = async (data) => {
-						await MediaModel.findByIdAndUpdate(
-							{ _id: user.mediaId },
-							{
-								$set: {
-									url: data.Location || null,
-									title: 'user',
-									mediaKey: data.Key,
-									alt: req.body.alt || null,
-								},
+			.then(async (media) => {	
+				const data = async (data) => {
+					await MediaModel.findByIdAndUpdate(
+						{ _id: user.mediaId },
+						{
+							$set: {
+								url: data.Location || null,
+								title: 'user',
+								mediaKey: data.Key,
+								alt: req.body.alt || null,
 							},
-							{ useFindAndModify: false, new: true }
-						)
-					
-					};
-					await S3.updateMedia(req, res, media.mediaKey, data);
+						},
+						{ useFindAndModify: false, new: true }
+					)
 				
-				})
-	
+				};
+				await S3.updateMedia(req, res, media.mediaKey, data);
 			
-                
+			})
+
 				const { firstname, lastname, email,mediaId} = req.body;
 				
 				await UserModel.findByIdAndUpdate(
@@ -189,7 +187,7 @@ exports.updateUser = async (req, res) => {
 							roleId: !req.body.roleId
 								? user.roleId
 								: req.body.roleId,
-							mediaId:user.mediaId,
+							mediaId: user.mediaId ,
 						},
 					},
 					{ useFindAndModify: false, new: true }
