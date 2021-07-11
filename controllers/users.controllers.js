@@ -87,9 +87,9 @@ exports.createUser = async (req, res) => {
 		const newMedia = await new MediaModel({
 			url: data.Location || null,
 			title: 'user',
-			mediaKey: data.Key, 
+			mediaKey: data.Key,
 			alt: req.body.alt || null,
-		}); 
+		});
 
 		newMedia.save();
 
@@ -144,12 +144,10 @@ exports.login = async (req, res) => {
 };
 
 exports.updateUser = async (req, res) => {
-	console.log(req.body)
+	console.log(req.body);
 	await UserModel.findById({ _id: req.params.id })
 		.then(async (user) => {
-		
-			await MediaModel.findById({ _id: user.mediaId })
-			.then(async (media) => {	
+			await MediaModel.findById({ _id: user.mediaId }).then(async (media) => {
 				const data = async (data) => {
 					await MediaModel.findByIdAndUpdate(
 						{ _id: user.mediaId },
@@ -162,36 +160,29 @@ exports.updateUser = async (req, res) => {
 							},
 						},
 						{ useFindAndModify: false, new: true }
-					)
-				
+					);
 				};
 				await S3.updateMedia(req, res, media.mediaKey, data);
-			
-			})
+			});
 
-				const { firstname, lastname, email,mediaId} = req.body;
-				
-				await UserModel.findByIdAndUpdate(
-					{ _id: req.params.id },
-					{
-						$set: {
-							firstname,
-							lastname,
-							email,
-							isActive: !req.body.isActive
-								? true
-								: req.body.isActive,
-							isDeleted: !req.body.isDeleted
-								? false
-								: req.body.isDeleted,
-							roleId: !req.body.roleId
-								? user.roleId
-								: req.body.roleId,
-							mediaId: user.mediaId ,
-						},
+			const { firstname, lastname, email, mediaId } = req.body;
+
+			await UserModel.findByIdAndUpdate(
+				{ _id: req.params.id },
+				{
+					$set: {
+						firstname,
+						lastname,
+						email,
+						isActive: !req.body.isActive ? true : req.body.isActive,
+						isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
+						roleId: !req.body.roleId ? user.roleId : req.body.roleId,
+						mediaId: user.mediaId,
 					},
-					{ useFindAndModify: false, new: true }
-				).then((data) =>
+				},
+				{ useFindAndModify: false, new: true }
+			)
+				.then((data) =>
 					res.json({
 						status: 200,
 						message: 'User is updated successfully',
@@ -203,35 +194,53 @@ exports.updateUser = async (req, res) => {
 		.catch((err) => res.json({ status: 404, message: err }));
 };
 
-
 exports.changePassword = (req, res) => {
-	const {currentPassword, newPassword} = req.body
+	const { currentPassword, newPassword } = req.body;
 
-	UserModel.findById({_id:req.params.id})
-		.then(async(response) => {
-			if(await bcrypt.compare(currentPassword, response.password)) {
+	UserModel.findById({ _id: req.params.id })
+		.then(async (response) => {
+			if (await bcrypt.compare(currentPassword, response.password)) {
 				const salt = await bcrypt.genSalt();
-			const hashedPassword = await bcrypt.hash(newPassword, salt);
-				UserModel.findByIdAndUpdate({_id:req.params.id}, {$set:{
-					password:hashedPassword
-				}}).then(data => res.json({status:200, message:'Password updated successfully'}))
+				const hashedPassword = await bcrypt.hash(newPassword, salt);
+				UserModel.findByIdAndUpdate(
+					{ _id: req.params.id },
+					{
+						$set: {
+							password: hashedPassword,
+						},
+					}
+				).then((data) =>
+					res.json({
+						status: 200,
+						message: 'Password updated successfully',
+						data,
+					})
+				);
 			}
 		})
-		.catch(err =>  res.json({ status: 404, message: err }))
-
-
-}
-
+		.catch((err) => res.json({ status: 404, message: err }));
+};
 
 exports.deleteUser = async (req, res) => {
-	await UserModel.findByIdAndRemove({ _id: req.params.id })
-		.then((data) =>
-			res.json({
-				status: 200,
-				message: 'User is deleted successfully.',
-				data,
-			})
-		)
+	await UserModel.findById({ _id: req.params.id })
+		.then(async (user) => {
+			await MediaModel.findByIdAndUpdate(
+				{ _id: user.mediaId },
+				{
+					$set: { isActive: false },
+				},
+				{ useFindAndModify: false, new: true }
+			);
+			await UserModel.findByIdAndRemove({ _id: req.params.id })
+				.then((data) =>
+					res.json({
+						status: 200,
+						message: 'User is deleted successfully.',
+						data,
+					})
+				)
+				.catch((err) => res.json({ status: 404, message: err }));
+		})
 		.catch((err) => res.json({ status: 404, message: err }));
 };
 
