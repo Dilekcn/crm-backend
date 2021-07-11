@@ -21,6 +21,7 @@ exports.getAllExperts = async (req, res) => {
 };
 
 exports.createExpert = async (req, res) => {
+	console.log(typeof req.body.socialMediaId)
 	if (req.body.socialMediaId) {
 		const newSocialMedia = await JSON.parse(req.body.socialMediaId).map((sm) => {
 			return new SocialMediaModel({
