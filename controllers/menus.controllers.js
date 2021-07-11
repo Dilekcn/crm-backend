@@ -17,7 +17,7 @@ exports.getAll = async (req, res) => {
 
 exports.create = async (req, res) => {
 	const { parentId, text, link, iconClassName, order, isActive, isDeleted } = req.body;
-	const newPost = await new MenusModel({
+	const newMenu = await new MenusModel({
 		parentId,
 		text,
 		link,
@@ -26,7 +26,7 @@ exports.create = async (req, res) => {
 		isActive,
 		isDeleted,
 	});
-	newPost
+	newMenu
 		.save()
 		.then((response) =>
 			res.json({

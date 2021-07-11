@@ -3,7 +3,7 @@ const MediaModel = require('../model/Media.model');
 
 const S3 = require('../config/aws.s3.config');
 
-exports.getAllProduct = async (req, res) => {
+exports.getAllProducts = async (req, res) => {
 	try {
 		const { page = 1, limit } = req.query;
 		const response = await ProductModel.find()
@@ -105,15 +105,8 @@ exports.updateSingleProduct = async (req, res) => {
 				await S3.updateMedia(req, res, media.mediaKey, data);
 			});
 
-			const {
-				title,
-				order,
-				isHomePage,
-				content,
-				shortDescription,
-				buttonText,
-				userId,
-			} = req.body;
+			const { title, order, content, shortDescription, buttonText, userId } =
+				req.body;
 
 			await ProductModel.findByIdAndUpdate(
 				{ _id: req.params.productid },

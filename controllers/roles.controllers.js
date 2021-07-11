@@ -32,7 +32,7 @@ exports.createRole = async (req, res) => {
 		.then((response) =>
 			res.json({
 				status: 200,
-				message: 'Added new role successfully.',
+				message: 'New role is created successfully.',
 				response,
 			})
 		)

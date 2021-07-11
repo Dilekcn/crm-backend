@@ -16,7 +16,7 @@ exports.getAll = async (req, res) => {
 };
 
 exports.create = async (req, res) => {
-	const newPost = await new IconBoxModel({
+	const newIconBox = await new IconBoxModel({
 		contentName: req.body.contentName,
 		routeName: req.body.routeName,
 		title: req.body.title,
@@ -26,7 +26,7 @@ exports.create = async (req, res) => {
 		isActive: req.body.isActive,
 		isDeleted: req.body.isDeleted,
 	});
-	newPost
+	newIconBox
 		.save()
 		.then((response) =>
 			res.json({
