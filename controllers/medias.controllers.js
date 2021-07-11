@@ -62,7 +62,7 @@ exports.getSingleMediaByTitle = async (req, res) => {
 
 exports.getMediaByIsActive = async (req, res) => {
 	const isActive = req.params.isActive.toLowerCase();
-	await MediaModel.find({ isActive: true }, (err, data) => {
+	await MediaModel.find({ isActive: isActive }, (err, data) => {
 		if (err) {
 			res.json({ status: 404, message: err });
 		} else {
