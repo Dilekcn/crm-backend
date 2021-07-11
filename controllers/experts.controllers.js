@@ -32,76 +32,124 @@ exports.createExpert = async (req, res) => {
 		newSocialMedia.map((sm) => sm.save());
 
 		const socialMediaIds = newSocialMedia.map((sm) => sm._id);
-		const data = async (data) => {
-			const newMedia = await new MediaModel({
-				url: data.Location || null,
-				title: 'expert',
-				alt: req.body.alt || null,
-				mediaKey: data.Key,
-			});
-
-			newMedia.save();
-
-			const { firstname, lastname, expertise, isActive, isDeleted } = req.body;
-
-			const newExpert = await new ExpertModel({
-				firstname,
-				lastname,
-				expertise,
-				mediaId: newMedia._id,
-				socialMediaId: socialMediaIds,
-				isActive,
-				isDeleted,
-			});
-			newExpert
-				.save()
-				.then((response) =>
-					res.json({
-						status: 200,
-						message: 'Added new expert successfully.',
-						response,
-					})
-				)
-				.catch((error) => res.json({ status: 404, message: error }));
-		};
-
-		await S3.uploadNewMedia(req, res, data);
+		if(req.files) {
+			const data = async (data) => {
+				const newMedia = await new MediaModel({
+					url: data.Location || null,
+					title: 'expert',
+					alt: req.body.alt || null,
+					mediaKey: data.Key,
+				});
+	
+				newMedia.save();
+	
+				const { firstname, lastname, expertise, isActive, isDeleted } = req.body;
+	
+				const newExpert = await new ExpertModel({
+					firstname,
+					lastname,
+					expertise,
+					mediaId: newMedia._id,
+					socialMediaId: socialMediaIds,
+					isActive,
+					isDeleted,
+				});
+				newExpert
+					.save()
+					.then((response) =>
+						res.json({
+							status: 200,
+							message: 'Added new expert successfully.',
+							response,
+						})
+					)
+					.catch((error) => res.json({ status: 404, message: error }));
+			};
+	
+			await S3.uploadNewMedia(req, res, data);
+		} else {	
+				const { firstname, lastname, expertise, isActive, isDeleted, mediaId } = req.body;
+	
+				const newExpert = await new ExpertModel({
+					firstname,
+					lastname,
+					expertise,
+					mediaId: mediaId,
+					socialMediaId: socialMediaIds,
+					isActive,
+					isDeleted,
+				});
+				newExpert
+					.save()
+					.then((response) =>
+						res.json({
+							status: 200,
+							message: 'Added new expert successfully.',
+							response,
+						})
+					)
+					.catch((error) => res.json({ status: 404, message: error }));
+		}
 	} else {
-		const data = async (data) => {
-			const newMedia = await new MediaModel({
-				url: data.Location || null,
-				title: 'expert',
-				alt: req.body.alt || null,
-				mediaKey: data.Key,
-			});
-
-			newMedia.save();
-
-			const { firstname, lastname, expertise, isActive, isDeleted } = req.body;
-
-			const newExpert = await new ExpertModel({
-				firstname,
-				lastname,
-				expertise,
-				mediaId: newMedia._id,
-				isActive,
-				isDeleted,
-			});
-			newExpert
-				.save()
-				.then((response) =>
-					res.json({
-						status: 200,
-						message: 'Added new expert successfully.',
-						response,
-					})
-				)
-				.catch((error) => res.json({ status: 404, message: error }));
-		};
-
-		await S3.uploadNewMedia(req, res, data);
-	}
-};
+		if(req.files) {
+			const data = async (data) => {
+				const newMedia = await new MediaModel({
+					url: data.Location || null,
+					title: 'expert',
+					alt: req.body.alt || null,
+					mediaKey: data.Key,
+				});
+	
+				newMedia.save();
+	
+				const { firstname, lastname, expertise, isActive, isDeleted } = req.body;
+	
+				const newExpert = await new ExpertModel({
+					firstname,
+					lastname,
+					expertise,
+					mediaId: newMedia._id,
+					isActive,
+					isDeleted,
+				});
+				newExpert
+					.save()
+					.then((response) =>
+						res.json({
+							status: 200,
+							message: 'Added new expert successfully.',
+							response,
+						})
+					)
+					.catch((error) => res.json({ status: 404, message: error }));
+			};
+	
+			await S3.uploadNewMedia(req, res, data);
+		} else {
+	
+				const { firstname, lastname, expertise, isActive, isDeleted, mediaId } = req.body;
+	
+				const newExpert = await new ExpertModel({
+					firstname,
+					lastname,
+					expertise,
+					mediaId: mediaId,
+					isActive,
+					isDeleted,
+				});
+				newExpert
+					.save()
+					.then((response) =>
+						res.json({
+							status: 200,
+							message: 'Added new expert successfully.',
+							response,
+						})
+					)
+					.catch((error) => res.json({ status: 404, message: error }));
+		}
+		}
+		}
 
 exports.getSingleExpert = async (req, res) => {
 	await ExpertModel.findById({ _id: req.params.expertid }, (err, data) => {
@@ -152,7 +200,8 @@ exports.getExpertsByExpertise = async (req, res) => {
 };
 
 exports.updateExpert = async (req, res) => {
-	await ExpertModel.findById({ _id: req.params.expertid })
+	if(req.files) {
+		await ExpertModel.findById({ _id: req.params.expertid })
 		.then(async (expert) => {
 			await MediaModel.findById({ _id: expert.mediaId }).then(async (media) => {
 				const data = async (data) => {
@@ -206,6 +255,45 @@ exports.updateExpert = async (req, res) => {
 				.catch((err) => res.json({ status: 404, message: err }));
 		})
 		.catch((err) => res.json({ status: 404, message: err }));
+	} else {
+		await ExpertModel.findById({ _id: req.params.expertid })
+		.then(async (expert) => {
+			await expert.socialMediaId.map(async (SMId, index) => {
+				await SocialMediaModel.findByIdAndUpdate(
+					{ _id: SMId },
+					{
+						$set: JSON.parse(req.body.socialMediaId)[index],
+					}
+				);
+			});
+
+			const { firstname, lastname, expertise, mediaId } = req.body;
+			await ExpertModel.findByIdAndUpdate(
+				{ _id: req.params.expertid },
+				{
+					$set: {
+						firstname,
+						lastname,
+						expertise,
+						mediaId: mediaId,
+						socialMediaId: expert.socialMediaId,
+						isActive: !req.body.isActive ? true : req.body.isActive,
+						isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
+					},
+				}
+			)
+
+				.then((data) =>
+					res.json({
+						status: 200,
+						message: 'Expert is updated successfully',
+						data,
+					})
+				)
+				.catch((err) => res.json({ status: 404, message: err }));
+		})
+		.catch((err) => res.json({ status: 404, message: err }));
+	}
 };
 
 exports.removeExpert = async (req, res) => {

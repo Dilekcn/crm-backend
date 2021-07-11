@@ -27,59 +27,115 @@ exports.getSingleProduct = (req, res) => {
 };
 
 exports.createProduct = async (req, res) => {
-	const data = async (data) => {
-		const newMedia = await new Media({
-			url: data.Location || null,
-			title: 'product',
-			mediaKey: data.Key,
-			alt: req.body.alt || null,
-		});
-
-		newMedia.save();
-
-		const mediaIds = newMedia._id;
-
-		const {
-			title,
-			order,
-			isHomePage,
-			content,
-			shortDescription,
-			buttonText,
-			userId,
-			isActive,
-			isDeleted,
-			isBlog,
-			isAboveFooter,
-		} = req.body;
-
-		const product = await new ProductModel({
-			title,
-			order,
-			coverImageId: mediaIds,
-			isHomePage,
-			content,
-			shortDescription,
-			buttonText,
-			userId,
-			isActive,
-			isDeleted,
-			isBlog,
-			isAboveFooter,
-		});
-
-		product
-			.save()
-			.then((response) =>
-				res.json({
-					status: 200,
-					message: 'Added a new product successfully.',
-					response,
-				})
-			)
-			.catch((error) => res.json({ status: 404, message: error }));
-	};
-	await S3.uploadNewMedia(req, res, data);
+	if(req.files) {
+		const data = async (data) => {
+			const newMedia = await new Media({
+				url: data.Location || null,
+				title: 'product',
+				mediaKey: data.Key,
+				alt: req.body.alt || null,
+			});
+	
+			newMedia.save();
+	
+			const mediaIds = newMedia._id;
+	
+			const {
+				title,
+				order,
+				isHomePage,
+				content,
+				shortDescription,
+				buttonText,
+				userId,
+				isActive,
+				isDeleted,
+				isBlog,
+				isAboveFooter,
+			} = req.body;
+	
+			const product = await new ProductModel({
+				title,
+				order,
+				coverImageId: mediaIds,
+				isHomePage,
+				content,
+				shortDescription,
+				buttonText,
+				userId,
+				isActive,
+				isDeleted,
+				isBlog,
+				isAboveFooter,
+			});
+	
+			product
+				.save()
+				.then((response) =>
+					res.json({
+						status: 200,
+						message: 'Added a new product successfully.',
+						response,
+					})
+				)
+				.catch((error) => res.json({ status: 404, message: error }));
+		};
+		await S3.uploadNewMedia(req, res, data);
+	} else {
+		const data = async (data) => {
+			const newMedia = await new Media({
+				url: data.Location || null,
+				title: 'product',
+				mediaKey: data.Key,
+				alt: req.body.alt || null,
+			});
+	
+			newMedia.save();
+	
+			const mediaIds = newMedia._id;
+	
+			const {
+				title,
+				order,
+				isHomePage,
+				content,
+				shortDescription,
+				buttonText,
+				userId,
+				isActive,
+				isDeleted,
+				isBlog,
+				isAboveFooter,
+			} = req.body;
+	
+			const product = await new ProductModel({
+				title,
+				order,
+				coverImageId: mediaIds,
+				isHomePage,
+				content,
+				shortDescription,
+				buttonText,
+				userId,
+				isActive,
+				isDeleted,
+				isBlog,
+				isAboveFooter,
+			});
+	
+			product
+				.save()
+				.then((response) =>
+					res.json({
+						status: 200,
+						message: 'Added a new product successfully.',
+						response,
+					})
+				)
+				.catch((error) => res.json({ status: 404, message: error }));
+		};
+		await S3.uploadNewMedia(req, res, data);
+	}
 };
 
 /************************************ */
