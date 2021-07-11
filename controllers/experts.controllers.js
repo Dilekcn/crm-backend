@@ -19,7 +19,7 @@ exports.getAllExperts = async (req, res) => {
 		res.json({ status: 404, message: error });
 	}
 };
- 
+
 exports.createExpert = async (req, res) => {
 	if (req.body.socialMediaId) {
 		const newSocialMedia = await JSON.parse(req.body.socialMediaId).map((sm) => {
@@ -237,12 +237,13 @@ exports.updateExpert = async (req, res) => {
 						firstname,
 						lastname,
 						expertise,
-						mediaId: expert.mediaId,
+						mediaId: req.body.files ? expert.mediaId : req.body.mediaId,
 						socialMediaId: expert.socialMediaId,
 						isActive: !req.body.isActive ? true : req.body.isActive,
 						isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
 					},
-				}
+				},
+				{ useFindAndModify: false, new: true }
 			)
 
 				.then((data) =>
@@ -297,11 +298,28 @@ exports.updateExpert = async (req, res) => {
 };
 
 exports.removeExpert = async (req, res) => {
-	await ExpertModel.findByIdAndDelete({ _id: req.params.expertid })
-		.then(async (data) => {
-			res.json({ status: 200, message: 'Expert is deleted successfully', data });
+	await ExpertModel.findById({ _id: req.params.expertid })
+		.then(async (expert) => {
+			await MediaModel.findByIdAndUpdate(
+				{ _id: expert.mediaId },
+				{
+					$set: {
+						isActive: false,
+					},
+				},
+				{ useFindAndModify: false, new: true }
+			);
+			await ExpertModel.findByIdAndDelete({ _id: req.params.expertid })
+				.then(async (data) => {
+					res.json({
+						status: 200,
+						message: 'Expert is deleted successfully',
+						data,
+					});
+				})
+				.catch((err) => {
+					res.json({ status: 404, message: err });
+				});
 		})
-		.catch((err) => {
-			res.json({ status: 404, message: err });
-		});
+		.catch((err) => res.json({ status: 404, message: err }));
 };

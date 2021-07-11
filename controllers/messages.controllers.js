@@ -28,7 +28,7 @@ exports.create = async (req, res) => {
 		isReplied,
 	} = req.body;
 
-	const newPost = await new MessagesModel({
+	const newMessage = await new MessagesModel({
 		firstname,
 		lastname,
 		subject,
@@ -39,7 +39,7 @@ exports.create = async (req, res) => {
 		isDeleted,
 		isReplied,
 	});
-	newPost
+	newMessage
 		.save()
 		.then((response) =>
 			res.json({

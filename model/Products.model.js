@@ -5,7 +5,7 @@ const ProductsSchema = new Schema(
 	{
 		title: { type: String },
 		order: { type: Number },
-		coverImageId: { type: Schema.Types.ObjectId, ref: 'media' },
+		mediaId: { type: Schema.Types.ObjectId, ref: 'media' },
 		isHomePage: { type: Boolean, default: false },
 		content: { type: String },
 		shortDescription: { type: String },
@@ -15,7 +15,6 @@ const ProductsSchema = new Schema(
 		isDeleted: { type: Boolean, default: false },
 		isBlog: { type: Boolean, default: false },
 		isAboveFooter: { type: Boolean, default: false },
-		alt: String,
 	},
 	{ timestamps: true }
 );

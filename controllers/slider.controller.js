@@ -93,7 +93,8 @@ exports.updateSlider = async (req, res) => {
 									mediaKey: data.Key,
 									alt: req.body.alt || null,
 								},
-							}
+							},
+							{ useFindAndModify: false, new: true }
 						)
 							.then(async (updatedMedia) => {
 								const {
@@ -120,7 +121,8 @@ exports.updateSlider = async (req, res) => {
 											mediaId: slider.mediaId,
 											isVideo,
 										},
-									}
+									},
+									{ useFindAndModify: false, new: true }
 								)
 									.then((data) => res.json({ status: 200, data }))
 									.catch((err) =>
@@ -144,16 +146,32 @@ exports.updateSlider = async (req, res) => {
 };
 
 exports.removeSlide = async (req, res) => {
-	await SliderModel.findByIdAndDelete({ _id: req.params.slideid })
+	await SliderModel.findById({ _id: req.params.slideid })
 		.then(async (slider) => {
-			res.json({ status: 200, message: 'Slide is deleted successfully', slider });
+			await MediaModel.findByIdAndUpdate(
+				{ _id: slider.mediaId },
+				{
+					$set: { isActive: false },
+				},
+				{ useFindAndModify: false, new: true }
+			);
+
+			await SliderModel.findByIdAndDelete({ _id: req.params.slideid })
+				.then(async (data) => {
+					res.json({
+						status: 200,
+						message: 'Slide is deleted successfully',
+						data,
+					});
+				})
+				.catch((err) => res.json({ status: 404, message: err }));
 		})
 		.catch((err) => res.json({ status: 404, message: err }));
-
-	// await SliderModel.findByIdAndDelete({ _id: req.params.slideid })
-	// 	.then(async(data) => {
-	// 		await MediaModel.findByIdAndRemove({_id:data.mediaId}).then(data => data).catch(err => res.json(err))
-	// 		return res.json(data)
-	// 	})
-	// 	.catch((err) => res.json({ message: err }));
 };
+
+// await SliderModel.findByIdAndDelete({ _id: req.params.slideid })
+// 	.then(async(data) => {
+// 		await MediaModel.findByIdAndRemove({_id:data.mediaId}).then(data => data).catch(err => res.json(err))
+// 		return res.json(data)
+// 	})
+// 	.catch((err) => res.json({ message: err }));
