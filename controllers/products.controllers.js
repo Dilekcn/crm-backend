@@ -1,5 +1,5 @@
 const ProductModel = require('../model/Products.model');
-const Media = require('../model/Media.model');
+const MediaModel = require('../model/Media.model');
 
 const S3 = require('../config/aws.s3.config');
 
@@ -30,7 +30,7 @@ exports.getSingleProduct = (req, res) => {
 
 exports.createProduct = async (req, res) => {
 	const data = async (data) => {
-		const newMedia = await new Media({
+		const newMedia = await new MediaModel({
 			url: data.Location || null,
 			title: 'product',
 			mediaKey: data.Key,
@@ -75,7 +75,7 @@ exports.createProduct = async (req, res) => {
 			.then((response) =>
 				res.json({
 					status: 200,
-					message: 'Added a new product successfully.',
+					message: 'New product is added successfully.',
 					response,
 				})
 			)
@@ -98,9 +98,9 @@ exports.deleteProduct = (req, res, next) => {
 exports.updateSingleProduct = async (req, res) => {
 	await ProductModel.findById({ _id: req.params.productid })
 		.then(async (product) => {
-			await Media.findById({ _id: product.mediaId }).then(async (media) => {
+			await MediaModel.findById({ _id: product.mediaId }).then(async (media) => {
 				const data = async (data) => {
-					await Media.findByIdAndUpdate(
+					await MediaModel.findByIdAndUpdate(
 						{ _id: product.mediaId },
 						{
 							$set: {
@@ -111,7 +111,7 @@ exports.updateSingleProduct = async (req, res) => {
 							},
 						},
 						{ useFindAndModify: false, new: true }
-					).catch((err) => res.json({ status: 4040, message: err }));
+					).catch((err) => res.json({ status: 404, message: err }));
 				};
 				await S3.updateMedia(req, res, media.mediaKey, data);
 			});
@@ -155,7 +155,7 @@ exports.updateSingleProduct = async (req, res) => {
 						data,
 					})
 				)
-				.catch((err) => res.json({ status: 4041, message: err }));
+				.catch((err) => res.json({ status: 404, message: err }));
 		})
-		.catch((err) => res.json({ status: 4042, message: err }));
+		.catch((err) => res.json({ status: 404, message: err }));
 };

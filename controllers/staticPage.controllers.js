@@ -1,5 +1,5 @@
 const StaticPageModel = require('../model/StaticPage.model');
-const ImageModel = require('../model/Media.model');
+const MediaModel = require('../model/Media.model');
 const S3 = require('../config/aws.s3.config');
 
 exports.getAll = async (req, res) => {
@@ -9,7 +9,7 @@ exports.getAll = async (req, res) => {
 			.limit(limit * 1)
 			.skip((page - 1) * limit)
 			.sort({ createdAt: -1 })
-			.populate('imageId', 'url title alt');
+			.populate('mediaId', 'url title alt');
 		const total = await StaticPageModel.find().count();
 		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
 		res.json({ total: total, pages, status: 200, response });
@@ -20,7 +20,7 @@ exports.getAll = async (req, res) => {
 
 exports.createPage = async (req, res) => {
 	const data = async (data) => {
-		const newImage = await new ImageModel({
+		const newImage = await new MediaModel({
 			url: data.Location || null,
 			title: 'static-page',
 			mediaKey: data.Key,
@@ -34,7 +34,7 @@ exports.createPage = async (req, res) => {
 		const newPage = await new StaticPageModel({
 			name,
 			content,
-			imageId: newImage._id,
+			mediaId: newImage._id,
 			isActive,
 			isDeleted,
 		});
@@ -43,7 +43,7 @@ exports.createPage = async (req, res) => {
 			.then((response) =>
 				res.json({
 					status: 200,
-					message: 'Added new static page successfully.',
+					message: 'New static page is created successfully.',
 					response,
 				})
 			)
@@ -59,7 +59,7 @@ exports.getSinglePage = async (req, res) => {
 		} else {
 			res.json({ status: 200, data });
 		}
-	}).populate('imageId', 'url title alt');
+	}).populate('mediaId', 'url title alt');
 };
 
 exports.getSinglePageByName = async (req, res) => {
@@ -69,47 +69,54 @@ exports.getSinglePageByName = async (req, res) => {
 		} else {
 			res.json({ status: 200, data });
 		}
-	}).populate('imageId', 'url title alt');
+	}).populate('mediaId', 'url title alt');
 };
 
 exports.updatePages = async (req, res) => {
 	await StaticPageModel.findById({ _id: req.params.id })
-		.then(async (data) => {
-			const { name, content, isActive, isDeleted } = req.body;
-			await ImageModel.findByIdAndUpdate(
-				{ _id: data.imageId },
-				{
-					$set: {
-						url: data.Location || null,
-						title: 'static-page',
-						mediaKey: data.Key,
-						alt: req.body.alt || null,
-					},
-				}
-			);
+		.then(async (staticpage) => {
+			await MediaModel.findById({ _id: staticpage.mediaId }).then(async (media) => {
+				const data = async (data) => {
+					await MediaModel.findByIdAndUpdate(
+						{ _id: staticpage.mediaId },
+						{
+							$set: {
+								url: data.Location || null,
+								title: 'static-page',
+								mediaKey: data.Key,
+								alt: req.body.alt,
+							},
+						},
+						{ useFindAndModify: false, new: true }
+					).catch((err) => res.json({ status: 4040, message: err }));
+				};
+				await S3.updateMedia(req, res, media.mediaKey, data);
+			});
+			const { name, content } = req.body;
+
 			await StaticPageModel.findByIdAndUpdate(
 				{ _id: req.params.id },
 				{
 					$set: {
 						name,
 						content,
-						imageId: req.body.files ? data.imageId : req.body.imageId,
-						isActive,
-						isDeleted,
+						mediaId: staticpage.mediaId,
+						isActive: !req.body.isActive ? true : req.body.isActive,
+						isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
 					},
-				}
+				},
+				{ useFindAndModify: false, new: true }
 			)
 				.then((data) =>
 					res.json({
 						status: 200,
-						message: 'Static page is updated  successfully',
+						message: 'Static page is updated successfully',
 						data,
 					})
 				)
-				.catch((err) => res.json({ status: 404, message: err }));
+				.catch((err) => res.json({ status: 4041, message: err }));
 		})
-		.then((data) => res.json({ status: 200, data }))
-		.catch((err) => res.json({ status: 404, message: err }));
+		.catch((err) => res.json({ status: 4042, message: err }));
 };
 
 exports.removePage = async (req, res) => {

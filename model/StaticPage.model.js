@@ -5,10 +5,9 @@ const StaticPageSchema = new Schema(
 	{
 		name: { type: String, unique: true },
 		content: String,
-		imageId: { type: Schema.Types.ObjectId, ref: 'media' },
+		mediaId: { type: Schema.Types.ObjectId, ref: 'media' },
 		isActive: { type: Boolean, default: true },
 		isDeleted: { type: Boolean, default: false },
-		alt: String,
 	},
 	{ timestamps: true }
 );
