@@ -60,6 +60,22 @@ exports.getSingleMediaByTitle = async (req, res) => {
 	});
 };
 
+exports.getMediaByIsActive = async (req, res) => {
+	const isActive = req.params.isActive.toLowerCase();
+	await MediaModel.find({ isActive: true }, (err, data) => {
+		if (err) {
+			res.json({ status: 404, message: err });
+		} else {
+			res.json({ status: 200, data });
+		}
+	});
+};
+
+
+
+
+
+
 exports.updateSingleMedia = async (req, res) => {
 	await MediaModel.findById({ _id: req.params.mediaId })
 		.then(async (response) => {

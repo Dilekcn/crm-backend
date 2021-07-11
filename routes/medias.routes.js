@@ -6,6 +6,7 @@ const mediasControllers = require('../controllers/medias.controllers');
 router.get('/medias', mediasControllers.getAllMedia);
 router.get('/medias/:mediaid', mediasControllers.getSingleMedia);
 router.get('/medias/title/:title', mediasControllers.getSingleMediaByTitle);
+router.get('/medias/isActive/:isActive', mediasControllers.getMediaByIsActive);
 router.post('/medias', mediasControllers.createMedia);
 router.put('/medias/:mediaid', mediasControllers.updateSingleMedia);
 router.delete('/medias/:mediaid', mediasControllers.removeSingleMedia);
