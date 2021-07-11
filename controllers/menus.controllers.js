@@ -1,4 +1,3 @@
-const mongoose = require('mongoose');
 const MenusModel = require('../model/Menu.model');
 
 exports.getAll = async (req, res) => {
