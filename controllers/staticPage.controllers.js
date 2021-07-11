@@ -88,7 +88,7 @@ exports.updatePages = async (req, res) => {
 							},
 						},
 						{ useFindAndModify: false, new: true }
-					).catch((err) => res.json({ status: 4040, message: err }));
+					).catch((err) => res.json({ status: 404, message: err }));
 				};
 				await S3.updateMedia(req, res, media.mediaKey, data);
 			});
@@ -114,19 +114,31 @@ exports.updatePages = async (req, res) => {
 						data,
 					})
 				)
-				.catch((err) => res.json({ status: 4041, message: err }));
+				.catch((err) => res.json({ status: 404, message: err }));
 		})
-		.catch((err) => res.json({ status: 4042, message: err }));
+		.catch((err) => res.json({ status: 404, message: err }));
 };
 
 exports.removePage = async (req, res) => {
-	await StaticPageModel.findByIdAndDelete({ _id: req.params.id })
-		.then((data) =>
-			res.json({
-				status: 200,
-				message: 'Static page is deleted successfully',
-				data,
-			})
-		)
+	await StaticPageModel.findById({ _id: req.params.id })
+		.then(async (staticpage) => {
+			await MediaModel.findByIdAndUpdate(
+				{ _id: staticpage.mediaId },
+				{
+					$set: { isActive: false },
+				},
+				{ useFindAndModify: false, new: true }
+			);
+
+			await StaticPageModel.findByIdAndDelete({ _id: req.params.id })
+				.then((data) =>
+					res.json({
+						status: 200,
+						message: 'Static page is deleted successfully',
+						data,
+					})
+				)
+				.catch((err) => res.json({ status: 404, message: err }));
+		})
 		.catch((err) => res.json({ status: 404, message: err }));
 };

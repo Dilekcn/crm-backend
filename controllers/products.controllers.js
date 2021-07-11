@@ -84,17 +84,6 @@ exports.createProduct = async (req, res) => {
 	await S3.uploadNewMedia(req, res, data);
 };
 
-/************************************ */
-exports.deleteProduct = (req, res, next) => {
-	ProductModel.findByIdAndRemove({ _id: req.params.productid })
-		.then((data) => {
-			res.json({ status: 200, message: 'Product is deleted successfully', data });
-		})
-		.catch((err) => {
-			res.json({ status: 404, message: err });
-		});
-};
-
 exports.updateSingleProduct = async (req, res) => {
 	await ProductModel.findById({ _id: req.params.productid })
 		.then(async (product) => {
@@ -156,6 +145,31 @@ exports.updateSingleProduct = async (req, res) => {
 					})
 				)
 				.catch((err) => res.json({ status: 404, message: err }));
+		})
+		.catch((err) => res.json({ status: 404, message: err }));
+};
+
+exports.deleteProduct = async (req, res) => {
+	await ProductModel.findById({ _id: req.params.productid })
+		.then(async (product) => {
+			await MediaModel.findByIdAndUpdate(
+				{ _id: product.mediaId },
+				{
+					$set: { isActive: false },
+				},
+				{ useFindAndModify: false, new: true }
+			);
+			await ProductModel.findByIdAndRemove({ _id: req.params.productid })
+				.then((data) => {
+					res.json({
+						status: 200,
+						message: 'Product is deleted successfully',
+						data,
+					});
+				})
+				.catch((err) => {
+					res.json({ status: 404, message: err });
+				});
 		})
 		.catch((err) => res.json({ status: 404, message: err }));
 };

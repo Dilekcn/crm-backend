@@ -193,7 +193,8 @@ exports.updateExpert = async (req, res) => {
 						isActive: !req.body.isActive ? true : req.body.isActive,
 						isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
 					},
-				}
+				},
+				{ useFindAndModify: false, new: true }
 			)
 
 				.then((data) =>
