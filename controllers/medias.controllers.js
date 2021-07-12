@@ -52,15 +52,18 @@ exports.getSingleMedia = async (req, res) => {
 exports.getSingleMediaByTitle = async (req, res) => {
 	const { page, limit } = req.query;
 	const title = req.params.title.toLowerCase();
+	const total = await MediaModel.find({ title: title }).count();
+	const pages = limit === undefined ? 1 : Math.ceil(total / limit);
 	await MediaModel.find({ title: title }, (err, data) => {
 		if (err) {
 			res.json({ status: 404, message: err });
 		} else {
-			res.json({ status: 200, data });
+			res.json({ total: total, pages: pages, status: 200, data });
 		}
 	})
 		.limit(limit * 1)
-		.skip((page - 1) * limit);
+		.skip((page - 1) * limit)
+		.sort({ createdAt: -1 });
 };
 
 exports.getMediaByIsActive = async (req, res) => {
@@ -74,7 +77,8 @@ exports.getMediaByIsActive = async (req, res) => {
 		}
 	})
 		.limit(limit * 1)
-		.skip((page - 1) * limit);
+		.skip((page - 1) * limit)
+		.sort({ createdAt: -1 });
 };
 
 exports.updateSingleMedia = async (req, res) => {
