@@ -56,7 +56,7 @@ exports.createProduct = async (req, res) => {
 				isAboveFooter,
 			} = req.body;
 
-			const product = await new ProductModel({
+			const newProduct = await new ProductModel({
 				title,
 				order,
 				mediaId: mediaIds,
@@ -71,7 +71,7 @@ exports.createProduct = async (req, res) => {
 				isAboveFooter,
 			});
 
-			product
+			newProduct
 				.save()
 				.then((response) =>
 					res.json({
@@ -99,7 +99,7 @@ exports.createProduct = async (req, res) => {
 			mediaId,
 		} = req.body;
 
-		const product = await new ProductModel({
+		const newProduct = await new ProductModel({
 			title,
 			order,
 			mediaId,
@@ -114,7 +114,7 @@ exports.createProduct = async (req, res) => {
 			isAboveFooter,
 		});
 
-		product
+		newProduct
 			.save()
 			.then((response) =>
 				res.json({
@@ -151,7 +151,7 @@ exports.createProduct = async (req, res) => {
 				isAboveFooter,
 			} = req.body;
 
-			const product = await new ProductModel({
+			const newProduct = await new ProductModel({
 				title,
 				order,
 				mediaId: mediaIds,
@@ -166,7 +166,7 @@ exports.createProduct = async (req, res) => {
 				isAboveFooter,
 			});
 
-			product
+			newProduct
 				.save()
 				.then((response) =>
 					res.json({
@@ -195,7 +195,7 @@ exports.updateSingleProduct = async (req, res) => {
 										url: data.Location || null,
 										title: 'product',
 										mediaKey: data.Key,
-										alt: req.body.alt,
+										alt: req.body.title,
 									},
 								},
 								{ useFindAndModify: false, new: true }
@@ -243,15 +243,8 @@ exports.updateSingleProduct = async (req, res) => {
 	} else {
 		await ProductModel.findById({ _id: req.params.productid })
 			.then(async (product) => {
-				const {
-					title,
-					order,
-					content,
-					shortDescription,
-					buttonText,
-					userId,
-					mediaId,
-				} = req.body;
+				const { title, order, content, shortDescription, buttonText, mediaId } =
+					req.body;
 
 				await ProductModel.findByIdAndUpdate(
 					{ _id: req.params.productid },

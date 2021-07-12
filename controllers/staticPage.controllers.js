@@ -19,22 +19,45 @@ exports.getAll = async (req, res) => {
 };
 
 exports.createPage = async (req, res) => {
-	const data = async (data) => {
-		const newImage = await new MediaModel({
-			url: data.Location || null,
-			title: 'static-page',
-			mediaKey: data.Key,
-			alt: req.body.alt || null,
-		});
+	if (req.files) {
+		const data = async (data) => {
+			const newImage = await new MediaModel({
+				url: data.Location || null,
+				title: 'static-page',
+				mediaKey: data.Key,
+				alt: req.body.alt || null,
+			});
 
-		newImage.save();
+			newImage.save();
 
-		const { name, content, isActive, isDeleted } = req.body;
+			const { name, content, isActive, isDeleted } = req.body;
+
+			const newPage = await new StaticPageModel({
+				name,
+				content,
+				mediaId: newImage._id,
+				isActive,
+				isDeleted,
+			});
+			newPage
+				.save()
+				.then((response) =>
+					res.json({
+						status: 200,
+						message: 'New static page is created successfully.',
+						response,
+					})
+				)
+				.catch((error) => res.json({ status: 404, message: error }));
+		};
+		await S3.uploadNewMedia(req, res, data);
+	} else if (req.body.mediaId) {
+		const { name, content, isActive, isDeleted, mediaId } = req.body;
 
 		const newPage = await new StaticPageModel({
 			name,
 			content,
-			mediaId: newImage._id,
+			mediaId,
 			isActive,
 			isDeleted,
 		});
@@ -48,8 +71,39 @@ exports.createPage = async (req, res) => {
 				})
 			)
 			.catch((error) => res.json({ status: 404, message: error }));
-	};
-	await S3.uploadNewMedia(req, res, data);
+	} else {
+		const data = async (data) => {
+			const newImage = await new MediaModel({
+				url: data.Location || null,
+				title: 'static-page',
+				mediaKey: data.Key,
+				alt: req.body.alt || null,
+			});
+
+			newImage.save();
+
+			const { name, content, isActive, isDeleted } = req.body;
+
+			const newPage = await new StaticPageModel({
+				name,
+				content,
+				mediaId: newImage._id,
+				isActive,
+				isDeleted,
+			});
+			newPage
+				.save()
+				.then((response) =>
+					res.json({
+						status: 200,
+						message: 'New static page is created successfully.',
+						response,
+					})
+				)
+				.catch((error) => res.json({ status: 404, message: error }));
+		};
+		await S3.uploadNewMedia(req, res, data);
+	}
 };
 
 exports.getSinglePage = async (req, res) => {
@@ -73,50 +127,82 @@ exports.getSinglePageByName = async (req, res) => {
 };
 
 exports.updatePages = async (req, res) => {
-	await StaticPageModel.findById({ _id: req.params.id })
-		.then(async (staticpage) => {
-			await MediaModel.findById({ _id: staticpage.mediaId }).then(async (media) => {
-				const data = async (data) => {
-					await MediaModel.findByIdAndUpdate(
-						{ _id: staticpage.mediaId },
-						{
-							$set: {
-								url: data.Location || null,
-								title: 'static-page',
-								mediaKey: data.Key,
-								alt: req.body.alt,
-							},
-						},
-						{ useFindAndModify: false, new: true }
-					).catch((err) => res.json({ status: 404, message: err }));
-				};
-				await S3.updateMedia(req, res, media.mediaKey, data);
-			});
-			const { name, content } = req.body;
+	if (req.files) {
+		await StaticPageModel.findById({ _id: req.params.id })
+			.then(async (staticpage) => {
+				await MediaModel.findById({ _id: staticpage.mediaId }).then(
+					async (media) => {
+						const data = async (data) => {
+							await MediaModel.findByIdAndUpdate(
+								{ _id: staticpage.mediaId },
+								{
+									$set: {
+										url: data.Location || null,
+										title: 'static-page',
+										mediaKey: data.Key,
+										alt: req.body.title,
+									},
+								},
+								{ useFindAndModify: false, new: true }
+							).catch((err) => res.json({ status: 404, message: err }));
+						};
+						await S3.updateMedia(req, res, media.mediaKey, data);
+					}
+				);
+				const { name, content } = req.body;
 
-			await StaticPageModel.findByIdAndUpdate(
-				{ _id: req.params.id },
-				{
-					$set: {
-						name,
-						content,
-						mediaId: staticpage.mediaId,
-						isActive: !req.body.isActive ? true : req.body.isActive,
-						isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
+				await StaticPageModel.findByIdAndUpdate(
+					{ _id: req.params.id },
+					{
+						$set: {
+							name,
+							content,
+							mediaId: staticpage.mediaId,
+							isActive: !req.body.isActive ? true : req.body.isActive,
+							isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
+						},
 					},
-				},
-				{ useFindAndModify: false, new: true }
-			)
-				.then((data) =>
-					res.json({
-						status: 200,
-						message: 'Static page is updated successfully',
-						data,
-					})
+					{ useFindAndModify: false, new: true }
 				)
-				.catch((err) => res.json({ status: 404, message: err }));
-		})
-		.catch((err) => res.json({ status: 404, message: err }));
+					.then((data) =>
+						res.json({
+							status: 200,
+							message: 'Static page is updated successfully',
+							data,
+						})
+					)
+					.catch((err) => res.json({ status: 404, message: err }));
+			})
+			.catch((err) => res.json({ status: 404, message: err }));
+	} else {
+		await StaticPageModel.findById({ _id: req.params.id })
+			.then(async (staticpage) => {
+				const { name, content, mediaId } = req.body;
+
+				await StaticPageModel.findByIdAndUpdate(
+					{ _id: req.params.id },
+					{
+						$set: {
+							name,
+							content,
+							mediaId: !mediaId ? staticpage.mediaId : mediaId,
+							isActive: !req.body.isActive ? true : req.body.isActive,
+							isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
+						},
+					},
+					{ useFindAndModify: false, new: true }
+				)
+					.then((data) =>
+						res.json({
+							status: 200,
+							message: 'Static page is updated successfully',
+							data,
+						})
+					)
+					.catch((err) => res.json({ status: 404, message: err }));
+			})
+			.catch((err) => res.json({ status: 404, message: err }));
+	}
 };
 
 exports.removePage = async (req, res) => {
