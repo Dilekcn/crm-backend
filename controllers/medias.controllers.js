@@ -64,6 +64,7 @@ exports.getSingleMediaByTitle = async (req, res) => {
 };
 
 exports.getMediaByIsActive = async (req, res) => {
+	const { page, limit } = req.query;
 	const isActive = req.params.isActive.toLowerCase();
 	await MediaModel.find({ isActive: isActive }, (err, data) => {
 		if (err) {
@@ -71,7 +72,9 @@ exports.getMediaByIsActive = async (req, res) => {
 		} else {
 			res.json({ status: 200, data });
 		}
-	});
+	})
+		.limit(limit * 1)
+		.skip((page - 1) * limit);
 };
 
 exports.updateSingleMedia = async (req, res) => {
