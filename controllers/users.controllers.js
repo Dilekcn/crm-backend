@@ -82,19 +82,52 @@ exports.getSingleUserByRoleId = async (req, res) => {
 };
 
 exports.createUser = async (req, res) => {
-	const data = async (data) => {
-		console.log(req.body);
-		const newMedia = await new MediaModel({
-			url: data.Location || null,
-			title: 'user',
-			mediaKey: data.Key,
-			alt: req.body.alt || null,
-		});
+	if (req.files) {
+		const data = async (data) => {
+			console.log(req.body);
+			const newMedia = await new MediaModel({
+				url: data.Location || null,
+				title: 'user',
+				mediaKey: data.Key,
+				alt: req.body.alt || null,
+			});
 
-		newMedia.save();
+			newMedia.save();
 
-		const { firstname, lastname, email, isActive, isDeleted, roleId, password } =
-			req.body;
+			const { firstname, lastname, email, isActive, isDeleted, roleId, password } =
+				req.body;
+			const salt = await bcrypt.genSalt();
+			const hashedPassword = await bcrypt.hash(password, salt);
+
+			const newUser = await new UserModel({
+				firstname,
+				lastname,
+				email,
+				isActive,
+				isDeleted,
+				password: hashedPassword,
+				mediaId: newMedia._id,
+				roleId,
+			});
+			newUser
+				.save()
+				.then((data) =>
+					res.json({ status: 200, message: 'Signed up successfully.', data })
+				)
+				.catch((err) => res.json({ status: 404, message: err }));
+		};
+		await S3.uploadNewMedia(req, res, data);
+	} else if (req.body.mediaId) {
+		const {
+			firstname,
+			lastname,
+			email,
+			isActive,
+			isDeleted,
+			roleId,
+			password,
+			mediaId,
+		} = req.body;
 		const salt = await bcrypt.genSalt();
 		const hashedPassword = await bcrypt.hash(password, salt);
 
@@ -105,7 +138,7 @@ exports.createUser = async (req, res) => {
 			isActive,
 			isDeleted,
 			password: hashedPassword,
-			mediaId: newMedia._id,
+			mediaId,
 			roleId,
 		});
 		newUser
@@ -114,8 +147,42 @@ exports.createUser = async (req, res) => {
 				res.json({ status: 200, message: 'Signed up successfully.', data })
 			)
 			.catch((err) => res.json({ status: 404, message: err }));
-	};
-	await S3.uploadNewMedia(req, res, data);
+	} else {
+		const data = async (data) => {
+			console.log(req.body);
+			const newMedia = await new MediaModel({
+				url: data.Location || null,
+				title: 'user',
+				mediaKey: data.Key,
+				alt: req.body.alt || null,
+			});
+
+			newMedia.save();
+
+			const { firstname, lastname, email, isActive, isDeleted, roleId, password } =
+				req.body;
+			const salt = await bcrypt.genSalt();
+			const hashedPassword = await bcrypt.hash(password, salt);
+
+			const newUser = await new UserModel({
+				firstname,
+				lastname,
+				email,
+				isActive,
+				isDeleted,
+				password: hashedPassword,
+				mediaId: newMedia._id,
+				roleId,
+			});
+			newUser
+				.save()
+				.then((data) =>
+					res.json({ status: 200, message: 'Signed up successfully.', data })
+				)
+				.catch((err) => res.json({ status: 404, message: err }));
+		};
+		await S3.uploadNewMedia(req, res, data);
+	}
 };
 
 exports.login = async (req, res) => {
@@ -144,54 +211,85 @@ exports.login = async (req, res) => {
 };
 
 exports.updateUser = async (req, res) => {
-	console.log(req.body);
-	await UserModel.findById({ _id: req.params.id })
-		.then(async (user) => {
-			await MediaModel.findById({ _id: user.mediaId }).then(async (media) => {
-				const data = async (data) => {
-					await MediaModel.findByIdAndUpdate(
-						{ _id: user.mediaId },
-						{
-							$set: {
-								url: data.Location || null,
-								title: 'user',
-								mediaKey: data.Key,
-								alt: req.body.alt || null,
+	if (req.files) {
+		await UserModel.findById({ _id: req.params.id })
+			.then(async (user) => {
+				await MediaModel.findById({ _id: user.mediaId }).then(async (media) => {
+					const data = async (data) => {
+						await MediaModel.findByIdAndUpdate(
+							{ _id: user.mediaId },
+							{
+								$set: {
+									url: data.Location || null,
+									title: 'user',
+									mediaKey: data.Key,
+									alt: req.body.alt || null,
+								},
 							},
+							{ useFindAndModify: false, new: true }
+						);
+					};
+					await S3.updateMedia(req, res, media.mediaKey, data);
+				});
+
+				const { firstname, lastname, email, mediaId } = req.body;
+
+				await UserModel.findByIdAndUpdate(
+					{ _id: req.params.id },
+					{
+						$set: {
+							firstname,
+							lastname,
+							email,
+							isActive: !req.body.isActive ? true : req.body.isActive,
+							isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
+							roleId: !req.body.roleId ? user.roleId : req.body.roleId,
+							mediaId: user.mediaId,
 						},
-						{ useFindAndModify: false, new: true }
-					);
-				};
-				await S3.updateMedia(req, res, media.mediaKey, data);
-			});
-
-			const { firstname, lastname, email, mediaId } = req.body;
-
-			await UserModel.findByIdAndUpdate(
-				{ _id: req.params.id },
-				{
-					$set: {
-						firstname,
-						lastname,
-						email,
-						isActive: !req.body.isActive ? true : req.body.isActive,
-						isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
-						roleId: !req.body.roleId ? user.roleId : req.body.roleId,
-						mediaId: user.mediaId,
 					},
-				},
-				{ useFindAndModify: false, new: true }
-			)
-				.then((data) =>
-					res.json({
-						status: 200,
-						message: 'User is updated successfully',
-						data,
-					})
+					{ useFindAndModify: false, new: true }
 				)
-				.catch((err) => res.json({ status: 404, message: err }));
-		})
-		.catch((err) => res.json({ status: 404, message: err }));
+					.then((data) =>
+						res.json({
+							status: 200,
+							message: 'User is updated successfully',
+							data,
+						})
+					)
+					.catch((err) => res.json({ status: 404, message: err }));
+			})
+			.catch((err) => res.json({ status: 404, message: err }));
+	} else {
+		await UserModel.findById({ _id: req.params.id })
+			.then(async (user) => {
+				const { firstname, lastname, email, mediaId } = req.body;
+
+				await UserModel.findByIdAndUpdate(
+					{ _id: req.params.id },
+					{
+						$set: {
+							firstname,
+							lastname,
+							email,
+							isActive: !req.body.isActive ? true : req.body.isActive,
+							isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
+							roleId: !req.body.roleId ? user.roleId : req.body.roleId,
+							mediaId: !mediaId ? user.mediaId : mediaId,
+						},
+					},
+					{ useFindAndModify: false, new: true }
+				)
+					.then((data) =>
+						res.json({
+							status: 200,
+							message: 'User is updated successfully',
+							data,
+						})
+					)
+					.catch((err) => res.json({ status: 404, message: err }));
+			})
+			.catch((err) => res.json({ status: 404, message: err }));
+	}
 };
 
 exports.changePassword = (req, res) => {
