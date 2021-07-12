@@ -21,12 +21,12 @@ exports.createMedia = async (req, res) => {
 	const data = async (data) => {
 		const newMedia = await new MediaModel({
 			url: data.Location,
-			title: req.body.title, 
+			title: req.body.title,
 			mediaKey: data.Key,
 			isHomePage: req.body.isHomePage,
 			isActive: req.body.isActive,
 			isDeleted: req.body.isDeleted,
-			alt:req.body.alt
+			alt: req.body.alt,
 		});
 
 		newMedia
@@ -50,6 +50,7 @@ exports.getSingleMedia = async (req, res) => {
 };
 
 exports.getSingleMediaByTitle = async (req, res) => {
+	const { page, limit } = req.query;
 	const title = req.params.title.toLowerCase();
 	await MediaModel.find({ title: title }, (err, data) => {
 		if (err) {
@@ -57,7 +58,9 @@ exports.getSingleMediaByTitle = async (req, res) => {
 		} else {
 			res.json({ status: 200, data });
 		}
-	});
+	})
+		.limit(limit * 1)
+		.skip((page - 1) * limit);
 };
 
 exports.getMediaByIsActive = async (req, res) => {
@@ -70,11 +73,6 @@ exports.getMediaByIsActive = async (req, res) => {
 		}
 	});
 };
-
-
-
-
-
 
 exports.updateSingleMedia = async (req, res) => {
 	await MediaModel.findById({ _id: req.params.mediaId })
@@ -89,7 +87,7 @@ exports.updateSingleMedia = async (req, res) => {
 							title: req.body.title,
 							isActive: req.body.isActive,
 							isDeleted: req.body.isDeleted,
-							alt:req.body.update
+							alt: req.body.update,
 						},
 					}
 				)
