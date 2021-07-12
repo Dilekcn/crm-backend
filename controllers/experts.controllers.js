@@ -75,7 +75,7 @@ exports.createExpert = async (req, res) => {
 				firstname,
 				lastname,
 				expertise,
-				mediaId: mediaId,
+				mediaId,
 				socialMediaId: socialMediaIds,
 				isActive,
 				isDeleted,
@@ -296,7 +296,6 @@ exports.updateExpert = async (req, res) => {
 	} else {
 		await ExpertModel.findById({ _id: req.params.expertid })
 			.then(async (expert) => {
-				console.log(expert.mediaId);
 				await expert.socialMediaId.map(async (SMId, index) => {
 					await SocialMediaModel.findByIdAndUpdate(
 						{ _id: SMId },
