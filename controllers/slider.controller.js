@@ -159,13 +159,18 @@ exports.getSingleSlide = async (req, res) => {
 };
 
 exports.getSingleSlideByTitle = async (req, res) => {
-	await SliderModel.findOne({ title: req.params.titletext }, (err, data) => {
+	const { page, limit } = req.query;
+	await SliderModel.find({ title: req.params.titletext }, (err, data) => {
 		if (err) {
 			res.json({ status: 404, message: err });
 		} else {
 			res.json({ status: 200, data });
 		}
-	}).populate('mediaId', 'url title alt');
+	})
+		.populate('mediaId', 'url title alt')
+		.limit(limit * 1)
+		.skip((page - 1) * limit)
+		.sort({ createdAt: -1 });
 };
 
 exports.updateSlider = async (req, res) => {
