@@ -21,7 +21,6 @@ exports.getAllExperts = async (req, res) => {
 };
 
 exports.createExpert = async (req, res) => {
-	console.log(typeof req.body.socialMediaId)
 	if (req.body.socialMediaId) {
 		const newSocialMedia = await JSON.parse(req.body.socialMediaId).map((sm) => {
 			return new SocialMediaModel({
@@ -33,7 +32,7 @@ exports.createExpert = async (req, res) => {
 		newSocialMedia.map((sm) => sm.save());
 
 		const socialMediaIds = newSocialMedia.map((sm) => sm._id);
-		if(req.files) {
+		if (req.files) {
 			const data = async (data) => {
 				const newMedia = await new MediaModel({
 					url: data.Location || null,
@@ -41,11 +40,11 @@ exports.createExpert = async (req, res) => {
 					alt: req.body.alt || null,
 					mediaKey: data.Key,
 				});
-	
+
 				newMedia.save();
-	
+
 				const { firstname, lastname, expertise, isActive, isDeleted } = req.body;
-	
+
 				const newExpert = await new ExpertModel({
 					firstname,
 					lastname,
@@ -66,16 +65,49 @@ exports.createExpert = async (req, res) => {
 					)
 					.catch((error) => res.json({ status: 404, message: error }));
 			};
-	
+
 			await S3.uploadNewMedia(req, res, data);
-		} else {	
-				const { firstname, lastname, expertise, isActive, isDeleted, mediaId } = req.body;
-	
+		} else if (req.body.mediaId) {
+			const { firstname, lastname, expertise, isActive, isDeleted, mediaId } =
+				req.body;
+
+			const newExpert = await new ExpertModel({
+				firstname,
+				lastname,
+				expertise,
+				mediaId: mediaId,
+				socialMediaId: socialMediaIds,
+				isActive,
+				isDeleted,
+			});
+			newExpert
+				.save()
+				.then((response) =>
+					res.json({
+						status: 200,
+						message: 'Added new expert successfully.',
+						response,
+					})
+				)
+				.catch((error) => res.json({ status: 404, message: error }));
+		} else {
+			const data = async (data) => {
+				const newMedia = await new MediaModel({
+					url: data.Location || null,
+					title: 'expert',
+					alt: req.body.alt || null,
+					mediaKey: data.Key,
+				});
+
+				newMedia.save();
+
+				const { firstname, lastname, expertise, isActive, isDeleted } = req.body;
+
 				const newExpert = await new ExpertModel({
 					firstname,
 					lastname,
 					expertise,
-					mediaId: mediaId,
+					mediaId: newMedia._id,
 					socialMediaId: socialMediaIds,
 					isActive,
 					isDeleted,
@@ -90,9 +122,12 @@ exports.createExpert = async (req, res) => {
 						})
 					)
 					.catch((error) => res.json({ status: 404, message: error }));
+			};
+
+			await S3.uploadNewMedia(req, res, data);
 		}
 	} else {
-		if(req.files) {
+		if (req.files) {
 			const data = async (data) => {
 				const newMedia = await new MediaModel({
 					url: data.Location || null,
@@ -100,11 +135,11 @@ exports.createExpert = async (req, res) => {
 					alt: req.body.alt || null,
 					mediaKey: data.Key,
 				});
-	
+
 				newMedia.save();
-	
+
 				const { firstname, lastname, expertise, isActive, isDeleted } = req.body;
-	
+
 				const newExpert = await new ExpertModel({
 					firstname,
 					lastname,
@@ -124,33 +159,33 @@ exports.createExpert = async (req, res) => {
 					)
 					.catch((error) => res.json({ status: 404, message: error }));
 			};
-	
+
 			await S3.uploadNewMedia(req, res, data);
 		} else {
-	
-				const { firstname, lastname, expertise, isActive, isDeleted, mediaId } = req.body;
-	
-				const newExpert = await new ExpertModel({
-					firstname,
-					lastname,
-					expertise,
-					mediaId: mediaId,
-					isActive,
-					isDeleted,
-				});
-				newExpert
-					.save()
-					.then((response) =>
-						res.json({
-							status: 200,
-							message: 'Added new expert successfully.',
-							response,
-						})
-					)
-					.catch((error) => res.json({ status: 404, message: error }));
+			const { firstname, lastname, expertise, isActive, isDeleted, mediaId } =
+				req.body;
+
+			const newExpert = await new ExpertModel({
+				firstname,
+				lastname,
+				expertise,
+				mediaId: mediaId,
+				isActive,
+				isDeleted,
+			});
+			newExpert
+				.save()
+				.then((response) =>
+					res.json({
+						status: 200,
+						message: 'Added new expert successfully.',
+						response,
+					})
+				)
+				.catch((error) => res.json({ status: 404, message: error }));
 		}
-		}
-		}
+	}
+};
 
 exports.getSingleExpert = async (req, res) => {
 	await ExpertModel.findById({ _id: req.params.expertid }, (err, data) => {
@@ -201,100 +236,103 @@ exports.getExpertsByExpertise = async (req, res) => {
 };
 
 exports.updateExpert = async (req, res) => {
-	if(req.files) {
+	if (req.files) {
 		await ExpertModel.findById({ _id: req.params.expertid })
-		.then(async (expert) => {
-			await MediaModel.findById({ _id: expert.mediaId }).then(async (media) => {
-				const data = async (data) => {
-					await MediaModel.findByIdAndUpdate(
-						{ _id: expert.mediaId },
-						{
-							$set: {
-								url: data.Location || null,
-								title: 'expert',
-								mediaKey: data.Key,
-								alt: req.body.alt,
+			.then(async (expert) => {
+				console.log(expert);
+				await MediaModel.findById({ _id: expert.mediaId }).then(async (media) => {
+					const data = async (data) => {
+						await MediaModel.findByIdAndUpdate(
+							{ _id: expert.mediaId },
+							{
+								$set: {
+									url: data.Location || null,
+									title: 'expert',
+									mediaKey: data.Key,
+									alt: req.body.alt,
+								},
 							},
-						},
-						{ useFindAndModify: false, new: true }
-					).catch((err) => res.json({ status: 404, message: err }));
-				};
-				await S3.updateMedia(req, res, media.mediaKey, data);
-			});
-			await expert.socialMediaId.map(async (SMId, index) => {
-				await SocialMediaModel.findByIdAndUpdate(
-					{ _id: SMId },
+							{ useFindAndModify: false, new: true }
+						).catch((err) => res.json({ status: 404, message: err }));
+					};
+					await S3.updateMedia(req, res, media.mediaKey, data);
+				});
+				await expert.socialMediaId.map(async (SMId, index) => {
+					await SocialMediaModel.findByIdAndUpdate(
+						{ _id: SMId },
+						{
+							$set: JSON.parse(req.body.socialMediaId)[index],
+						}
+					);
+				});
+
+				const { firstname, lastname, expertise } = req.body;
+				await ExpertModel.findByIdAndUpdate(
+					{ _id: req.params.expertid },
 					{
-						$set: JSON.parse(req.body.socialMediaId)[index],
-					}
-				);
-			});
-
-			const { firstname, lastname, expertise } = req.body;
-			await ExpertModel.findByIdAndUpdate(
-				{ _id: req.params.expertid },
-				{
-					$set: {
-						firstname,
-						lastname,
-						expertise,
-						mediaId: req.body.files ? expert.mediaId : req.body.mediaId,
-						socialMediaId: expert.socialMediaId,
-						isActive: !req.body.isActive ? true : req.body.isActive,
-						isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
+						$set: {
+							firstname,
+							lastname,
+							expertise,
+							mediaId: req.files ? expert.mediaId : req.body.mediaId,
+							socialMediaId: expert.socialMediaId,
+							isActive: !req.body.isActive ? true : req.body.isActive,
+							isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
+						},
 					},
-				},
-				{ useFindAndModify: false, new: true }
-			)
-
-				.then((data) =>
-					res.json({
-						status: 200,
-						message: 'Expert is updated successfully',
-						data,
-					})
+					{ useFindAndModify: false, new: true }
 				)
-				.catch((err) => res.json({ status: 404, message: err }));
-		})
-		.catch((err) => res.json({ status: 404, message: err }));
+
+					.then((data) =>
+						res.json({
+							status: 200,
+							message: 'Expert is updated successfully',
+							data,
+						})
+					)
+					.catch((err) => res.json({ status: 404, message: err }));
+			})
+			.catch((err) => res.json({ status: 404, message: err }));
 	} else {
 		await ExpertModel.findById({ _id: req.params.expertid })
-		.then(async (expert) => {
-			await expert.socialMediaId.map(async (SMId, index) => {
-				await SocialMediaModel.findByIdAndUpdate(
-					{ _id: SMId },
+			.then(async (expert) => {
+				console.log(expert.mediaId);
+				await expert.socialMediaId.map(async (SMId, index) => {
+					await SocialMediaModel.findByIdAndUpdate(
+						{ _id: SMId },
+						{
+							$set: JSON.parse(req.body.socialMediaId)[index],
+						},
+						{ useFindAndModify: false, new: true }
+					);
+				});
+
+				const { firstname, lastname, expertise, mediaId } = req.body;
+				await ExpertModel.findByIdAndUpdate(
+					{ _id: req.params.expertid },
 					{
-						$set: JSON.parse(req.body.socialMediaId)[index],
+						$set: {
+							firstname,
+							lastname,
+							expertise,
+							mediaId: !mediaId ? expert.mediaId : mediaId,
+							socialMediaId: expert.socialMediaId,
+							isActive: !req.body.isActive ? true : req.body.isActive,
+							isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
+						},
 					}
-				);
-			});
-
-			const { firstname, lastname, expertise, mediaId } = req.body;
-			await ExpertModel.findByIdAndUpdate(
-				{ _id: req.params.expertid },
-				{
-					$set: {
-						firstname,
-						lastname,
-						expertise,
-						mediaId: mediaId,
-						socialMediaId: expert.socialMediaId,
-						isActive: !req.body.isActive ? true : req.body.isActive,
-						isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
-					},
-				}
-			)
-
-				.then((data) =>
-					res.json({
-						status: 200,
-						message: 'Expert is updated successfully',
-						data,
-					})
 				)
-				.catch((err) => res.json({ status: 404, message: err }));
-		})
-		.catch((err) => res.json({ status: 404, message: err }));
+
+					.then((data) =>
+						res.json({
+							status: 200,
+							message: 'Expert is updated successfully',
+							data,
+						})
+					)
+					.catch((err) => res.json({ status: 404, message: err }));
+			})
+			.catch((err) => res.json({ status: 404, message: err }));
 	}
 };
 
@@ -319,8 +357,8 @@ exports.removeExpert = async (req, res) => {
 					});
 				})
 				.catch((err) => {
-					res.json({ status: 404, message: err });
+					res.json({ status: 4041, message: err });
 				});
 		})
-		.catch((err) => res.json({ status: 404, message: err }));
+		.catch((err) => res.json({ status: 4042, message: err }));
 };
