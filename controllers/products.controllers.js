@@ -14,7 +14,7 @@ exports.getAllProducts = async (req, res) => {
 			.populate('userId', 'firstname lastname email');
 		const total = await ProductModel.find().countDocuments();
 		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
-		res.json({ total: total, pages, status: 200, response });
+		res.json({ total, pages, status: 200, response });
 	} catch (err) {
 		res.json({ status: 404, message: err });
 	}

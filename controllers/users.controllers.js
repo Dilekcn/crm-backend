@@ -15,7 +15,7 @@ exports.getAllUsers = async (req, res) => {
 			.populate('mediaId', 'url title alt');
 		const total = await UserModel.find().countDocuments();
 		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
-		res.json({ total: total, pages, status: 200, response });
+		res.json({ total, pages, status: 200, response });
 	} catch (err) {
 		res.json({ status: 404, message: err });
 	}

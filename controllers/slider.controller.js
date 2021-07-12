@@ -12,7 +12,7 @@ exports.getAllSlides = async (req, res) => {
 			.populate('mediaId', 'url title alt');
 		const total = await SliderModel.find().countDocuments();
 		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
-		res.json({ total: total, pages, status: 200, response });
+		res.json({ total, pages, status: 200, response });
 	} catch (error) {
 		res.json({ status: 404, error });
 	}
