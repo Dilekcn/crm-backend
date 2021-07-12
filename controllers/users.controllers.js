@@ -13,7 +13,7 @@ exports.getAllUsers = async (req, res) => {
 			.sort({ createdAt: -1 })
 			.populate('roleId', 'name')
 			.populate('mediaId', 'url title alt');
-		const total = await UserModel.find().count();
+		const total = await UserModel.find().countDocuments();
 		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
 		res.json({ total: total, pages, status: 200, response });
 	} catch (err) {

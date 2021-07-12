@@ -12,7 +12,7 @@ exports.getAllExperts = async (req, res) => {
 			.sort({ createdAt: -1 })
 			.populate('socialMediaId', 'title link description')
 			.populate('mediaId', 'url title alt');
-		const total = await ExpertModel.find().count();
+		const total = await ExpertModel.find().countDocuments();
 		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
 		res.json({ total: total, pages, status: 200, response });
 	} catch (error) {
