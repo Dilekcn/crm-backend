@@ -54,11 +54,11 @@ exports.getSingleMediaByTitle = async (req, res) => {
 	const title = req.params.title.toLowerCase();
 	const total = await MediaModel.find({ title: title }).count();
 	const pages = limit === undefined ? 1 : Math.ceil(total / limit);
-	await MediaModel.find({ title: title }, (err, data) => {
+	await MediaModel.find({ title }, (err, data) => {
 		if (err) {
 			res.json({ status: 404, message: err });
 		} else {
-			res.json({ total: total, pages: pages, status: 200, data });
+			res.json({ total, pages, status: 200, data });
 		}
 	})
 		.limit(limit * 1)
@@ -68,12 +68,14 @@ exports.getSingleMediaByTitle = async (req, res) => {
 
 exports.getMediaByIsActive = async (req, res) => {
 	const { page, limit } = req.query;
-	const isActive = req.params.isActive.toLowerCase();
-	await MediaModel.find({ isActive: isActive }, (err, data) => {
+	const total = await MediaModel.find({ title: title }).count();
+	const pages = limit === undefined ? 1 : Math.ceil(total / limit);
+	const isActive = req.params.isactive.toLowerCase();
+	await MediaModel.find({ isActive }, (err, data) => {
 		if (err) {
 			res.json({ status: 404, message: err });
 		} else {
-			res.json({ status: 200, data });
+			res.json({ total, pages, status: 200, data });
 		}
 	})
 		.limit(limit * 1)
