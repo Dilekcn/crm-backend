@@ -129,7 +129,8 @@ exports.createProduct = async (req, res) => {
 };
 
 exports.updateSingleProduct = async (req, res) => {
-	await ProductModel.findById({ _id: req.params.productid })
+	if(req.files) {
+		await ProductModel.findById({ _id: req.params.productid })
 		.then(async (product) => {
 			await MediaModel.findById({ _id: product.mediaId }).then(async (media) => {
 				const data = async (data) => {
@@ -184,6 +185,47 @@ exports.updateSingleProduct = async (req, res) => {
 				.catch((err) => res.json({ status: 404, message: err }));
 		})
 		.catch((err) => res.json({ status: 404, message: err }));
+	} else {
+		await ProductModel.findById({ _id: req.params.productid })
+		.then(async (product) => {
+
+			const { title, order, content, shortDescription, buttonText, userId, coverImageId } =
+				req.body;
+
+			await ProductModel.findByIdAndUpdate(
+				{ _id: req.params.productid },
+				{
+					$set: {
+						title,
+						order,
+						coverImageId,
+						mediaId: product.mediaId,
+						isHomePage: !req.body.isHomePage ? false : req.body.isHome,
+						content,
+						shortDescription,
+						buttonText,
+						userId,
+						isActive: !req.body.isActive ? true : req.body.isActive,
+						isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
+						isBlog: !req.body.isBlog ? false : req.body.isBlog,
+						isAboveFooter: !req.body.isAboveFooter
+							? false
+							: req.body.isAboveFooter,
+					},
+				},
+				{ useFindAndModify: false, new: true }
+			)
+				.then((data) =>
+					res.json({
+						status: 200,
+						message: 'Product is updated successfully',
+						data,
+					})
+				)
+				.catch((err) => res.json({ status: 404, message: err }));
+		})
+		.catch((err) => res.json({ status: 404, message: err }));
+	}
 };
 
 exports.deleteProduct = async (req, res) => {
