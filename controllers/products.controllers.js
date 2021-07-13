@@ -125,18 +125,7 @@ exports.createProduct = async (req, res) => {
 			)
 			.catch((error) => res.json({ status: 404, message: error }));
 	} else {
-		const data = async (data) => {
-			const newMedia = await new MediaModel({
-				url: data.Location || null,
-				title: 'product',
-				mediaKey: data.Key,
-				alt: req.body.alt || null,
-			});
-
-			newMedia.save();
-
-			const mediaIds = newMedia._id;
-
+	
 			const {
 				title,
 				order,
@@ -149,12 +138,13 @@ exports.createProduct = async (req, res) => {
 				isDeleted,
 				isBlog,
 				isAboveFooter,
+				coverImageId
 			} = req.body;
 
 			const newProduct = await new ProductModel({
 				title,
 				order,
-				mediaId: mediaIds,
+				coverImageId,
 				isHomePage,
 				content,
 				shortDescription,
@@ -176,34 +166,30 @@ exports.createProduct = async (req, res) => {
 					})
 				)
 				.catch((error) => res.json({ status: 404, message: error }));
-		};
-		await S3.uploadNewMedia(req, res, data);
 	}
 };
 
 exports.updateSingleProduct = async (req, res) => {
-	if (req.files) {
+	if(req.files) {
 		await ProductModel.findById({ _id: req.params.productid })
-			.then(async (product) => {
-				await MediaModel.findById({ _id: product.mediaId }).then(
-					async (media) => {
-						const data = async (data) => {
-							await MediaModel.findByIdAndUpdate(
-								{ _id: product.mediaId },
-								{
-									$set: {
-										url: data.Location || null,
-										title: 'product',
-										mediaKey: data.Key,
-										alt: req.body.title,
-									},
-								},
-								{ useFindAndModify: false, new: true }
-							).catch((err) => res.json({ status: 404, message: err }));
-						};
-						await S3.updateMedia(req, res, media.mediaKey, data);
-					}
-				);
+		.then(async (product) => {
+			await MediaModel.findById({ _id: product.mediaId }).then(async (media) => {
+				const data = async (data) => {
+					await MediaModel.findByIdAndUpdate(
+						{ _id: product.mediaId },
+						{
+							$set: {
+								url: data.Location || null,
+								title: 'product',
+								mediaKey: data.Key,
+								alt: req.body.alt,
+							},
+						},
+						{ useFindAndModify: false, new: true }
+					).catch((err) => res.json({ status: 404, message: err }));
+				};
+				await S3.updateMedia(req, res, media.mediaKey, data);
+			});
 
 				const { title, order, content, shortDescription, buttonText, userId } =
 					req.body;
@@ -230,54 +216,49 @@ exports.updateSingleProduct = async (req, res) => {
 					},
 					{ useFindAndModify: false, new: true }
 				)
-					.then((data) =>
-						res.json({
-							status: 200,
-							message: 'Product is updated successfully',
-							data,
-						})
-					)
-					.catch((err) => res.json({ status: 404, message: err }));
-			})
-			.catch((err) => res.json({ status: 404, message: err }));
+				.catch((err) => res.json({ status: 404, message: err }));
+		})
+		.catch((err) => res.json({ status: 404, message: err }));
 	} else {
 		await ProductModel.findById({ _id: req.params.productid })
-			.then(async (product) => {
-				const { title, order, content, shortDescription, buttonText, mediaId } =
-					req.body;
+		.then(async (product) => {
 
-				await ProductModel.findByIdAndUpdate(
-					{ _id: req.params.productid },
-					{
-						$set: {
-							title,
-							order,
-							mediaId: !mediaId ? product.mediaId : mediaId,
-							isHomePage: !req.body.isHomePage ? false : req.body.isHome,
-							content,
-							shortDescription,
-							buttonText,
-							userId: !req.body.userId ? product.userId : req.body.userId,
-							isActive: !req.body.isActive ? true : req.body.isActive,
-							isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
-							isBlog: !req.body.isBlog ? false : req.body.isBlog,
-							isAboveFooter: !req.body.isAboveFooter
-								? false
-								: req.body.isAboveFooter,
-						},
+			const { title, order, content, shortDescription, buttonText, userId, coverImageId } =
+				req.body;
+
+			await ProductModel.findByIdAndUpdate(
+				{ _id: req.params.productid },
+				{
+					$set: {
+						title,
+						order,
+						coverImageId,
+						mediaId: product.mediaId,
+						isHomePage: !req.body.isHomePage ? false : req.body.isHome,
+						content,
+						shortDescription,
+						buttonText,
+						userId,
+						isActive: !req.body.isActive ? true : req.body.isActive,
+						isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
+						isBlog: !req.body.isBlog ? false : req.body.isBlog,
+						isAboveFooter: !req.body.isAboveFooter
+							? false
+							: req.body.isAboveFooter,
 					},
-					{ useFindAndModify: false, new: true }
+				},
+				{ useFindAndModify: false, new: true }
+			)
+				.then((data) =>
+					res.json({
+						status: 200,
+						message: 'Product is updated successfully',
+						data,
+					})
 				)
-					.then((data) =>
-						res.json({
-							status: 200,
-							message: 'Product is updated successfully',
-							data,
-						})
-					)
-					.catch((err) => res.json({ status: 404, message: err }));
-			})
-			.catch((err) => res.json({ status: 404, message: err }));
+				.catch((err) => res.json({ status: 404, message: err }));
+		})
+		.catch((err) => res.json({ status: 404, message: err }));
 	}
 };
 
