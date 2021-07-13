@@ -17,7 +17,6 @@ exports.getAll = async (req, res) => {
                     select:'url'
                 }
             })
-			// .populate('userId', 'firstname lastname mediaId url')
             
             
 		const total = await CommentsModel.find().count();
@@ -58,7 +57,16 @@ exports.getSingleComment = async (req, res) => {
 			res.json({ data });
 		}
 	})
-    .populate('userId', 'firstname lastname mediaId')
+    .populate({
+        path:'userId',
+        model:'user',
+        select:'firstname lastname mediaId',
+        populate:{
+            path:'mediaId',
+            model:'media',
+            select:'url'
+        }
+    })
 	
 };
 
@@ -70,7 +78,16 @@ exports.getCommentsByUserId = async (req, res) => {
 			res.json({ status: 200, data });
 		} 
 	})
-		.populate('userId', 'firstname lastname')
+    .populate({
+        path:'userId',
+        model:'user',
+        select:'firstname lastname mediaId',
+        populate:{
+            path:'mediaId',
+            model:'media',
+            select:'url'
+        }
+    })
 	
 };
 
