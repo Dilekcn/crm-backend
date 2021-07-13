@@ -84,7 +84,7 @@ exports.getMediaByIsActive = async (req, res) => {
 };
 
 exports.updateSingleMedia = async (req, res) => {
-	await MediaModel.findById({ _id: req.params.mediaId })
+	await MediaModel.findById({ _id: req.params.mediaid })
 		.then(async (response) => {
 			const data = async (data) => {
 				await MediaModel.findByIdAndUpdate(
@@ -111,7 +111,7 @@ exports.updateSingleMedia = async (req, res) => {
 };
 
 exports.removeSingleMedia = async (req, res) => {
-	await MediaModel.findById({ _id: req.params.mediaId })
+	await MediaModel.findById({ _id: req.params.mediaid })
 		.then(async (response) => {
 			S3.deleteMedia(response.mediaKey);
 			await MediaModel.findByIdAndDelete({ _id: req.params.mediaid })
