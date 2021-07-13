@@ -9,7 +9,7 @@ exports.getAllMedia = async (req, res) => {
 			.limit(limit * 1)
 			.skip((page - 1) * limit)
 			.sort({ createdAt: -1 });
-		const total = await MediaModel.find().count();
+		const total = await MediaModel.find().countDocuments();
 		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
 		res.json({ message: 'All Medias', total: total, pages, status: 200, response });
 	} catch (error) {
@@ -21,12 +21,12 @@ exports.createMedia = async (req, res) => {
 	const data = async (data) => {
 		const newMedia = await new MediaModel({
 			url: data.Location,
-			title: req.body.title, 
+			title: req.body.title,
 			mediaKey: data.Key,
 			isHomePage: req.body.isHomePage,
 			isActive: req.body.isActive,
 			isDeleted: req.body.isDeleted,
-			alt:req.body.alt
+			alt: req.body.alt,
 		});
 
 		newMedia
@@ -50,14 +50,37 @@ exports.getSingleMedia = async (req, res) => {
 };
 
 exports.getSingleMediaByTitle = async (req, res) => {
+	const { page, limit } = req.query;
 	const title = req.params.title.toLowerCase();
-	await MediaModel.find({ title: title }, (err, data) => {
+	const total = await MediaModel.find({ title: title }).countDocuments();
+	const pages = limit === undefined ? 1 : Math.ceil(total / limit);
+	await MediaModel.find({ title }, (err, data) => {
 		if (err) {
 			res.json({ status: 404, message: err });
 		} else {
-			res.json({ status: 200, data });
+			res.json({ total, pages, status: 200, data });
 		}
-	});
+	})
+		.limit(limit * 1)
+		.skip((page - 1) * limit)
+		.sort({ createdAt: -1 });
+};
+
+exports.getMediaByIsActive = async (req, res) => {
+	const { page, limit } = req.query;
+	const total = await MediaModel.find({ title: title }).countDocuments();
+	const pages = limit === undefined ? 1 : Math.ceil(total / limit);
+	const isActive = req.params.isactive.toLowerCase();
+	await MediaModel.find({ isActive }, (err, data) => {
+		if (err) {
+			res.json({ status: 404, message: err });
+		} else {
+			res.json({ total, pages, status: 200, data });
+		}
+	})
+		.limit(limit * 1)
+		.skip((page - 1) * limit)
+		.sort({ createdAt: -1 });
 };
 
 exports.updateSingleMedia = async (req, res) => {
@@ -73,7 +96,7 @@ exports.updateSingleMedia = async (req, res) => {
 							title: req.body.title,
 							isActive: req.body.isActive,
 							isDeleted: req.body.isDeleted,
-							alt:req.body.update
+							alt: req.body.update,
 						},
 					}
 				)

@@ -9,9 +9,9 @@ exports.getAll = async (req, res) => {
 			.skip((page - 1) * limit)
 			.sort({ createdAt: -1 })
 			.populate('socialMediaId', 'title link');
-		const total = await CompanyProfileModel.find().count();
+		const total = await CompanyProfileModel.find().countDocuments();
 		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
-		res.json({ total: total, pages, status: 200, response });
+		res.json({ total, pages, status: 200, response });
 	} catch (error) {
 		res.json({ status: 404, message: error });
 	}

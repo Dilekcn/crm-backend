@@ -12,9 +12,9 @@ exports.getAllProducts = async (req, res) => {
 			.sort({ createdAt: -1 })
 			.populate('mediaId', 'title url alt')
 			.populate('userId', 'firstname lastname email');
-		const total = await ProductModel.find().count();
+		const total = await ProductModel.find().countDocuments();
 		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
-		res.json({ total: total, pages, status: 200, response });
+		res.json({ total, pages, status: 200, response });
 	} catch (err) {
 		res.json({ status: 404, message: err });
 	}
@@ -29,19 +29,19 @@ exports.getSingleProduct = (req, res) => {
 };
 
 exports.createProduct = async (req, res) => {
-	if(req.files) {
+	if (req.files) {
 		const data = async (data) => {
-			const newMedia = await new Media({
+			const newMedia = await new MediaModel({
 				url: data.Location || null,
 				title: 'product',
 				mediaKey: data.Key,
 				alt: req.body.alt || null,
 			});
-	
+
 			newMedia.save();
-	
+
 			const mediaIds = newMedia._id;
-	
+
 			const {
 				title,
 				order,
@@ -55,11 +55,11 @@ exports.createProduct = async (req, res) => {
 				isBlog,
 				isAboveFooter,
 			} = req.body;
-	
-			const product = await new ProductModel({
+
+			const newProduct = await new ProductModel({
 				title,
 				order,
-				coverImageId: mediaIds,
+				mediaId: mediaIds,
 				isHomePage,
 				content,
 				shortDescription,
@@ -70,19 +70,60 @@ exports.createProduct = async (req, res) => {
 				isBlog,
 				isAboveFooter,
 			});
-	
-			product
+
+			newProduct
 				.save()
 				.then((response) =>
 					res.json({
 						status: 200,
-						message: 'Added a new product successfully.',
+						message: 'New product is created successfully',
 						response,
 					})
 				)
 				.catch((error) => res.json({ status: 404, message: error }));
 		};
 		await S3.uploadNewMedia(req, res, data);
+	} else if (req.body.mediaId) {
+		const {
+			title,
+			order,
+			isHomePage,
+			content,
+			shortDescription,
+			buttonText,
+			userId,
+			isActive,
+			isDeleted,
+			isBlog,
+			isAboveFooter,
+			mediaId,
+		} = req.body;
+
+		const newProduct = await new ProductModel({
+			title,
+			order,
+			mediaId,
+			isHomePage,
+			content,
+			shortDescription,
+			buttonText,
+			userId,
+			isActive,
+			isDeleted,
+			isBlog,
+			isAboveFooter,
+		});
+
+		newProduct
+			.save()
+			.then((response) =>
+				res.json({
+					status: 200,
+					message: 'New product is created successfully',
+					response,
+				})
+			)
+			.catch((error) => res.json({ status: 404, message: error }));
 	} else {
 	
 			const {
@@ -99,8 +140,8 @@ exports.createProduct = async (req, res) => {
 				isAboveFooter,
 				coverImageId
 			} = req.body;
-	
-			const product = await new ProductModel({
+
+			const newProduct = await new ProductModel({
 				title,
 				order,
 				coverImageId,
@@ -114,13 +155,13 @@ exports.createProduct = async (req, res) => {
 				isBlog,
 				isAboveFooter,
 			});
-	
-			product
+
+			newProduct
 				.save()
 				.then((response) =>
 					res.json({
 						status: 200,
-						message: 'Added a new product successfully.',
+						message: 'New product is created successfully',
 						response,
 					})
 				)
@@ -150,37 +191,30 @@ exports.updateSingleProduct = async (req, res) => {
 				await S3.updateMedia(req, res, media.mediaKey, data);
 			});
 
-			const { title, order, content, shortDescription, buttonText, userId } =
-				req.body;
+				const { title, order, content, shortDescription, buttonText, userId } =
+					req.body;
 
-			await ProductModel.findByIdAndUpdate(
-				{ _id: req.params.productid },
-				{
-					$set: {
-						title,
-						order,
-						mediaId: product.mediaId,
-						isHomePage: !req.body.isHomePage ? false : req.body.isHome,
-						content,
-						shortDescription,
-						buttonText,
-						userId,
-						isActive: !req.body.isActive ? true : req.body.isActive,
-						isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
-						isBlog: !req.body.isBlog ? false : req.body.isBlog,
-						isAboveFooter: !req.body.isAboveFooter
-							? false
-							: req.body.isAboveFooter,
+				await ProductModel.findByIdAndUpdate(
+					{ _id: req.params.productid },
+					{
+						$set: {
+							title,
+							order,
+							mediaId: product.mediaId,
+							isHomePage: !req.body.isHomePage ? false : req.body.isHome,
+							content,
+							shortDescription,
+							buttonText,
+							userId: !req.body.userId ? product.userId : req.body.userId,
+							isActive: !req.body.isActive ? true : req.body.isActive,
+							isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
+							isBlog: !req.body.isBlog ? false : req.body.isBlog,
+							isAboveFooter: !req.body.isAboveFooter
+								? false
+								: req.body.isAboveFooter,
+						},
 					},
-				},
-				{ useFindAndModify: false, new: true }
-			)
-				.then((data) =>
-					res.json({
-						status: 200,
-						message: 'Product is updated successfully',
-						data,
-					})
+					{ useFindAndModify: false, new: true }
 				)
 				.catch((err) => res.json({ status: 404, message: err }));
 		})

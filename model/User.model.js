@@ -11,7 +11,6 @@ const UserSchema = new Schema(
 		isActive: { type: Boolean, default: true },
 		isDeleted: { type: Boolean, default: false },
 		mediaId: { type: Schema.Types.ObjectId, ref: 'media' },
-		alt:{ type: String}
 	},
 	{ timestamps: true }
 );
