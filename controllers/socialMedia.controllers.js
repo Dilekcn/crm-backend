@@ -45,7 +45,7 @@ exports.createSocialMedia = (req, res) => {
 // }
 
 exports.updateSocialMedia = (req, res) => {
-	SocialMediaModel.findByIdAndUpdate(req.params.socialMediaId, req.body)
+	SocialMediaModel.findByIdAndUpdate(req.params.socialmediaid, req.body)
 		.then((data) => {
 			res.json({
 				status: 200,
@@ -59,7 +59,7 @@ exports.updateSocialMedia = (req, res) => {
 };
 
 exports.removeSocialMedia = (req, res) => {
-	SocialMediaModel.findByIdAndRemove(req.params.socialMediaId)
+	SocialMediaModel.findByIdAndRemove(req.params.socialmediaid)
 		.then((data) => {
 			res.json({
 				status: 200,

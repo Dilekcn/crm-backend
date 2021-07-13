@@ -306,7 +306,8 @@ exports.changePassword = (req, res) => {
 						$set: {
 							password: hashedPassword,
 						},
-					}
+					},
+					{ useFindAndModify: false, new: true }
 				).then((data) =>
 					res.json({
 						status: 200,

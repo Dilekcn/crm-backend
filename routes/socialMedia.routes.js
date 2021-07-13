@@ -3,9 +3,9 @@ const router = express.Router();
 
 const SocialMediaController = require('../controllers/socialMedia.controllers');
 
-router.get('/socialMedia', SocialMediaController.getAllSocialMedia);
-router.post('/socialMedia', SocialMediaController.createSocialMedia);
-router.put('/socialMedia/:socialMediaId', SocialMediaController.updateSocialMedia);
-router.delete('/socialMedia/:socialMediaId', SocialMediaController.removeSocialMedia);
+router.get('/socialmedia', SocialMediaController.getAllSocialMedia);
+router.post('/socialmedia', SocialMediaController.createSocialMedia);
+router.put('/socialmedia/:socialmediaid', SocialMediaController.updateSocialMedia);
+router.delete('/socialmedia/:socialmediaid', SocialMediaController.removeSocialMedia);
 
 module.exports = router;
