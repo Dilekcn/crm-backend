@@ -22,7 +22,12 @@ exports.getAllExperts = async (req, res) => {
 
 exports.createExpert = async (req, res) => {
 	if (req.body.socialMediaId) {
-		const newSocialMedia = await JSON.parse(req.body.socialMediaId).map((sm) => {
+		const newSocialMedia = typeof req.body.socialMediaId === 'string' ? await JSON.parse(req.body.socialMediaId).map((sm) => {
+			return new SocialMediaModel({
+				title: sm.title || null,
+				link: sm.link || null,
+			});
+		}) : req.body.socialMediaId.map((sm) => {
 			return new SocialMediaModel({
 				title: sm.title || null,
 				link: sm.link || null,

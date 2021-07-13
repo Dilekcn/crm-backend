@@ -84,17 +84,6 @@ exports.createProduct = async (req, res) => {
 		};
 		await S3.uploadNewMedia(req, res, data);
 	} else {
-		const data = async (data) => {
-			const newMedia = await new Media({
-				url: data.Location || null,
-				title: 'product',
-				mediaKey: data.Key,
-				alt: req.body.alt || null,
-			});
-	
-			newMedia.save();
-	
-			const mediaIds = newMedia._id;
 	
 			const {
 				title,
@@ -108,12 +97,13 @@ exports.createProduct = async (req, res) => {
 				isDeleted,
 				isBlog,
 				isAboveFooter,
+				coverImageId
 			} = req.body;
 	
 			const product = await new ProductModel({
 				title,
 				order,
-				coverImageId: mediaIds,
+				coverImageId,
 				isHomePage,
 				content,
 				shortDescription,
@@ -135,8 +125,6 @@ exports.createProduct = async (req, res) => {
 					})
 				)
 				.catch((error) => res.json({ status: 404, message: error }));
-		};
-		await S3.uploadNewMedia(req, res, data);
 	}
 };
 
