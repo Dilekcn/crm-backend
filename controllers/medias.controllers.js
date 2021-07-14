@@ -21,15 +21,15 @@ exports.getWithQuery = async (req, res) => {
 	try {
 		const  query  = JSON.parse(req.body.query);
 		const { page = 1, limit } = req.query;	
-		const response = await MediaModel.find()
+		const response = await MediaModel.find({title:"gallery"})
 			.limit(limit * 1)
 			.skip((page - 1) * limit)
 			.sort({ createdAt: -1 });
 		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
-		const filteredResponse = await response.filter((item)=>{
-			return item.title === query.title && item.isActive === query.isActive
-		})	
-		res.json({message: 'Filtered medias',total: filteredResponse.length, pages,status: 200, filteredResponse });
+		// const filteredResponse = await response.filter((item)=>{
+		// 	return item.title === query.title && item.isActive === query.isActive
+		// })	
+		res.json({message: 'Filtered medias',total: filteredResponse.length, pages,status: 200, response });
 	} catch (error) {
 		res.json({ status: 404, message: error });
 	}
