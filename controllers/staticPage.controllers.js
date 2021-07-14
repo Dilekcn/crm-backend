@@ -33,7 +33,7 @@ exports.createPage = async (req, res) => {
 			const { name, content, isActive, isDeleted } = req.body;
 
 			const newPage = await new StaticPageModel({
-				name,
+				name:name.trim(),
 				content,
 				mediaId: newImage._id,
 				isActive,
@@ -124,7 +124,7 @@ exports.getSinglePageByName = async (req, res) => {
 			res.json({ status: 200, data });
 		}
 	}).populate('mediaId', 'url title alt');
-};
+}; 
 
 exports.updatePages = async (req, res) => {
 	if (req.files) {
