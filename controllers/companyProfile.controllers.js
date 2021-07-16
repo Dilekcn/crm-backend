@@ -377,13 +377,26 @@ exports.update = async (req, res) => {
 };
 
 exports.delete = async (req, res) => {
-	await CompanyProfileModel.findByIdAndDelete({ _id: req.params.id })
-		.then((data) =>
-			res.json({
-				status: 200,
-				message: 'Company profile is deleted successfully',
-				data,
-			})
-		)
+	await CompanyProfileModel.findById({ _id: req.params.id })
+		.then(async (companyprofile) => {
+			await MediaModel.findByIdAndUpdate(
+				{ _id: companyprofile.mediaId },
+				{
+					$set: {
+						isActive: false,
+					},
+				},
+				{ useFindAndModify: false, new: true }
+			);
+			await CompanyProfileModel.findByIdAndDelete({ _id: req.params.id })
+				.then((data) =>
+					res.json({
+						status: 200,
+						message: 'Company profile is deleted successfully',
+						data,
+					})
+				)
+				.catch((err) => res.json({ status: 404, message: err }));
+		})
 		.catch((err) => res.json({ status: 404, message: err }));
 };

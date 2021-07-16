@@ -387,8 +387,8 @@ exports.removeExpert = async (req, res) => {
 					});
 				})
 				.catch((err) => {
-					res.json({ status: 4041, message: err });
+					res.json({ status: 404, message: err });
 				});
 		})
-		.catch((err) => res.json({ status: 4042, message: err }));
+		.catch((err) => res.json({ status: 404, message: err }));
 };
