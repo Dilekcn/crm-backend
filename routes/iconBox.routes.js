@@ -8,6 +8,7 @@ router.get('/iconbox/:id', iconBoxControllers.getSingleIconBox);
 router.get('/iconbox/title/:title', iconBoxControllers.getIconBoxByTitle);
 router.get('/iconbox/author/:author', iconBoxControllers.getIconBoxByAuthor);
 router.post('/iconbox', iconBoxControllers.create);
+router.post('/iconbox/filter', iconBoxControllers.getWithQuery);
 router.put('/iconbox/:id', iconBoxControllers.updateIconBox);
 router.delete('/iconbox/:id', iconBoxControllers.removeSingleIconBox);
 
