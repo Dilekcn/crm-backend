@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 const CompanyProfileSchema = new Schema(
 	{
 		name: String,
-		logo: String,
+		mediaId: { type: Schema.Types.ObjectId, ref: 'media' },
 		phones: Array,
 		address: String,
 		socialMediaId: [{ type: Schema.Types.ObjectId, ref: 'social' }],
