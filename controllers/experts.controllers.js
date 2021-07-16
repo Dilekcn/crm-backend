@@ -74,7 +74,6 @@ exports.createExpert = async (req, res) => {
 					)
 					.catch((error) => res.json({ status: 404, message: error }));
 			};
-
 			await S3.uploadNewMedia(req, res, data);
 		} else if (req.body.mediaId) {
 			const { firstname, lastname, expertise, isActive, isDeleted, mediaId } =

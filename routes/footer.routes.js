@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const footersControllers = require('../controllers/footer.controllers');
+const footerControllers = require('../controllers/footer.controllers');
 
-router.get('/footers', footersControllers.getAll);
-router.get('/footers/:id', footersControllers.getSingleFooterById);
-router.post('/footers', footersControllers.createFooter);
-router.put('/footers/:footerid', footersControllers.updateFooterById);
-router.delete('/footers/:id', footersControllers.removeFooterById);
+router.get('/footer', footerControllers.getAll);
+router.get('/footer/:id', footerControllers.getSingleFooterById);
+router.post('/footer', footerControllers.createFooter);
+router.put('/footer/:footerid', footerControllers.updateFooterById);
+router.delete('/footer/:id', footerControllers.removeFooterById);
 
 module.exports = router;
