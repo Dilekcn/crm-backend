@@ -271,7 +271,6 @@ exports.updateExpert = async (req, res) => {
 	if (req.files) {
 		await ExpertModel.findById({ _id: req.params.expertid })
 			.then(async (expert) => {
-				console.log(expert);
 				await MediaModel.findById({ _id: expert.mediaId }).then(async (media) => {
 					const data = async (data) => {
 						await MediaModel.findByIdAndUpdate(

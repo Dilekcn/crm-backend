@@ -92,8 +92,7 @@ exports.create = async (req, res) => {
 			};
 			await S3.uploadNewMedia(req, res, data);
 		} else if (req.body.mediaId) {
-			const { name, mediaId, phones, address, email, isActive, isDeleted } =
-				req.body;
+			const { name, mediaId, address, email, isActive, isDeleted } = req.body;
 
 			const newCompanyProfile = await new CompanyProfileModel({
 				name,
@@ -130,8 +129,7 @@ exports.create = async (req, res) => {
 
 				newMedia.save();
 
-				const { name, mediaId, phones, address, email, isActive, isDeleted } =
-					req.body;
+				const { name, address, email, isActive, isDeleted } = req.body;
 
 				const newCompanyProfile = await new CompanyProfileModel({
 					name,
@@ -172,8 +170,7 @@ exports.create = async (req, res) => {
 
 				newMedia.save();
 
-				const { name, mediaId, phones, address, email, isActive, isDeleted } =
-					req.body;
+				const { name, address, email, isActive, isDeleted } = req.body;
 
 				const newCompanyProfile = await new CompanyProfileModel({
 					name,
@@ -202,13 +199,15 @@ exports.create = async (req, res) => {
 			};
 			await S3.uploadNewMedia(req, res, data);
 		} else if (req.body.mediaId) {
-			const { name, mediaId, phones, address, email, isActive, isDeleted } =
-				req.body;
+			const { name, mediaId, address, email, isActive, isDeleted } = req.body;
 
 			const newCompanyProfile = await new CompanyProfileModel({
 				name,
 				mediaId,
-				phones,
+				phones:
+					typeof req.body.phones === 'string'
+						? JSON.parse(req.body.phones)
+						: req.body.phones,
 				address,
 				socialMediaId: socialMediaIds,
 				email,
@@ -237,13 +236,15 @@ exports.create = async (req, res) => {
 
 				newMedia.save();
 
-				const { name, mediaId, phones, address, email, isActive, isDeleted } =
-					req.body;
+				const { name, address, email, isActive, isDeleted } = req.body;
 
 				const newCompanyProfile = await new CompanyProfileModel({
 					name,
 					mediaId: newMedia._id,
-					phones,
+					phones:
+						typeof req.body.phones === 'string'
+							? JSON.parse(req.body.phones)
+							: req.body.phones,
 					address,
 					socialMediaId: socialMediaIds,
 					email,
@@ -268,44 +269,111 @@ exports.create = async (req, res) => {
 };
 
 exports.update = async (req, res) => {
-	await CompanyProfileModel.findById({ _id: req.params.id })
-		.then(async (companyprofile) => {
-			await companyprofile.socialMediaId.map(async (SMId, index) => {
-				await SocialMedia.findByIdAndUpdate(
-					{ _id: SMId },
-					{
-						$set: req.body.socialMediaId[index],
-					},
-					{ useFindAndModify: false, new: true }
+	if (req.files) {
+		await CompanyProfileModel.findById({ _id: req.params.id })
+			.then(async (companyprofile) => {
+				await MediaModel.findById({ _id: companyprofile.mediaId }).then(
+					async (media) => {
+						const data = async (data) => {
+							await MediaModel.findByIdAndUpdate(
+								{
+									_id: companyprofile.mediaId,
+								},
+								{
+									$set: {
+										url: data.Location || null,
+										title: 'company-profile',
+										mediaKey: data.Key,
+										alt: req.body.alt,
+									},
+								},
+								{ useFindAndModify: false, new: true }
+							).catch((err) => res.json({ status: 404, message: err }));
+						};
+						await S3.updateMedia(req, res, media.mediaKey, data);
+					}
 				);
-			});
 
-			const { name, mediaId, phones, address, email } = req.body;
+				await companyprofile.socialMediaId.map(async (SMId, index) => {
+					await SocialMediaModel.findByIdAndUpdate(
+						{ _id: SMId },
+						{
+							$set: JSON.parse(req.body.socialMediaId)[index],
+						},
+						{ useFindAndModify: false, new: true }
+					);
+				});
 
-			await CompanyProfileModel.findByIdAndUpdate(
-				{ _id: req.params.id },
-				{
-					name,
-					mediaId,
-					phones,
-					address,
-					socialMediaId: companyprofile.socialMediaId,
-					email,
-					isActive: !req.body.isActive ? true : req.body.isActive,
-					isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
-				}
-			)
-				.then((companyprofile) =>
-					res.json({
-						status: 200,
-						message: 'Company profile is updated successfully',
-						companyprofile,
-					})
+				const { name, address, email } = req.body;
+
+				await CompanyProfileModel.findByIdAndUpdate(
+					{ _id: req.params.id },
+					{
+						name,
+						mediaId: req.files ? companyprofile.mediaId : req.body.mediaId,
+						phones:
+							typeof req.body.phones === 'string'
+								? JSON.parse(req.body.phones)
+								: req.body.phones,
+						address,
+						socialMediaId: companyprofile.socialMediaId,
+						email,
+						isActive: !req.body.isActive ? true : req.body.isActive,
+						isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
+					}
 				)
-				.catch((err) => res.json({ status: 404, message: err }));
-		})
-		.then((data) => res.json({ status: 200, data }))
-		.catch((err) => res.json({ status: 404, message: err }));
+					.then((companyprofile) =>
+						res.json({
+							status: 200,
+							message: 'Company profile is updated successfully',
+							companyprofile,
+						})
+					)
+					.catch((err) => res.json({ status: 404, message: err }));
+			})
+			.catch((err) => res.json({ status: 404, message: err }));
+	} else {
+		await CompanyProfileModel.findById({ _id: req.params.id })
+			.then(async (companyprofile) => {
+				await companyprofile.socialMediaId.map(async (SMId, index) => {
+					await SocialMediaModel.findByIdAndUpdate(
+						{ _id: SMId },
+						{
+							$set: req.body.socialMediaId[index],
+						},
+						{ useFindAndModify: false, new: true }
+					);
+				});
+
+				const { name, address, email, mediaId } = req.body;
+
+				await CompanyProfileModel.findByIdAndUpdate(
+					{ _id: req.params.id },
+					{
+						name,
+						mediaId: !mediaId ? companyprofile.mediaId : mediaId,
+						phones:
+							typeof req.body.phones === 'string'
+								? JSON.parse(req.body.phones)
+								: req.body.phones,
+						address,
+						socialMediaId: companyprofile.socialMediaId,
+						email,
+						isActive: !req.body.isActive ? true : req.body.isActive,
+						isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
+					}
+				)
+					.then((companyprofile) =>
+						res.json({
+							status: 200,
+							message: 'Company profile is updated successfully',
+							companyprofile,
+						})
+					)
+					.catch((err) => res.json({ status: 404, message: err }));
+			})
+			.catch((err) => res.json({ status: 404, message: err }));
+	}
 };
 
 exports.delete = async (req, res) => {
