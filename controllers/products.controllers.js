@@ -29,7 +29,7 @@ exports.getWithQuery = async (req, res) => {
 		const { page = 1, limit } = req.query;
 		const response = await ProductModel.find(query)
 			.limit(limit * 1)
-			.skip((page - 1) * limit)
+			.skip((page - 1) * limit) 
 			.sort({ createdAt: -1 });
 		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
 		res.json({
@@ -161,13 +161,13 @@ exports.createProduct = async (req, res) => {
 			isDeleted,
 			isBlog,
 			isAboveFooter,
-			coverImageId,
+			mediaId,
 		} = req.body;
 
 		const newProduct = await new ProductModel({
 			title,
 			order,
-			coverImageId,
+			mediaId,
 			isHomePage,
 			content,
 			shortDescription,
@@ -226,7 +226,7 @@ exports.updateSingleProduct = async (req, res) => {
 							title,
 							order,
 							mediaId: product.mediaId,
-							isHomePage: !req.body.isHomePage ? false : req.body.isHome,
+							isHomePage: !req.body.isHomePage ? false : req.body.isHomePage,
 							content,
 							shortDescription,
 							buttonText,
@@ -253,7 +253,7 @@ exports.updateSingleProduct = async (req, res) => {
 					shortDescription,
 					buttonText,
 					userId,
-					coverImageId,
+					mediaId,
 				} = req.body;
 
 				await ProductModel.findByIdAndUpdate(
@@ -262,9 +262,8 @@ exports.updateSingleProduct = async (req, res) => {
 						$set: {
 							title,
 							order,
-							coverImageId,
 							mediaId: product.mediaId,
-							isHomePage: !req.body.isHomePage ? false : req.body.isHome,
+							isHomePage: !req.body.isHomePage ? false : req.body.isHomePage,
 							content,
 							shortDescription,
 							buttonText,
