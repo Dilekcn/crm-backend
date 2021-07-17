@@ -90,7 +90,7 @@ exports.create = async (req, res) => {
 					)
 					.catch((error) => res.json({ status: 404, message: error }));
 			};
-			await S3.uploadNewMedia(req, res, data);
+			await S3.uploadNewLogo(req, res, data);
 		} else if (req.body.logo) {
 			const { name, logo, address, email, isActive, isDeleted } = req.body;
 
@@ -156,7 +156,7 @@ exports.create = async (req, res) => {
 					)
 					.catch((error) => res.json({ status: 404, message: error }));
 			};
-			await S3.uploadNewMedia(req, res, data);
+			await S3.uploadNewLogo(req, res, data);
 		}
 	} else {
 		if (req.files) {
@@ -197,7 +197,7 @@ exports.create = async (req, res) => {
 					)
 					.catch((error) => res.json({ status: 404, message: error }));
 			};
-			await S3.uploadNewMedia(req, res, data);
+			await S3.uploadNewLogo(req, res, data);
 		} else if (req.body.logo) {
 			const { name, logo, address, email, isActive, isDeleted } = req.body;
 
@@ -263,7 +263,7 @@ exports.create = async (req, res) => {
 					)
 					.catch((error) => res.json({ status: 404, message: error }));
 			};
-			await S3.uploadNewMedia(req, res, data);
+			await S3.uploadNewLogo(req, res, data);
 		}
 	}
 };
@@ -290,7 +290,7 @@ exports.update = async (req, res) => {
 								{ useFindAndModify: false, new: true }
 							).catch((err) => res.json({ status: 404, message: err }));
 						};
-						await S3.updateMedia(req, res, media.mediaKey, data);
+						await S3.updateLogo(req, res, media.mediaKey, data);
 					}
 				);
 

@@ -1,7 +1,5 @@
 const AWS = require('aws-sdk');
 require('dotenv').config();
-const UserModel = require('../model/User.model');
-const ExpertModel = require('../model/Expert.model');
 const Access_Key = process.env.Access_Key_ID;
 const Secret_Key = process.env.Secret_Access_Key;
 const Bucket_Name = process.env.Bucket_Name;
@@ -42,12 +40,48 @@ const uploadNewLogo = (req, res, callback) => {
 		callback(data);
 	});
 };
+
 const updateMedia = (req, res, mediaKey, callback) => {
 	if (req.files) {
 		const params = {
 			Bucket: Bucket_Name,
 			Key: mediaKey,
 			Body: req.files ? req.files.mediaId.data : null,
+			ContentType: 'image/JPG',
+		};
+		S3.upload(params, (err, data) => {
+			if (err) return res.json({ message: 'error from aws update', err });
+			callback(data);
+		});
+	} else {
+		const params = {
+			Bucket: Bucket_Name,
+			Key: mediaKey,
+		};
+
+		S3.getObject(params, (err, data) => {
+			if (err) return res.json({ message: 'error from aws update', err });
+
+			const updateParams = {
+				Bucket: Bucket_Name,
+				Key: mediaKey,
+				Body: data.Body,
+				ContentType: 'image/JPG',
+			};
+			S3.upload(updateParams, (err, updateData) => {
+				if (err) return res.json({ message: 'error from aws update', err });
+				callback(updateData);
+			});
+		});
+	}
+};
+
+const updateLogo = (req, res, mediaKey, callback) => {
+	if (req.files) {
+		const params = {
+			Bucket: Bucket_Name,
+			Key: mediaKey,
+			Body: req.files ? req.files.logo.data : null,
 			ContentType: 'image/JPG',
 		};
 		S3.upload(params, (err, data) => {
@@ -86,4 +120,4 @@ const deleteMedia = (mediaKey) => {
 	S3.deleteObject(params).promise();
 };
 
-module.exports = { uploadNewMedia, updateMedia, deleteMedia, uploadNewLogo };
+module.exports = { uploadNewMedia, uploadNewLogo, updateMedia, updateLogo, deleteMedia };
