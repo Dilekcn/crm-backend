@@ -32,7 +32,7 @@ const uploadNewLogo = (req, res, callback) => {
 	const params = {
 		Bucket: Bucket_Name,
 		Key: uuid(),
-		Body: req.files ? req.files.mediaId.data : data,
+		Body: req.files ? req.files.logo.data : data,
 		ContentType: 'image/JPG',
 	};
 	S3.upload(params, (err, data) => {
@@ -46,7 +46,7 @@ const updateMedia = (req, res, mediaKey, callback) => {
 		const params = {
 			Bucket: Bucket_Name,
 			Key: mediaKey,
-			Body: req.files ? req.files.mediaId.data : null,
+			Body: req.files ? req.files.logo.data : null,
 			ContentType: 'image/JPG',
 		};
 		S3.upload(params, (err, data) => {
