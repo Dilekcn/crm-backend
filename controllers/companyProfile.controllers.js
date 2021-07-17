@@ -11,7 +11,7 @@ exports.getAll = async (req, res) => {
 			.skip((page - 1) * limit)
 			.sort({ createdAt: -1 })
 			.populate('socialMediaId', 'title link')
-			.populate('mediaId', 'url title alt');
+			.populate('logo', 'url title alt');
 		const total = await CompanyProfileModel.find().countDocuments();
 		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
 		res.json({ total, pages, status: 200, response });
@@ -29,7 +29,7 @@ exports.getSingle = async (req, res) => {
 		}
 	})
 		.populate('socialMediaId', 'title link')
-		.populate('mediaId', 'url title alt');
+		.populate('logo', 'url title alt');
 };
 
 exports.create = async (req, res) => {
@@ -56,18 +56,18 @@ exports.create = async (req, res) => {
 			const data = async (data) => {
 				const newMedia = await new MediaModel({
 					url: data.Location || null,
-					title: 'company-profile',
+					title: 'company-logo',
 					alt: req.body.alt || null,
 					mediaKey: data.Key,
 				});
 
 				newMedia.save();
 
-				const { name, mediaId, address, email, isActive, isDeleted } = req.body;
+				const { name, logo, address, email, isActive, isDeleted } = req.body;
 
 				const newCompanyProfile = await new CompanyProfileModel({
 					name,
-					mediaId: newMedia._id,
+					logo: newMedia._id,
 					phones:
 						typeof req.body.phones === 'string'
 							? JSON.parse(req.body.phones)
@@ -91,12 +91,12 @@ exports.create = async (req, res) => {
 					.catch((error) => res.json({ status: 404, message: error }));
 			};
 			await S3.uploadNewMedia(req, res, data);
-		} else if (req.body.mediaId) {
-			const { name, mediaId, address, email, isActive, isDeleted } = req.body;
+		} else if (req.body.logo) {
+			const { name, logo, address, email, isActive, isDeleted } = req.body;
 
 			const newCompanyProfile = await new CompanyProfileModel({
 				name,
-				mediaId,
+				logo,
 				phones:
 					typeof req.body.phones === 'string'
 						? JSON.parse(req.body.phones)
@@ -122,7 +122,7 @@ exports.create = async (req, res) => {
 			const data = async (data) => {
 				const newMedia = await new MediaModel({
 					url: data.Location || null,
-					title: 'company-profile',
+					title: 'company-logo',
 					alt: req.body.alt || null,
 					mediaKey: data.Key,
 				});
@@ -133,7 +133,7 @@ exports.create = async (req, res) => {
 
 				const newCompanyProfile = await new CompanyProfileModel({
 					name,
-					mediaId: newMedia._id,
+					logo: newMedia._id,
 					phones:
 						typeof req.body.phones === 'string'
 							? JSON.parse(req.body.phones)
@@ -163,7 +163,7 @@ exports.create = async (req, res) => {
 			const data = async (data) => {
 				const newMedia = await new MediaModel({
 					url: data.Location || null,
-					title: 'company-profile',
+					title: 'company-logo',
 					alt: req.body.alt || null,
 					mediaKey: data.Key,
 				});
@@ -174,7 +174,7 @@ exports.create = async (req, res) => {
 
 				const newCompanyProfile = await new CompanyProfileModel({
 					name,
-					mediaId: newMedia._id,
+					logo: newMedia._id,
 					phones:
 						typeof req.body.phones === 'string'
 							? JSON.parse(req.body.phones)
@@ -198,12 +198,12 @@ exports.create = async (req, res) => {
 					.catch((error) => res.json({ status: 404, message: error }));
 			};
 			await S3.uploadNewMedia(req, res, data);
-		} else if (req.body.mediaId) {
-			const { name, mediaId, address, email, isActive, isDeleted } = req.body;
+		} else if (req.body.logo) {
+			const { name, logo, address, email, isActive, isDeleted } = req.body;
 
 			const newCompanyProfile = await new CompanyProfileModel({
 				name,
-				mediaId,
+				logo,
 				phones:
 					typeof req.body.phones === 'string'
 						? JSON.parse(req.body.phones)
@@ -229,7 +229,7 @@ exports.create = async (req, res) => {
 			const data = async (data) => {
 				const newMedia = await new MediaModel({
 					url: data.Location || null,
-					title: 'company-profile',
+					title: 'company-logo',
 					alt: req.body.alt || null,
 					mediaKey: data.Key,
 				});
@@ -240,7 +240,7 @@ exports.create = async (req, res) => {
 
 				const newCompanyProfile = await new CompanyProfileModel({
 					name,
-					mediaId: newMedia._id,
+					logo: newMedia._id,
 					phones:
 						typeof req.body.phones === 'string'
 							? JSON.parse(req.body.phones)
@@ -272,17 +272,17 @@ exports.update = async (req, res) => {
 	if (req.files) {
 		await CompanyProfileModel.findById({ _id: req.params.id })
 			.then(async (companyprofile) => {
-				await MediaModel.findById({ _id: companyprofile.mediaId }).then(
+				await MediaModel.findById({ _id: companyprofile.logo }).then(
 					async (media) => {
 						const data = async (data) => {
 							await MediaModel.findByIdAndUpdate(
 								{
-									_id: companyprofile.mediaId,
+									_id: companyprofile.logo,
 								},
 								{
 									$set: {
 										url: data.Location || null,
-										title: 'company-profile',
+										title: 'company-logo',
 										mediaKey: data.Key,
 										alt: req.body.alt,
 									},
@@ -310,7 +310,7 @@ exports.update = async (req, res) => {
 					{ _id: req.params.id },
 					{
 						name,
-						mediaId: req.files ? companyprofile.mediaId : req.body.mediaId,
+						logo: req.files ? companyprofile.logo : req.body.logo,
 						phones:
 							typeof req.body.phones === 'string'
 								? JSON.parse(req.body.phones)
@@ -345,13 +345,13 @@ exports.update = async (req, res) => {
 					);
 				});
 
-				const { name, address, email, mediaId } = req.body;
+				const { name, address, email, logo } = req.body;
 
 				await CompanyProfileModel.findByIdAndUpdate(
 					{ _id: req.params.id },
 					{
 						name,
-						mediaId: !mediaId ? companyprofile.mediaId : mediaId,
+						logo: !logo ? companyprofile.logo : logo,
 						phones:
 							typeof req.body.phones === 'string'
 								? JSON.parse(req.body.phones)
@@ -380,7 +380,7 @@ exports.delete = async (req, res) => {
 	await CompanyProfileModel.findById({ _id: req.params.id })
 		.then(async (companyprofile) => {
 			await MediaModel.findByIdAndUpdate(
-				{ _id: companyprofile.mediaId },
+				{ _id: companyprofile.logo },
 				{
 					$set: {
 						isActive: false,
