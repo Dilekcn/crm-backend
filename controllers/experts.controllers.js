@@ -178,7 +178,6 @@ exports.createExpert = async (req, res) => {
 				lastname,
 				expertise,
 				mediaId,
-				socialMediaId: socialMediaIds,
 				isActive,
 				isDeleted,
 			});
