@@ -4,7 +4,7 @@ const MediaModel = require('../model/Media.model');
 const S3 = require('../config/aws.s3.config');
 
 exports.getAll = async (req, res) => {
-	try {
+	try {	
 		const { page = 1, limit } = req.query;
 		const response = await CompanyProfileModel.find()
 			.limit(limit * 1)
@@ -19,6 +19,7 @@ exports.getAll = async (req, res) => {
 		res.json({ status: 404, message: error });
 	}
 };
+
 
 exports.getSingle = async (req, res) => {
 	await CompanyProfileModel.findById({ _id: req.params.id }, (err, data) => {
@@ -180,7 +181,6 @@ exports.create = async (req, res) => {
 							? JSON.parse(req.body.phones)
 							: req.body.phones,
 					address,
-					socialMediaId: socialMediaIds,
 					email,
 					isActive,
 					isDeleted,

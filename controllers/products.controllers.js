@@ -5,6 +5,7 @@ const S3 = require('../config/aws.s3.config');
 
 exports.getAllProducts = async (req, res) => {
 	try {
+		
 		const { page = 1, limit } = req.query;
 		const response = await ProductModel.find()
 			.limit(limit * 1)
