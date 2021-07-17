@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const FooterSchema = new Schema(
 	{
-		mediaId: { type: Schema.Types.ObjectId, ref: 'media' },
+		logo: { type: Schema.Types.ObjectId, ref: 'media' },
 		address: { type: String },
 		email: { type: String },
 		phone: { type: String },
