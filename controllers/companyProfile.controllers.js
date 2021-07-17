@@ -209,7 +209,6 @@ exports.create = async (req, res) => {
 						? JSON.parse(req.body.phones)
 						: req.body.phones,
 				address,
-				socialMediaId: socialMediaIds,
 				email,
 				isActive,
 				isDeleted,
@@ -246,7 +245,6 @@ exports.create = async (req, res) => {
 							? JSON.parse(req.body.phones)
 							: req.body.phones,
 					address,
-					socialMediaId: socialMediaIds,
 					email,
 					isActive,
 					isDeleted,
