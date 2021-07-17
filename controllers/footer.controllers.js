@@ -61,15 +61,18 @@ exports.createFooter = async (req, res) => {
 
 				newMedia.save();
 
+				const { address, email, phone, copyright, isActive, isDeleted } =
+					req.body;
+
 				const newFooter = new FooterModel({
 					mediaId: newMedia._id,
-					address: req.body.address,
-					email: req.body.email,
-					phone: req.body.phone,
+					address,
+					email,
+					phone,
 					socialMediaId: socialMediaIds,
-					copyright: req.body.copyright,
-					isActive: req.body.isActive,
-					isDeleted: req.body.isDeleted,
+					copyright,
+					isActive,
+					isDeleted,
 				});
 
 				newFooter
@@ -85,15 +88,18 @@ exports.createFooter = async (req, res) => {
 			};
 			await S3.uploadNewMedia(req, res, data);
 		} else if (req.body.mediaId) {
+			const { address, email, phone, copyright, isActive, isDeleted, mediaId } =
+				req.body;
+
 			const newFooter = new FooterModel({
-				mediaId: req.body.mediaId,
-				address: req.body.address,
-				email: req.body.email,
-				phone: req.body.phone,
+				mediaId,
+				address,
+				email,
+				phone,
 				socialMediaId: socialMediaIds,
-				copyright: req.body.copyright,
-				isActive: req.body.isActive,
-				isDeleted: req.body.isDeleted,
+				copyright,
+				isActive,
+				isDeleted,
 			});
 
 			newFooter
@@ -117,15 +123,18 @@ exports.createFooter = async (req, res) => {
 
 				newMedia.save();
 
+				const { address, email, phone, copyright, isActive, isDeleted } =
+					req.body;
+
 				const newFooter = new FooterModel({
 					mediaId: newMedia._id,
-					address: req.body.address,
-					email: req.body.email,
-					phone: req.body.phone,
+					address,
+					email,
+					phone,
 					socialMediaId: socialMediaIds,
-					copyright: req.body.copyright,
-					isActive: req.body.isActive,
-					isDeleted: req.body.isDeleted,
+					copyright,
+					isActive,
+					isDeleted,
 				});
 
 				newFooter
@@ -153,15 +162,18 @@ exports.createFooter = async (req, res) => {
 
 				newMedia.save();
 
+				const { address, email, phone, copyright, isActive, isDeleted } =
+					req.body;
+
 				const newFooter = new FooterModel({
 					mediaId: newMedia._id,
-					address: req.body.address,
-					email: req.body.email,
-					phone: req.body.phone,
+					address,
+					email,
+					phone,
 					socialMediaId: socialMediaIds,
-					copyright: req.body.copyright,
-					isActive: req.body.isActive,
-					isDeleted: req.body.isDeleted,
+					copyright,
+					isActive,
+					isDeleted,
 				});
 
 				newFooter
@@ -177,17 +189,19 @@ exports.createFooter = async (req, res) => {
 			};
 			await S3.uploadNewMedia(req, res, data);
 		} else if (req.body.mediaId) {
-			const newFooter = new FooterModel({
-				mediaId: newMedia._id,
-				address: req.body.address,
-				email: req.body.email,
-				phone: req.body.phone,
-				socialMediaId: socialMediaIds,
-				copyright: req.body.copyright,
-				isActive: req.body.isActive,
-				isDeleted: req.body.isDeleted,
-			});
+			const { address, email, phone, copyright, isActive, isDeleted, mediaId } =
+				req.body;
 
+			const newFooter = new FooterModel({
+				mediaId,
+				address,
+				email,
+				phone,
+				socialMediaId: socialMediaIds,
+				copyright,
+				isActive,
+				isDeleted,
+			});
 			newFooter
 				.save()
 				.then((data) =>
@@ -209,15 +223,18 @@ exports.createFooter = async (req, res) => {
 
 				newMedia.save();
 
+				const { address, email, phone, copyright, isActive, isDeleted } =
+					req.body;
+
 				const newFooter = new FooterModel({
 					mediaId: newMedia._id,
-					address: req.body.address,
-					email: req.body.email,
-					phone: req.body.phone,
+					address,
+					email,
+					phone,
 					socialMediaId: socialMediaIds,
-					copyright: req.body.copyright,
-					isActive: req.body.isActive,
-					isDeleted: req.body.isDeleted,
+					copyright,
+					isActive,
+					isDeleted,
 				});
 
 				newFooter
@@ -237,46 +254,128 @@ exports.createFooter = async (req, res) => {
 };
 
 exports.updateFooterById = async (req, res) => {
-	await FooterModel.findById({ _id: req.params.footerid })
-		.then(async (footer) => {
-			await footer.socialMediaId.map(
-				async (socialMediaid, index) =>
+	if (req.files) {
+		await FooterModel.findById({ _id: req.params.id })
+			.then(async (footer) => {
+				await MediaModel.findById({ _id: footer.mediaId }).then(async (media) => {
+					const data = async (data) => {
+						await MediaModel.findByIdAndUpdate(
+							{ _id: footer.mediaId },
+							{
+								$set: {
+									url: data.Location || null,
+									title: 'footer',
+									mediaKey: data.Key,
+									alt: req.body.alt,
+								},
+							},
+							{ useFindAndModify: false, new: true }
+						).catch((err) => res.json({ status: 404, message: err }));
+					};
+					await S3.updateMedia(req, res, media.mediaKey, data);
+				});
+				await footer.socialMediaId.map(async (SMId, index) => {
 					await SocialMediaModel.findByIdAndUpdate(
-						{ _id: socialMediaid },
-						{ $set: req.body.socialMediaId[index] }
-					)
-						.then((data) => res.json({ status: 200, data }))
-						.catch((err) => res.json({ status: 404, message: err }))
-			);
+						{ _id: SMId },
+						{
+							$set: JSON.parse(req.body.socialMediaId)[index],
+						}
+					);
+				});
 
-			await FooterModel.findByIdAndUpdate(
-				{ _id: req.params.footerid },
-				{
-					logo: req.body.logo,
-					address: req.body.address,
-					email: req.body.email,
-					phone: req.body.phone,
-					socialMediaId: footer.socialMediaId,
-					copyright: req.body.copyright,
-				}
-			)
-				.then((data) =>
-					res.json({
-						status: 200,
-						message: 'Expert is updated successfully',
-						data,
-					})
+				const { address, email, phone, copyright } = req.body;
+				await FooterModel.findByIdAndUpdate(
+					{ _id: req.params.id },
+					{
+						$set: {
+							address,
+							email,
+							phone,
+							copyright,
+							mediaId: req.files ? footer.mediaId : req.body.mediaId,
+							socialMediaId: footer.socialMediaId,
+							isActive: !req.body.isActive ? true : req.body.isActive,
+							isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
+						},
+					},
+					{ useFindAndModify: false, new: true }
 				)
-				.catch((err) => res.json({ status: 404, message: err }));
-		})
-		.catch((err) => res.json({ status: 404, message: err }));
+
+					.then((data) =>
+						res.json({
+							status: 200,
+							message: 'Footer is updated successfully',
+							data,
+						})
+					)
+					.catch((err) => res.json({ status: 4041, message: err }));
+			})
+			.catch((err) => res.json({ status: 4042, message: err }));
+	} else {
+		await FooterModel.findById({ _id: req.params.id })
+			.then(async (footer) => {
+				await footer.socialMediaId.map(async (SMId, index) => {
+					await SocialMediaModel.findByIdAndUpdate(
+						{ _id: SMId },
+						{
+							$set: JSON.parse(req.body.socialMediaId)[index],
+						},
+						{ useFindAndModify: false, new: true }
+					);
+				});
+
+				const { address, email, phone, copyright, mediaId } = req.body;
+				await FooterModel.findByIdAndUpdate(
+					{ _id: req.params.id },
+					{
+						$set: {
+							address,
+							email,
+							phone,
+							copyright,
+							mediaId: !mediaId ? footer.mediaId : mediaId,
+							isActive: !req.body.isActive ? true : req.body.isActive,
+							isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
+						},
+					},
+					{ useFindAndModify: false, new: true }
+				)
+
+					.then((data) =>
+						res.json({
+							status: 200,
+							message: 'Footer is updated successfully',
+							data,
+						})
+					)
+					.catch((err) => res.json({ status: 4041, message: err }));
+			})
+			.catch((err) => res.json({ status: 4042, message: err }));
+	}
 };
 
-exports.removeFooterById = (req, res) => {
-	const id = req.params.id;
-	FooterModel.findByIdAndDelete({ _id: id })
-		.then(async (data) => {
-			res.json({ status: 200, message: 'Footer is deleted successfully', data });
+exports.removeFooterById = async (req, res) => {
+	await FooterModel.findById({ _id: req.params.id })
+		.then(async (footer) => {
+			await MediaModel.findByIdAndUpdate(
+				{ _id: footer.mediaId },
+				{
+					$set: {
+						isActive: false,
+					},
+				},
+				{ useFindAndModify: false, new: true }
+			);
+			const id = req.params.id;
+			await FooterModel.findByIdAndDelete({ _id: id })
+				.then(async (data) => {
+					res.json({
+						status: 200,
+						message: 'Footer is deleted successfully',
+						data,
+					});
+				})
+				.catch((err) => res.json({ status: 404, message: err }));
 		})
 		.catch((err) => res.json({ status: 404, message: err }));
 };
