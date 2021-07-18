@@ -20,6 +20,34 @@ exports.getAllExperts = async (req, res) => {
 	}
 };
 
+exports.getWithQuery = async (req, res) => {
+	try {
+		const query =
+			typeof req.body.query === 'string'
+				? JSON.parse(req.body.query)
+				: req.body.query;
+		const { page = 1, limit } = req.query;
+		const response = await ExpertModel.find(query)
+			.limit(limit * 1)
+			.skip((page - 1) * limit)
+			.sort({ createdAt: -1 })
+			.populate('socialMediaId', 'title link description')
+			.populate('mediaId', 'url title alt');
+		const total = await ExpertModel.find().countDocuments();
+		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
+		res.json({
+			message: 'Filtered expert',
+			total: response.length,
+			pages,
+			status: 200,
+			response,
+		});
+	} catch (error) {
+		res.json({ status: 404, message: error });
+	}
+};
+
+
 exports.createExpert = async (req, res) => {
 	if (req.body.socialMediaId) {
 		const newSocialMedia =
