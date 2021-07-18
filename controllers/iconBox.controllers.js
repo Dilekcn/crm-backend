@@ -2,7 +2,7 @@ const IconBoxModel = require('../model/IconBox.model');
 
 exports.getAll = async (req, res) => {
 	try {
-		const { page = 1, limit } = req.query;
+		const { page, limit } = req.query;
 		const response = await IconBoxModel.find()
 			.limit(limit * 1)
 			.skip((page - 1) * limit)
@@ -12,6 +12,30 @@ exports.getAll = async (req, res) => {
 		res.json({ total, pages, status: 200, response });
 	} catch (error) {
 		res.json({ status: 404, error });
+	}
+};
+
+exports.getWithQuery = async (req, res) => {
+	try {
+		const query =
+			typeof req.body.query === 'string'
+				? JSON.parse(req.body.query)
+				: req.body.query;
+		const { page = 1, limit } = req.query;
+		const response = await IconBoxModel.find(query)
+			.limit(limit * 1)
+			.skip((page - 1) * limit)
+			.sort({ createdAt: -1 });
+		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
+		res.json({
+			message: 'Filtered icon-boxes',
+			total: response.length,
+			pages,
+			status: 200,
+			response,
+		});
+	} catch (error) {
+		res.json({ status: 404, message: error });
 	}
 };
 
