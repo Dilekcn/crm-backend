@@ -4,7 +4,7 @@ const MediaModel = require('../model/Media.model');
 const S3 = require('../config/aws.s3.config');
 
 exports.getAll = async (req, res) => {
-	try {	
+	try {
 		const { page = 1, limit } = req.query;
 		const response = await CompanyProfileModel.find()
 			.limit(limit * 1)
@@ -19,7 +19,6 @@ exports.getAll = async (req, res) => {
 		res.json({ status: 404, message: error });
 	}
 };
-
 
 exports.getSingle = async (req, res) => {
 	await CompanyProfileModel.findById({ _id: req.params.id }, (err, data) => {
@@ -307,18 +306,21 @@ exports.update = async (req, res) => {
 				await CompanyProfileModel.findByIdAndUpdate(
 					{ _id: req.params.id },
 					{
-						name,
-						logo: req.files ? companyprofile.logo : req.body.logo,
-						phones:
-							typeof req.body.phones === 'string'
-								? JSON.parse(req.body.phones)
-								: req.body.phones,
-						address,
-						socialMediaId: companyprofile.socialMediaId,
-						email,
-						isActive: !req.body.isActive ? true : req.body.isActive,
-						isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
-					}
+						$set: {
+							name,
+							logo: req.files ? companyprofile.logo : req.body.logo,
+							phones:
+								typeof req.body.phones === 'string'
+									? JSON.parse(req.body.phones)
+									: req.body.phones,
+							address,
+							socialMediaId: companyprofile.socialMediaId,
+							email,
+							isActive: !req.body.isActive ? true : req.body.isActive,
+							isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
+						},
+					},
+					{ useFindAndModify: false, new: true }
 				)
 					.then((companyprofile) =>
 						res.json({
@@ -348,18 +350,21 @@ exports.update = async (req, res) => {
 				await CompanyProfileModel.findByIdAndUpdate(
 					{ _id: req.params.id },
 					{
-						name,
-						logo: !logo ? companyprofile.logo : logo,
-						phones:
-							typeof req.body.phones === 'string'
-								? JSON.parse(req.body.phones)
-								: req.body.phones,
-						address,
-						socialMediaId: companyprofile.socialMediaId,
-						email,
-						isActive: !req.body.isActive ? true : req.body.isActive,
-						isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
-					}
+						$set: {
+							name,
+							logo: !logo ? companyprofile.logo : logo,
+							phones:
+								typeof req.body.phones === 'string'
+									? JSON.parse(req.body.phones)
+									: req.body.phones,
+							address,
+							socialMediaId: companyprofile.socialMediaId,
+							email,
+							isActive: !req.body.isActive ? true : req.body.isActive,
+							isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
+						},
+					},
+					{ useFindAndModify: false, new: true }
 				)
 					.then((companyprofile) =>
 						res.json({
