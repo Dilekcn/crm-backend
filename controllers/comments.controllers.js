@@ -27,6 +27,24 @@ exports.getAll = async (req, res) => {
 	}
 };
 
+exports.getWithQuery = async (req, res) => {
+	
+	try {
+		const  query  = typeof req.body.query==="string" ?  JSON.parse(req.body.query) : req.body.query
+		const { page = 1, limit } = req.query;	
+		const response = await CommentsModel.find(query)
+			.limit(limit * 1)
+			.skip((page - 1) * limit)
+			.sort({ createdAt: -1 });
+		const pages = limit === undefined ? 1 : Math.ceil(total / limit);	
+		res.json({message: 'Filtered Comments', total:response.length,pages,status: 200, response });
+	} catch (error) {
+		res.json({ status: 404, message: error });
+	}
+};
+
+
+
 exports.create = async (req, res) => {
 	const newComment = await new CommentsModel({
 		userId: req.body.userId,
