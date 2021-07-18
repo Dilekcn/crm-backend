@@ -192,27 +192,39 @@ exports.createExpert = async (req, res) => {
 				)
 				.catch((error) => res.json({ status: 404, message: error }));
 		} else {
-			const { firstname, lastname, expertise, isActive, isDeleted, mediaId } =
-				req.body;
+			const data = async (data) => {
+				const newMedia = await new MediaModel({
+					url: data.Location || null,
+					title: 'expert',
+					alt: req.body.alt || null,
+					mediaKey: data.Key,
+				});
 
-			const newExpert = await new ExpertModel({
-				firstname,
-				lastname,
-				expertise,
-				mediaId: mediaId,
-				isActive,
-				isDeleted,
-			});
-			newExpert
-				.save()
-				.then((response) =>
-					res.json({
-						status: 200,
-						message: 'Added new expert successfully.',
-						response,
-					})
-				)
-				.catch((error) => res.json({ status: 404, message: error }));
+				newMedia.save();
+
+				const { firstname, lastname, expertise, isActive, isDeleted } = req.body;
+
+				const newExpert = await new ExpertModel({
+					firstname,
+					lastname,
+					expertise,
+					mediaId: newMedia._id,
+					isActive,
+					isDeleted,
+				});
+				newExpert
+					.save()
+					.then((response) =>
+						res.json({
+							status: 200,
+							message: 'Added new expert successfully.',
+							response,
+						})
+					)
+					.catch((error) => res.json({ status: 404, message: error }));
+			};
+
+			await S3.uploadNewMedia(req, res, data);
 		}
 	}
 };
@@ -233,6 +245,7 @@ exports.getExpertsByFirstname = async (req, res) => {
 	const { page, limit } = req.query;
 	const total = await ExpertModel.find().countDocuments();
 	const pages = limit === undefined ? 1 : Math.ceil(total / limit);
+
 	await ExpertModel.find({ firstname: req.params.firstname }, (err, data) => {
 		if (err) {
 			res.json({ status: 404, message: err });
@@ -251,6 +264,7 @@ exports.getExpertsByLastname = async (req, res) => {
 	const { page, limit } = req.query;
 	const total = await ExpertModel.find().countDocuments();
 	const pages = limit === undefined ? 1 : Math.ceil(total / limit);
+
 	await ExpertModel.find({ lastname: req.params.lastname }, (err, data) => {
 		if (err) {
 			res.json({ status: 404, message: err });
@@ -269,6 +283,7 @@ exports.getExpertsByExpertise = async (req, res) => {
 	const { page, limit } = req.query;
 	const total = await ExpertModel.find().countDocuments();
 	const pages = limit === undefined ? 1 : Math.ceil(total / limit);
+
 	await ExpertModel.find({ expertise: req.params.expertise }, (err, data) => {
 		if (err) {
 			res.json({ status: 404, message: err });

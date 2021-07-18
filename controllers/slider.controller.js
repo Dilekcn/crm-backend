@@ -166,7 +166,10 @@ exports.getSingleSlideByTitle = async (req, res) => {
 		} else {
 			res.json({ status: 200, data });
 		}
-	}).populate('mediaId', 'url title alt');
+	})
+		.populate('mediaId', 'url title alt')
+		.limit(limit * 1)
+		.skip((page - 1) * limit);
 };
 
 exports.updateSlider = async (req, res) => {

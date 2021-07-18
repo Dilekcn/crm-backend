@@ -73,7 +73,7 @@ exports.getSingleMenu = async (req, res) => {
 };
 
 exports.getMenuByParentId = async (req, res) => {
-	await MenusModel.find({ parentId: req.params.parentId }, (err, data) => {
+	await MenusModel.find({ parentId: req.params.parentid }, (err, data) => {
 		if (err) {
 			res.json({ status: 404, message: err });
 		} else {

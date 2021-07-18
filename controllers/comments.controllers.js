@@ -45,7 +45,7 @@ exports.create = async (req, res) => {
 				response,
 			})
 		)
-		.catch((err) => res.json({ status: false, message: err }));
+		.catch((err) => res.json({ status: 404, message: err }));
 };
 
 exports.getSingleComment = async (req, res) => {
@@ -68,22 +68,29 @@ exports.getSingleComment = async (req, res) => {
 };
 
 exports.getCommentsByUserId = async (req, res) => {
+	const { page, limit } = req.query;
+	const total = await CommentsModel.find().countDocuments();
+	const pages = limit === undefined ? 1 : Math.ceil(total / limit);
 	await CommentsModel.find({ userId: req.params.userid }, (err, data) => {
 		if (err) {
 			res.json({ status: 404, message: err });
 		} else {
-			res.json({ status: 200, data });
+			res.json({ total, pages, status: 200, data });
 		}
-	}).populate({
-		path: 'userId',
-		model: 'user',
-		select: 'firstname lastname mediaId',
-		populate: {
-			path: 'mediaId',
-			model: 'media',
-			select: 'url',
-		},
-	});
+	})
+		.limit(limit * 1)
+		.skip((page - 1) * limit)
+		.sort({ createdAt: -1 })
+		.populate({
+			path: 'userId',
+			model: 'user',
+			select: 'firstname lastname mediaId',
+			populate: {
+				path: 'mediaId',
+				model: 'media',
+				select: 'url',
+			},
+		});
 };
 
 exports.updateComment = async (req, res) => {
