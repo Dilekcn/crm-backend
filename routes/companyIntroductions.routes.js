@@ -12,6 +12,8 @@ router.get(
 	'/companyintroduction/title/:title',
 	companyIntroductionControllers.getSingleIntroductionByTitle
 );
+router.post('/companyintroduction/filter', companyIntroductionControllers.getWithQuery);
+
 router.post('/companyintroduction', companyIntroductionControllers.createIntroduction);
 router.put(
 	'/companyintroduction/:id',

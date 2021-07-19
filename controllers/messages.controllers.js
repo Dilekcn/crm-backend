@@ -87,14 +87,38 @@ exports.getSingleMessage = async (req, res) => {
 	});
 };
 
-exports.getMessageBySubject = async (req, res) => {
+exports.getMessagesBySubject = async (req, res) => {
+	const { page, limit } = req.query;
+	const total = await MessagesModel.find().countDocuments();
+	const pages = limit === undefined ? 1 : Math.ceil(total / limit);
+
 	await MessagesModel.find({ subject: req.params.subject }, (err, data) => {
 		if (err) {
 			res.json({ status: 404, message: err });
 		} else {
-			res.json({ status: 200, data });
+			res.json({ total, pages, status: 200, data });
 		}
-	});
+	})
+		.limit(limit * 1)
+		.skip((page - 1) * limit)
+		.sort({ createdAt: -1 });
+};
+
+exports.getMessagesByEmail = async (req, res) => {
+	const { page, limit } = req.query;
+	const total = await MessagesModel.find().countDocuments();
+	const pages = limit === undefined ? 1 : Math.ceil(total / limit);
+
+	await MessagesModel.find({ email: req.params.email }, (err, data) => {
+		if (err) {
+			res.json({ status: 404, message: err });
+		} else {
+			res.json({ total, pages, status: 200, data });
+		}
+	})
+		.limit(limit * 1)
+		.skip((page - 1) * limit)
+		.sort({ createdAt: -1 });
 };
 
 exports.updateMessage = async (req, res) => {

@@ -1,12 +1,10 @@
 const ProductModel = require('../model/Products.model');
 const MediaModel = require('../model/Media.model');
-
 const S3 = require('../config/aws.s3.config');
 
 exports.getAllProducts = async (req, res) => {
 	try {
-		
-		const { page = 1, limit } = req.query;
+		const { page, limit } = req.query;
 		const response = await ProductModel.find()
 			.limit(limit * 1)
 			.skip((page - 1) * limit)
@@ -30,7 +28,7 @@ exports.getWithQuery = async (req, res) => {
 		const { page = 1, limit } = req.query;
 		const response = await ProductModel.find(query)
 			.limit(limit * 1)
-			.skip((page - 1) * limit) 
+			.skip((page - 1) * limit)
 			.sort({ createdAt: -1 });
 		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
 		res.json({
@@ -51,6 +49,44 @@ exports.getSingleProduct = (req, res) => {
 		.populate('userId', 'firstname lastname email')
 		.then((data) => res.json({ status: 200, data }))
 		.catch((err) => res.json({ status: 404, message: err }));
+};
+
+exports.getProductsByUserId = async (req, res) => {
+	const { page, limit } = req.query;
+	const total = await ProductModel.find().countDocuments();
+	const pages = limit === undefined ? 1 : Math.ceil(total / limit);
+
+	await ProductModel.find({ userId: req.params.userid }, (err, data) => {
+		if (err) {
+			res.json({ status: 404, message: err });
+		} else {
+			res.json({ total, pages, status: 200, data });
+		}
+	})
+		.limit(limit * 1)
+		.skip((page - 1) * limit)
+		.sort({ createdAt: -1 })
+		.populate('mediaId', 'title url alt')
+		.populate('userId', 'firstname lastname email');
+};
+
+exports.getProductsByTitle = async (req, res) => {
+	const { page, limit } = req.query;
+	const total = await ProductModel.find().countDocuments();
+	const pages = limit === undefined ? 1 : Math.ceil(total / limit);
+
+	await ProductModel.find({ title: req.params.title }, (err, data) => {
+		if (err) {
+			res.json({ status: 404, message: err });
+		} else {
+			res.json({ total, pages, status: 200, data });
+		}
+	})
+		.limit(limit * 1)
+		.skip((page - 1) * limit)
+		.sort({ createdAt: -1 })
+		.populate('mediaId', 'title url alt')
+		.populate('userId', 'firstname lastname email');
 };
 
 exports.createProduct = async (req, res) => {
@@ -227,7 +263,9 @@ exports.updateSingleProduct = async (req, res) => {
 							title,
 							order,
 							mediaId: product.mediaId,
-							isHomePage: !req.body.isHomePage ? false : req.body.isHomePage,
+							isHomePage: !req.body.isHomePage
+								? false
+								: req.body.isHomePage,
 							content,
 							shortDescription,
 							buttonText,
@@ -264,7 +302,9 @@ exports.updateSingleProduct = async (req, res) => {
 							title,
 							order,
 							mediaId: product.mediaId,
-							isHomePage: !req.body.isHomePage ? false : req.body.isHomePage,
+							isHomePage: !req.body.isHomePage
+								? false
+								: req.body.isHomePage,
 							content,
 							shortDescription,
 							buttonText,

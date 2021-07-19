@@ -8,6 +8,8 @@ router.get('/experts/:expertid', ExpertsController.getSingleExpert);
 router.get('/experts/firstname/:firstname', ExpertsController.getExpertsByFirstname);
 router.get('/experts/lastname/:lastname', ExpertsController.getExpertsByLastname);
 router.get('/experts/expertise/:expertise', ExpertsController.getExpertsByExpertise);
+router.post('/experts/filter', ExpertsController.getWithQuery);
+
 router.post('/experts', ExpertsController.createExpert);
 router.put('/experts/:expertid', ExpertsController.updateExpert);
 router.delete('/experts/:expertid', ExpertsController.removeExpert);

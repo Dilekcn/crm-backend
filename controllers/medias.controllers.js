@@ -94,6 +94,7 @@ exports.getMediaByIsActive = async (req, res) => {
 	const isActive = req.params.isactive.toLowerCase();
 	const total = await MediaModel.find({ isActive }).countDocuments();
 	const pages = limit === undefined ? 1 : Math.ceil(total / limit);
+
 	await MediaModel.find({ isActive }, (err, data) => {
 		if (err) {
 			res.json({ status: 404, message: err });

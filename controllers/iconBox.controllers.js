@@ -2,7 +2,7 @@ const IconBoxModel = require('../model/IconBox.model');
 
 exports.getAll = async (req, res) => {
 	try {
-		const { page = 1, limit } = req.query;
+		const { page, limit } = req.query;
 		const response = await IconBoxModel.find()
 			.limit(limit * 1)
 			.skip((page - 1) * limit)

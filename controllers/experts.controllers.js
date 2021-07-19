@@ -20,6 +20,34 @@ exports.getAllExperts = async (req, res) => {
 	}
 };
 
+exports.getWithQuery = async (req, res) => {
+	try {
+		const query =
+			typeof req.body.query === 'string'
+				? JSON.parse(req.body.query)
+				: req.body.query;
+		const { page = 1, limit } = req.query;
+		const response = await ExpertModel.find(query)
+			.limit(limit * 1)
+			.skip((page - 1) * limit)
+			.sort({ createdAt: -1 })
+			.populate('socialMediaId', 'title link description')
+			.populate('mediaId', 'url title alt');
+		const total = await ExpertModel.find().countDocuments();
+		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
+		res.json({
+			message: 'Filtered expert',
+			total: response.length,
+			pages,
+			status: 200,
+			response,
+		});
+	} catch (error) {
+		res.json({ status: 404, message: error });
+	}
+};
+
+
 exports.createExpert = async (req, res) => {
 	if (req.body.socialMediaId) {
 		const newSocialMedia =
@@ -178,7 +206,6 @@ exports.createExpert = async (req, res) => {
 				lastname,
 				expertise,
 				mediaId,
-				socialMediaId: socialMediaIds,
 				isActive,
 				isDeleted,
 			});
@@ -193,27 +220,39 @@ exports.createExpert = async (req, res) => {
 				)
 				.catch((error) => res.json({ status: 404, message: error }));
 		} else {
-			const { firstname, lastname, expertise, isActive, isDeleted, mediaId } =
-				req.body;
+			const data = async (data) => {
+				const newMedia = await new MediaModel({
+					url: data.Location || null,
+					title: 'expert',
+					alt: req.body.alt || null,
+					mediaKey: data.Key,
+				});
 
-			const newExpert = await new ExpertModel({
-				firstname,
-				lastname,
-				expertise,
-				mediaId: mediaId,
-				isActive,
-				isDeleted,
-			});
-			newExpert
-				.save()
-				.then((response) =>
-					res.json({
-						status: 200,
-						message: 'Added new expert successfully.',
-						response,
-					})
-				)
-				.catch((error) => res.json({ status: 404, message: error }));
+				newMedia.save();
+
+				const { firstname, lastname, expertise, isActive, isDeleted } = req.body;
+
+				const newExpert = await new ExpertModel({
+					firstname,
+					lastname,
+					expertise,
+					mediaId: newMedia._id,
+					isActive,
+					isDeleted,
+				});
+				newExpert
+					.save()
+					.then((response) =>
+						res.json({
+							status: 200,
+							message: 'Added new expert successfully.',
+							response,
+						})
+					)
+					.catch((error) => res.json({ status: 404, message: error }));
+			};
+
+			await S3.uploadNewMedia(req, res, data);
 		}
 	}
 };
@@ -231,37 +270,58 @@ exports.getSingleExpert = async (req, res) => {
 };
 
 exports.getExpertsByFirstname = async (req, res) => {
+	const { page, limit } = req.query;
+	const total = await ExpertModel.find().countDocuments();
+	const pages = limit === undefined ? 1 : Math.ceil(total / limit);
+
 	await ExpertModel.find({ firstname: req.params.firstname }, (err, data) => {
 		if (err) {
 			res.json({ status: 404, message: err });
 		} else {
-			res.json({ status: 200, data });
+			res.json({ total, pages, status: 200, data });
 		}
 	})
+		.limit(limit * 1)
+		.skip((page - 1) * limit)
+		.sort({ createdAt: -1 })
 		.populate('socialMediaId', 'title link description')
 		.populate('mediaId', 'url title alt');
 };
 
 exports.getExpertsByLastname = async (req, res) => {
+	const { page, limit } = req.query;
+	const total = await ExpertModel.find().countDocuments();
+	const pages = limit === undefined ? 1 : Math.ceil(total / limit);
+
 	await ExpertModel.find({ lastname: req.params.lastname }, (err, data) => {
 		if (err) {
 			res.json({ status: 404, message: err });
 		} else {
-			res.json({ status: 200, data });
+			res.json({ total, pages, status: 200, data });
 		}
 	})
+		.limit(limit * 1)
+		.skip((page - 1) * limit)
+		.sort({ createdAt: -1 })
 		.populate('socialMediaId', 'title link description')
 		.populate('mediaId', 'url title alt');
 };
 
 exports.getExpertsByExpertise = async (req, res) => {
+	const { page, limit } = req.query;
+	const total = await ExpertModel.find().countDocuments();
+	const pages = limit === undefined ? 1 : Math.ceil(total / limit);
+
 	await ExpertModel.find({ expertise: req.params.expertise }, (err, data) => {
 		if (err) {
 			res.json({ status: 404, message: err });
 		} else {
-			res.json({ status: 200, data });
+			res.json({ total, pages, status: 200, data });
 		}
 	})
+		.limit(limit * 1)
+		.skip((page - 1) * limit)
+		.sort({ createdAt: -1 })
 		.populate('socialMediaId', 'title link description')
 		.populate('mediaId', 'url title alt');
 };
