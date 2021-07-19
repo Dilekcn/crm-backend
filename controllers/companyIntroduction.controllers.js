@@ -22,7 +22,7 @@ exports.createIntroduction = async (req, res) => {
 		title,
 		subTitle,
 		iconName,
-		shortDescription,
+		shortDescription, 
 		isActive,
 		isDeleted,
 	});

@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const CompanyIntroductionSchema = new Schema(
 	{
-		title: { type: String, unique: true },
+		title: { type: String },
 		subTitle: { type: String },
 		iconName: { type: String },
 		isActive: { type: Boolean, default: true },
