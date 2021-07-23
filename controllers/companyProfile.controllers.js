@@ -97,8 +97,7 @@ exports.update = async (req, res, next) => {
 														mediaKey: data.Key,
 														alt: req.body.alt,
 													},
-												},
-												{ useFindAndModify: false, new: true }
+												}
 											).catch((err) => res.json({ status: 404, message: err }));
 										};
 										await S3.updateLogo(req, res, media.mediaKey, data);
@@ -106,12 +105,11 @@ exports.update = async (req, res, next) => {
 								);
 				
 								await companyprofile.socialMediaId.map(async (SMId, index) => {
-									await SocialMediaModel.findByIdAndUpdate(
+									await SocialMedia.findByIdAndUpdate(
 										{ _id: SMId },
 										{
-											$set: JSON.parse(req.body.socialMediaId)[index],
-										},
-										{ useFindAndModify: false, new: true }
+											$set: typeof req.body.socialMediaId === 'string' ? JSON.parse(req.body.socialMediaId)[index] : req.body.socialMediaId[index]
+										}
 									);
 								});
 				
@@ -133,8 +131,7 @@ exports.update = async (req, res, next) => {
 											isActive: !req.body.isActive ? true : req.body.isActive,
 											isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
 										},
-									},
-									{ useFindAndModify: false, new: true }
+									}
 								)
 									.then((companyprofile) =>
 										res.json({
@@ -150,12 +147,11 @@ exports.update = async (req, res, next) => {
 						await CompanyProfileModel.findById({ _id: req.params.id })
 							.then(async (companyprofile) => {
 								await companyprofile.socialMediaId.map(async (SMId, index) => {
-									await SocialMediaModel.findByIdAndUpdate(
+									await SocialMedia.findByIdAndUpdate(
 										{ _id: SMId },
 										{
-											$set: req.body.socialMediaId[index],
-										},
-										{ useFindAndModify: false, new: true }
+											$set: typeof req.body.socialMediaId === 'string' ? JSON.parse(req.body.socialMediaId)[index] : req.body.socialMediaId[index]
+										}
 									);
 								});
 				
