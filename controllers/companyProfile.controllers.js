@@ -166,10 +166,9 @@ exports.update = async (req, res, next) => {
 										$set: {
 											name,
 											logo: !logo ? companyprofile.logo : logo,
-											phones:
-												typeof req.body.phones === 'string'
-													? JSON.parse(req.body.phones)
-													: req.body.phones,
+											phones: req.body.phones ? typeof req.body.phones === 'string'
+											? JSON.parse(req.body.phones)
+											: req.body.phones : companyprofile.phones,
 											address,
 											socialMediaId: companyprofile.socialMediaId,
 											email,
