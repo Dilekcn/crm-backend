@@ -26,6 +26,7 @@ const socialMediaRouter = require('./routes/socialMedia.routes');
 const companyProfileRouter = require('./routes/companyProfile.routes');
 const commentsRouter = require('./routes/comments.routes');
 const sectionsRouter = require('./routes/sections.routes');
+const blogsRouter = require('./routes/blogs.routes');
 
 //middlewares
 // const verifyToken = require('./auth/verifyToken');
@@ -85,6 +86,9 @@ app.use('/', companyProfileRouter);
 app.use('/', productsRouter);
 app.use('/', commentsRouter);
 app.use('/', sectionsRouter);
+app.use('/', blogsRouter);
+
+
 
 
 
