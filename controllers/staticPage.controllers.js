@@ -18,6 +18,29 @@ exports.getAll = async (req, res) => {
 	}
 };
 
+exports.getWithQuery = async (req, res) => {
+	try {
+		const query =
+			typeof req.query === 'string' ? JSON.parse(req.body.query) : req.body.query;
+		const { page, limit } = req.query;
+		const total = await StaticPageModel.find().countDocuments();
+		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
+		const response = await StaticPageModel.find(query)
+			.limit(limit * 1)
+			.skip((page - 1) * limit)
+			.sort({ createdAt: -1 });
+		res.json({
+			message: 'Filtered static pages',
+			total,
+			pages,
+			status: 200,
+			response,
+		});
+	} catch (error) {
+		res.json({ status: 404, message: err });
+	}
+};
+
 exports.createPage = async (req, res) => {
 	if (req.files) {
 		const data = async (data) => {
@@ -33,7 +56,7 @@ exports.createPage = async (req, res) => {
 			const { name, content, isActive, isDeleted } = req.body;
 
 			const newPage = await new StaticPageModel({
-				name:name.trim(),
+				name: name.trim(),
 				content,
 				mediaId: newImage._id,
 				isActive,
@@ -124,7 +147,7 @@ exports.getSinglePageByName = async (req, res) => {
 			res.json({ status: 200, data });
 		}
 	}).populate('mediaId', 'url title alt');
-}; 
+};
 
 exports.updatePages = async (req, res) => {
 	if (req.files) {
