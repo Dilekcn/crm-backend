@@ -43,6 +43,22 @@ exports.getSingleSection = async (req, res) => {
 		}
 	})
 };
+exports.getSingleSectionByType = async (req, res) => {
+	const { page, limit } = req.query;
+	const title = req.params.title.toLowerCase();
+	const total = await MediaModel.find({ title }).countDocuments();
+	const pages = limit === undefined ? 1 : Math.ceil(total / limit);
+	await SectionModel.find({ secType }, (err, data) => {
+		if (err) {
+			res.json({ status: 404, message: err });
+		} else {
+			res.json({ total, pages, status: 200, data });
+		}
+	})
+		.limit(limit * 1)
+		.skip((page - 1) * limit)
+		.sort({ createdAt: -1 });
+};
 
 
 
