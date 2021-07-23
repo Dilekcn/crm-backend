@@ -73,7 +73,7 @@ exports.update = async (req, res, next) => {
 		await CompanyProfileModel.findById({_id:req.params.id})
 			.then(async(isExist) => {
 				if(isExist === null) {
-					next({status:400, message:'This'})
+					next({status:400, message:'This Id is not exist in Company Profile Model.'})
 				} else {
 					if (req.files) {
 						await CompanyProfileModel.findById({ _id: req.params.id })
