@@ -9,7 +9,8 @@ exports.getAll = async (req, res,next) => {
 			.limit(limit * 1)
 			.skip((page - 1) * limit)
 			.sort({ createdAt: -1 })
-			.populate('socialMediaId', 'title link');
+			.populate('socialMediaId', 'title link')
+			.populate('logo', 'url title alt');
 		const total = await CompanyProfileModel.find().countDocuments();
 		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
 		res.json({ total, pages, status: 200, response });
@@ -25,7 +26,9 @@ exports.getSingle = async (req, res, next) => {
 		} else {
 			res.json({ data, status: 200 });
 		}
-	}).populate('socialMediaId', 'title link');
+	})
+		.populate('socialMediaId', 'title link')
+		.populate('logo', 'url title alt');
 };
 
 exports.create = async (req, res, next) => {
@@ -68,51 +71,124 @@ exports.create = async (req, res, next) => {
 exports.update = async (req, res, next) => {
 	if(mongoose.isValidObjectId(req.params.id)) {
 		await CompanyProfileModel.findById({_id:req.params.id})
-		.then(async(isExist) => {
-			if(isExist === null) {
-				return next({status:400, message:'This Id is not exist in Company Profile Model'})
-			} else {
-				await CompanyProfileModel.findById({ _id: req.params.id })
-		.then(async (companyprofile) => {
-			await companyprofile.socialMediaId.map(async (SMId, index) => {
-				await SocialMedia.findByIdAndUpdate(
-					{ _id: SMId },
-					{
-						$set: req.body.socialMediaId[index],
-					},
-					{ useFindAndModify: false, new: true }
-				);
-			});
-
-			const { name, logo, phones, address, email } = req.body;
-
-			await CompanyProfileModel.findByIdAndUpdate(
-				{ _id: req.params.id },
-				{
-					name,
-					logo,
-					phones,
-					address,
-					socialMediaId: companyprofile.socialMediaId,
-					email,
-					isActive: !req.body.isActive ? true : req.body.isActive,
-					isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
+			.then(async(isExist) => {
+				if(isExist === null) {
+					next({status:400, message:'This'})
+				} else {
+					if (req.files) {
+						await CompanyProfileModel.findById({ _id: req.params.id })
+							.then(async (companyprofile) => {
+								await MediaModel.findById({ _id: companyprofile.logo }).then(
+									async (media) => {
+										const data = async (data) => {
+											await MediaModel.findByIdAndUpdate(
+												{
+													_id: companyprofile.logo,
+												},
+												{
+													$set: {
+														url: data.Location || null,
+														title: 'company-logo',
+														mediaKey: data.Key,
+														alt: req.body.alt,
+													},
+												},
+												{ useFindAndModify: false, new: true }
+											).catch((err) => res.json({ status: 404, message: err }));
+										};
+										await S3.updateLogo(req, res, media.mediaKey, data);
+									}
+								);
+				
+								await companyprofile.socialMediaId.map(async (SMId, index) => {
+									await SocialMediaModel.findByIdAndUpdate(
+										{ _id: SMId },
+										{
+											$set: JSON.parse(req.body.socialMediaId)[index],
+										},
+										{ useFindAndModify: false, new: true }
+									);
+								});
+				
+								const { name, address, email } = req.body;
+				
+								await CompanyProfileModel.findByIdAndUpdate(
+									{ _id: req.params.id },
+									{
+										$set: {
+											name,
+											logo: req.files ? companyprofile.logo : req.body.logo,
+											phones:
+												typeof req.body.phones === 'string'
+													? JSON.parse(req.body.phones)
+													: req.body.phones,
+											address,
+											socialMediaId: companyprofile.socialMediaId,
+											email,
+											isActive: !req.body.isActive ? true : req.body.isActive,
+											isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
+										},
+									},
+									{ useFindAndModify: false, new: true }
+								)
+									.then((companyprofile) =>
+										res.json({
+											status: 200,
+											message: 'Company profile is updated successfully',
+											companyprofile,
+										})
+									)
+									.catch((err) => res.json({ status: 404, message: err }));
+							})
+							.catch((err) => res.json({ status: 404, message: err }));
+					} else {
+						await CompanyProfileModel.findById({ _id: req.params.id })
+							.then(async (companyprofile) => {
+								await companyprofile.socialMediaId.map(async (SMId, index) => {
+									await SocialMediaModel.findByIdAndUpdate(
+										{ _id: SMId },
+										{
+											$set: req.body.socialMediaId[index],
+										},
+										{ useFindAndModify: false, new: true }
+									);
+								});
+				
+								const { name, address, email, logo } = req.body;
+				
+								await CompanyProfileModel.findByIdAndUpdate(
+									{ _id: req.params.id },
+									{
+										$set: {
+											name,
+											logo: !logo ? companyprofile.logo : logo,
+											phones:
+												typeof req.body.phones === 'string'
+													? JSON.parse(req.body.phones)
+													: req.body.phones,
+											address,
+											socialMediaId: companyprofile.socialMediaId,
+											email,
+											isActive: !req.body.isActive ? true : req.body.isActive,
+											isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
+										},
+									},
+									{ useFindAndModify: false, new: true }
+								)
+									.then((companyprofile) =>
+										res.json({
+											status: 200,
+											message: 'Company profile is updated successfully',
+											companyprofile,
+										})
+									)
+									.catch((err) => res.json({ status: 404, message: err }));
+							})
+							.catch((err) => res.json({ status: 404, message: err }));
+					}
 				}
-			)
-				.then((companyprofile) =>
-					res.json({
-						status: 200,
-						message: 'Company profile is updated successfully',
-						companyprofile,
-					})
-				)
-				.catch((err) => next({ status: 404, message: err }));
-		})
-		.then((data) => res.json({ status: 200, data }))
-		.catch((err) => next({ status: 404, message: err }));
-			}
-		})
-		.catch((err) => next({ status: 404, message: err }));
+			})
+			.catch(err => next({status:404, message:err}))
 	} else {
 		next({status:400, message:'Object Id is not valid.'})
 	}

@@ -18,42 +18,27 @@ exports.getAllMedia = async (req, res) => {
 
 exports.getWithQuery = async (req, res) => {
 	try {
-		const  query  = typeof req.body.query === "string" ? JSON.parse(req.body.query) : req.body.query
-		const { page = 1, limit } = req.query;	
+		const query =
+			typeof req.body.query === 'string'
+				? JSON.parse(req.body.query)
+				: req.body.query;
+		const { page = 1, limit } = req.query;
 		const response = await MediaModel.find(query)
 			.limit(limit * 1)
 			.skip((page - 1) * limit)
 			.sort({ createdAt: -1 });
-		const pages = limit === undefined ? 1 : Math.ceil(total / limit);	
-		res.json({message: 'Filtered medias', pages, total:response.length ,status: 200, response });
+		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
+		res.json({
+			message: 'Filtered medias',
+			total: response.length,
+			pages,
+			status: 200,
+			response,
+		});
 	} catch (error) {
 		res.json({ status: 404, message: error });
 	}
 };
-
-
-// exports.getWithQuery = async (req, res) => {
-	
-// 	try {
-// 		const  query  = JSON.parse(req.body.query);
-// 		console.log(typeof query.isActive)
-// 		const { page = 1, limit } = req.query;	
-// 		const response = await MediaModel.find()
-// 			.limit(limit * 1)
-// 			.skip((page - 1) * limit)
-// 			.sort({ createdAt: -1 });
-// 		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
-// 		const filteredResponse = await response.filter((item)=>{
-// 				return item.title === query.title && item.isActive === query.isActive
-// 		})	
-// 		res.json({message: 'Filtered medias',total: filteredResponse.length, pages,status: 200, filteredResponse });
-// 	} catch (error) {
-// 		res.json({ status: 404, message: error });
-// 	}
-// };
-
-
-
 
 exports.createMedia = async (req, res) => {
 	const data = async (data) => {
@@ -90,7 +75,7 @@ exports.getSingleMedia = async (req, res) => {
 exports.getSingleMediaByTitle = async (req, res) => {
 	const { page, limit } = req.query;
 	const title = req.params.title.toLowerCase();
-	const total = await MediaModel.find({ title: title }).countDocuments();
+	const total = await MediaModel.find({ title }).countDocuments();
 	const pages = limit === undefined ? 1 : Math.ceil(total / limit);
 	await MediaModel.find({ title }, (err, data) => {
 		if (err) {
@@ -106,9 +91,10 @@ exports.getSingleMediaByTitle = async (req, res) => {
 
 exports.getMediaByIsActive = async (req, res) => {
 	const { page, limit } = req.query;
-	const total = await MediaModel.find({ title: title }).countDocuments();
-	const pages = limit === undefined ? 1 : Math.ceil(total / limit);
 	const isActive = req.params.isactive.toLowerCase();
+	const total = await MediaModel.find({ isActive }).countDocuments();
+	const pages = limit === undefined ? 1 : Math.ceil(total / limit);
+
 	await MediaModel.find({ isActive }, (err, data) => {
 		if (err) {
 			res.json({ status: 404, message: err });

@@ -26,6 +26,31 @@ exports.getAll = async (req, res) => {
 	}
 };
 
+exports.getWithQuery = async (req, res) => {
+	try {
+		const query =
+			typeof req.body.query === 'string'
+				? JSON.parse(req.body.query)
+				: req.body.query;
+		const { page, limit } = req.query;
+		const total = await SubscribersModel.find().countDocuments();
+		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
+		const response = await SubscribersModel.find(query)
+			.limit(limit * 1)
+			.skip((page - 1) * limit)
+			.sort({ createdAt: -1 });
+		res.json({
+			message: 'Filtered subscribers',
+			total,
+			pages,
+			status: 200,
+			response,
+		});
+	} catch (error) {
+		res.json({ status: 404, message: error });
+	}
+};
+
 exports.create = (req, res) => {
 	const newSubscriber = new SubscribersModel({
 		email: req.body.email,

@@ -5,8 +5,10 @@ const messagesControllers = require('../controllers/messages.controllers');
 
 router.get('/messages', messagesControllers.getAll);
 router.get('/messages/:id', messagesControllers.getSingleMessage);
-router.get('/messages/subject/:subject', messagesControllers.getMessageBySubject);
+router.get('/messages/subject/:subject', messagesControllers.getMessagesBySubject);
+router.get('/messages/email/:email', messagesControllers.getMessagesByEmail);
 router.post('/messages', messagesControllers.create);
+router.post('/messages/filter', messagesControllers.getWithQuery);
 router.put('/messages/:id', messagesControllers.updateMessage);
 router.delete('/messages/:id', messagesControllers.removeSingleMessage);
 

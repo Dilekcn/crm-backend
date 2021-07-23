@@ -18,6 +18,25 @@ exports.getAllSlides = async (req, res) => {
 	}
 };
 
+exports.getWithQuery = async (req, res) => {
+	try {
+		const query =
+			typeof req.body.query === 'string'
+				? JSON.parse(req.body.query)
+				: req.body.query;
+		const { page, limit } = req.query;
+		const total = await SliderModel.find().countDocuments();
+		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
+		const response = await SliderModel.find(query)
+			.limit(limit * 1)
+			.skip((page - 1) * limit)
+			.sort({ createdAt: -1 });
+		res.json({ message: 'Filtered sliders', total, pages, status: 200, response });
+	} catch (error) {
+		res.json({ status: 404, message: error });
+	}
+};
+
 exports.createSlide = async (req, res) => {
 	if (req.files) {
 		const data = async (data) => {
@@ -166,7 +185,10 @@ exports.getSingleSlideByTitle = async (req, res) => {
 		} else {
 			res.json({ status: 200, data });
 		}
-	}).populate('mediaId', 'url title alt');
+	})
+		.populate('mediaId', 'url title alt')
+		.limit(limit * 1)
+		.skip((page - 1) * limit);
 };
 
 exports.updateSlider = async (req, res) => {

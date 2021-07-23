@@ -34,25 +34,39 @@ exports.getSingleUserById = async (req, res) => {
 };
 
 exports.getSingleUserByFirstName = async (req, res) => {
+	const { page, limit } = req.query;
+	const total = await UserModel.find().countDocuments();
+	const pages = limit === undefined ? 1 : Math.ceil(total / limit);
+
 	await UserModel.find({ firstname: req.params.firstname }, (err, data) => {
 		if (err) {
 			res.json({ status: 404, message: err });
 		} else {
-			res.json({ status: 200, data });
+			res.json({ total, pages, status: 200, data });
 		}
 	})
+		.limit(limit * 1)
+		.skip((page - 1) * limit)
+		.sort({ createdAt: -1 })
 		.populate('roleId', 'name')
 		.populate('mediaId', 'url title alt');
 };
 
 exports.getSingleUserByLastName = async (req, res) => {
+	const { page, limit } = req.query;
+	const total = await UserModel.find().countDocuments();
+	const pages = limit === undefined ? 1 : Math.ceil(total / limit);
+
 	await UserModel.find({ lastname: req.params.lastname }, (err, data) => {
 		if (err) {
 			res.json({ status: 404, message: err });
 		} else {
-			res.json({ status: 200, data });
+			res.json({ total, pages, status: 200, data });
 		}
 	})
+		.limit(limit * 1)
+		.skip((page - 1) * limit)
+		.sort({ createdAt: -1 })
 		.populate('roleId', 'name')
 		.populate('mediaId', 'url title alt');
 };
@@ -70,15 +84,41 @@ exports.getSingleUserByEmail = async (req, res) => {
 };
 
 exports.getSingleUserByRoleId = async (req, res) => {
+	const { page, limit } = req.query;
+	const total = await UserModel.find().countDocuments();
+	const pages = limit === undefined ? 1 : Math.ceil(total / limit);
+
 	await UserModel.find({ roleId: req.params.roleid }, (err, data) => {
 		if (err) {
 			res.json({ status: 404, message: err });
 		} else {
-			res.json({ status: 200, data });
+			res.json({ total, pages, status: 200, data });
 		}
 	})
+		.limit(limit * 1)
+		.skip((page - 1) * limit)
+		.sort({ createdAt: -1 })
 		.populate('roleId', 'name')
 		.populate('mediaId', 'url title alt');
+};
+
+exports.getWithQuery = async (req, res) => {
+	try {
+		const query =
+			typeof req.body.query === 'string'
+				? JSON.parse(req.body.query)
+				: req.body.query;
+		const { page, limit } = req.query;
+		const total = await UserModel.find().countDocuments();
+		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
+		const response = await UserModel.find(query)
+			.limit(limit * 1)
+			.skip((page - 1) * limit)
+			.sort({ createdAt: -1 });
+		res.json({ message: 'Filtered users', total, pages, status: 200, response });
+	} catch (error) {
+		res.json({ status: 404, message: error });
+	}
 };
 
 exports.createUser = async (req, res) => {
@@ -196,7 +236,7 @@ exports.login = async (req, res) => {
 					{ expiresIn: '1h' }
 				);
 				res.json({
-					status: true,
+					status: 200,
 					firstname: data.firstname,
 					lastname: data.lastname,
 					email: data.email,
