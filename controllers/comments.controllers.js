@@ -69,12 +69,12 @@ exports.create = async (req, res) => {
 	newComment
 		.save()
 		.then((response) =>
-			res.json({
+			res.json({ 
 				status: 200,
 				message: 'New comment is created successfully',
 				response,
 			})
-		)
+		)   
 		.catch((err) => res.json({ status: 404, message: err }));
 };
 
