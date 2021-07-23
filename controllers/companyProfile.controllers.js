@@ -53,7 +53,7 @@ exports.create = async (req, res, next) => {
 	const companyProfile = await new CompanyProfileModel({
 		name,
 		logo,
-		phones,
+		phones: typeof phones === 'string' ? await JSON.parse(req.body.phones):phones,
 		address,
 		socialMediaId: socialMediaIds,
 		email,
@@ -78,13 +78,15 @@ exports.update = async (req, res, next) => {
 		await CompanyProfileModel.findById({_id:req.params.id})
 			.then(async(isExist) => {
 				if(isExist === null) {
-					next({status:400, message:'This Id is not exist in Company Profile Model.'})
+					next({status:400, message:'This Id does not exist in Company Profile Model.'})
 				} else {
 					if (req.files) {
 						await CompanyProfileModel.findById({ _id: req.params.id })
 							.then(async (companyprofile) => {
+								
 								await MediaModel.findById({ _id: companyprofile.logo }).then(
 									async (media) => {
+								
 										const data = async (data) => {
 											await MediaModel.findByIdAndUpdate(
 												{
@@ -102,6 +104,7 @@ exports.update = async (req, res, next) => {
 											).catch((err) => res.json({ status: 404, message: err }));
 										};
 										await S3.updateLogo(req, res, media.mediaKey, data);
+										
 									}
 								);
 				
