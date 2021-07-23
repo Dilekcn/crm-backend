@@ -32,7 +32,9 @@ exports.getWithQuery = async (req, res) => {
 			.skip((page - 1) * limit)
 			.sort({ createdAt: -1 });
 		res.json({ message: 'Filtered sliders', total, pages, status: 200, response });
-	} catch (error) {}
+	} catch (error) {
+		res.json({ status: 404, message: error });
+	}
 };
 
 exports.createSlide = async (req, res) => {

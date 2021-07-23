@@ -15,6 +15,29 @@ exports.getAllSocialMedia = async (req, res) => {
 	}
 };
 
+exports.getWithQuery = async (req, res) => {
+	try {
+		const query =
+			typeof req.query === 'string' ? JSON.parse(req.body.query) : req.body.query;
+		const { page, limit } = req.query;
+		const total = await SocialMediaModel.find().countDocuments();
+		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
+		const response = await SocialMediaModel.find(query)
+			.limit(limit * 1)
+			.skip((page - 1) * limit)
+			.sort({ createdAt: -1 });
+		res.json({
+			message: 'Filtered social medias',
+			total,
+			pages,
+			status: 200,
+			response,
+		});
+	} catch (error) {
+		res.json({ status: 404, message: error });
+	}
+};
+
 exports.createSocialMedia = (req, res) => {
 	const newSocialMedia = new SocialMediaModel(req.body);
 	newSocialMedia
