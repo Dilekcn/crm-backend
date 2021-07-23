@@ -1,6 +1,7 @@
 const CompanyProfileModel = require('../model/CompanyProfile.model');
 const SocialMediaModel = require('../model/SocialMedia.model');
 const MediaModel = require('../model/Media.model');
+const S3 = require('../config/aws.s3.config');
 const mongoose = require('mongoose');
 
 exports.getAll = async (req, res, next) => {
