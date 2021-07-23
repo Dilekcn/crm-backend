@@ -32,7 +32,12 @@ exports.getSingle = async (req, res, next) => {
 };
 
 exports.create = async (req, res, next) => {
-	const newSocialMedia = await req.body.socialMediaId.map((sm) => {
+	const newSocialMedia = typeof req.body.socialMediaId === 'string' ? await JSON.parse(req.body.socialMediaId).map((sm) => {
+		return new SocialMedia({
+			title: sm.title || null,
+			link: sm.link || null,
+		});
+	}) : await req.body.socialMediaId.map((sm) => {
 		return new SocialMedia({
 			title: sm.title || null,
 			link: sm.link || null,
