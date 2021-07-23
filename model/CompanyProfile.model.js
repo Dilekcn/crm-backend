@@ -4,12 +4,14 @@ const Schema = mongoose.Schema;
 
 const CompanyProfileSchema = new Schema(
 	{
-		name: {type:String, required:[true, `Field 'name' must be filled.`]},
-		logo: String,
-		phones: [{type: String, required:true}],
+		name: { type: String, required: [true, `Field 'name' must be filled.`] },
+		logo: { type: Schema.Types.ObjectId, ref: 'media' },
+		phones: [{ type: String, required: true }],
 		address: String,
-		socialMediaId: [{ type: Schema.Types.ObjectId, description: 'Hello world',  ref: 'social' }],
-		email: {type:String, required:[true, `Field 'email' must be filled.`]},
+		socialMediaId: [
+			{ type: Schema.Types.ObjectId, description: 'Hello world', ref: 'social' },
+		],
+		email: { type: String, required: [true, `Field 'email' must be filled.`] },
 		isActive: { type: Boolean, default: true },
 		isDeleted: { type: Boolean, default: false },
 		// componentId:{ type: Schema.Types.ObjectId, ref: 'component' }
