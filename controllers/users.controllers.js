@@ -102,6 +102,25 @@ exports.getSingleUserByRoleId = async (req, res) => {
 		.populate('mediaId', 'url title alt');
 };
 
+exports.getWithQuery = async (req, res) => {
+	try {
+		const query =
+			typeof req.body.query === 'string'
+				? JSON.parse(req.body.query)
+				: req.body.query;
+		const { page, limit } = req.query;
+		const total = await UserModel.find().countDocuments();
+		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
+		const response = await UserModel.find(query)
+			.limit(limit * 1)
+			.skip((page - 1) * limit)
+			.sort({ createdAt: -1 });
+		res.json({ message: 'Filtered users', total, pages, status: 200, response });
+	} catch (error) {
+		res.json({ status: 404, message: error });
+	}
+};
+
 exports.createUser = async (req, res) => {
 	if (req.files) {
 		const data = async (data) => {
