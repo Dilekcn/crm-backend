@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const FooterSchema = new Schema(
+const FooterSchema = new Schema( 
 	{
 		logo: { type: Schema.Types.ObjectId, ref: 'media' },
 		address: { type: String },
