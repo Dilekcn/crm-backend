@@ -7,7 +7,7 @@ module.exports = () => {
 		useCreateIndex: true,
 	});
 	mongoose.connection.on('open', () => {
-		console.log('DB connection established');
+		console.log('DB connection established at http://localhost:5000/');
 	});
 
 	mongoose.connection.on('error', (err) => {

@@ -3,7 +3,7 @@ const router = express.Router();
 
 const mediasControllers = require('../controllers/medias.controllers');
 
-router.get('/medias', mediasControllers.getAllMedia); 
+router.get('/medias', mediasControllers.getAllMedia);
 router.get('/medias/:mediaid', mediasControllers.getSingleMedia);
 router.get('/medias/title/:title', mediasControllers.getSingleMediaByTitle);
 router.get('/medias/isactive/:isactive', mediasControllers.getMediaByIsActive);
