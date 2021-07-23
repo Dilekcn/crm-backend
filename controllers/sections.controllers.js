@@ -45,8 +45,8 @@ exports.getSingleSection = async (req, res) => {
 };
 exports.getSingleSectionByType = async (req, res) => {
 	const { page, limit } = req.query;
-	const title = req.params.title.toLowerCase();
-	const total = await MediaModel.find({ title }).countDocuments();
+	const secType = req.params.secType.toLowerCase();
+	const total = await SectionModel.find({ secType }).countDocuments();
 	const pages = limit === undefined ? 1 : Math.ceil(total / limit);
 	await SectionModel.find({ secType }, (err, data) => {
 		if (err) {
