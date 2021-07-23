@@ -260,7 +260,7 @@ exports.update = async (req, res, next) => {
 				if (isExist === null) {
 					next({
 						status: 400,
-						message: 'This Id is not exist in Company Profile Model.',
+						message: 'This Id does not exist in Company Profile Model.',
 					});
 				} else {
 					if (req.files) {
