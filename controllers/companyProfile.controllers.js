@@ -1,7 +1,8 @@
 const CompanyProfileModel = require('../model/CompanyProfile.model');
 const SocialMedia = require('../model/SocialMedia.model');
+const mongoose = require('mongoose')
 
-exports.getAll = async (req, res) => {
+exports.getAll = async (req, res,next) => {
 	try {
 		const { page = 1, limit } = req.query;
 		const response = await CompanyProfileModel.find()
@@ -13,21 +14,21 @@ exports.getAll = async (req, res) => {
 		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
 		res.json({ total, pages, status: 200, response });
 	} catch (error) {
-		res.json({ status: 404, message: error });
+		next({ status: 404, message: error });
 	}
 };
 
-exports.getSingle = async (req, res) => {
+exports.getSingle = async (req, res, next) => {
 	await CompanyProfileModel.findById({ _id: req.params.id }, (err, data) => {
 		if (err) {
-			res.json({ message: err, status: 404 });
+			next({ message: err, status: 404 });
 		} else {
 			res.json({ data, status: 200 });
 		}
 	}).populate('socialMediaId', 'title link');
 };
 
-exports.create = async (req, res) => {
+exports.create = async (req, res, next) => {
 	const newSocialMedia = await req.body.socialMediaId.map((sm) => {
 		return new SocialMedia({
 			title: sm.title || null,
@@ -35,11 +36,9 @@ exports.create = async (req, res) => {
 		});
 	});
 
-	console.log(req.body.socialMediaId);
-
 	newSocialMedia.map((sm) => sm.save());
 
-	const socialMediaIds = newSocialMedia.map((sm) => sm._id);
+	const socialMediaIds = newSocialMedia.map((sm) => sm._id)
 
 	const { name, logo, phones, address, email, isActive, isDeleted } = req.body;
 
@@ -63,12 +62,17 @@ exports.create = async (req, res) => {
 				response,
 			})
 		)
-		.catch((error) => res.json({ status: 404, message: error }));
-	console.log(companyProfile);
+		.catch((error) => next({ status: 400, message: error }));
 };
 
-exports.update = async (req, res) => {
-	await CompanyProfileModel.findById({ _id: req.params.id })
+exports.update = async (req, res, next) => {
+	if(mongoose.isValidObjectId(req.params.id)) {
+		await CompanyProfileModel.findById({_id:req.params.id})
+		.then(async(isExist) => {
+			if(isExist === null) {
+				return next({status:400, message:'This Id is not exist in Company Profile Model'})
+			} else {
+				await CompanyProfileModel.findById({ _id: req.params.id })
 		.then(async (companyprofile) => {
 			await companyprofile.socialMediaId.map(async (SMId, index) => {
 				await SocialMedia.findByIdAndUpdate(
@@ -102,14 +106,25 @@ exports.update = async (req, res) => {
 						companyprofile,
 					})
 				)
-				.catch((err) => res.json({ status: 404, message: err }));
+				.catch((err) => next({ status: 404, message: err }));
 		})
 		.then((data) => res.json({ status: 200, data }))
-		.catch((err) => res.json({ status: 404, message: err }));
+		.catch((err) => next({ status: 404, message: err }));
+			}
+		})
+		.catch((err) => next({ status: 404, message: err }));
+	} else {
+		next({status:400, message:'Object Id is not valid.'})
+	}
 };
 
-exports.delete = async (req, res) => {
-	await CompanyProfileModel.findByIdAndDelete({ _id: req.params.id })
+exports.delete = async (req, res, next) => {
+	await CompanyProfileModel.findById({_id:req.params.id})
+		.then(async(isExist) => {
+			if(isExist === null) {
+				return next({status:400, message:'This Id is not exist in Company Profile Model.'})
+			} else {
+				await CompanyProfileModel.findByIdAndDelete({ _id: req.params.id })
 		.then((data) =>
 			res.json({
 				status: 200,
@@ -117,5 +132,9 @@ exports.delete = async (req, res) => {
 				data,
 			})
 		)
-		.catch((err) => res.json({ status: 404, message: err }));
+		.catch((err) => next({ status: 404, message: err }));
+			}
+		})
+		.catch((err) => next({ status: 404, message: err }));
+	
 };

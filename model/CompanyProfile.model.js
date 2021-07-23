@@ -4,12 +4,12 @@ const Schema = mongoose.Schema;
 
 const CompanyProfileSchema = new Schema(
 	{
-		name: String,
+		name: {type:String, required:[true, `Field 'name' must be filled.`]},
 		logo: String,
-		phones: Array,
+		phones: [{type: String, required:true}],
 		address: String,
-		socialMediaId: [{ type: Schema.Types.ObjectId, ref: 'social' }],
-		email: String,
+		socialMediaId: [{ type: Schema.Types.ObjectId, description: 'Hello world',  ref: 'social' }],
+		email: {type:String, required:[true, `Field 'email' must be filled.`]},
 		isActive: { type: Boolean, default: true },
 		isDeleted: { type: Boolean, default: false },
 	},

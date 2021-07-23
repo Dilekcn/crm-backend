@@ -93,13 +93,12 @@ app.use(function (req, res, next) {
 
 // error handler
 app.use(function (err, req, res, next) {
-	// set locals, only providing error in development
-	res.locals.message = err.message;
-	res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-	// render the error page
 	res.status(err.status || 500);
-	res.render('error');
+	if(err.message.name !== undefined && err.message.name === 'ValidationError') {
+		const keys = Object.keys(err.message.errors)
+		res.send(keys.map(key => err.message.errors[key].message+' ').join(''))
+	}
+	res.send(err.message);
 });
 
 module.exports = app;
