@@ -252,48 +252,6 @@ exports.create = async (req, res) => {
 	}
 };
 
-// exports.create = async (req, res, next) => {
-// 	const newSocialMedia = typeof req.body.socialMediaId === 'string' ? await JSON.parse(req.body.socialMediaId).map((sm) => {
-// 		return new SocialMedia({
-// 			title: sm.title || null,
-// 			link: sm.link || null,
-// 		});
-// 	}) : await req.body.socialMediaId.map((sm) => {
-// 		return new SocialMedia({
-// 			title: sm.title || null,
-// 			link: sm.link || null,
-// 		});
-// 	});
-
-// 	newSocialMedia.map((sm) => sm.save());
-
-// 	const socialMediaIds = newSocialMedia.map((sm) => sm._id)
-
-// 	const { name, logo, phones, address, email, isActive, isDeleted } = req.body;
-
-// 	const companyProfile = await new CompanyProfileModel({
-// 		name,
-// 		logo,
-// 		phones,
-// 		address,
-// 		socialMediaId: socialMediaIds,
-// 		email,
-// 		isActive,
-// 		isDeleted,
-// 	});
-
-// 	companyProfile
-// 		.save()
-// 		.then((response) =>
-// 			res.json({
-// 				status: 200,
-// 				message: 'Added a new company profile successfully.',
-// 				response,
-// 			})
-// 		)
-// 		.catch((error) => next({ status: 400, message: error }));
-// };
-
 exports.update = async (req, res, next) => {
 	if (mongoose.isValidObjectId(req.params.id)) {
 		await CompanyProfileModel.findById({ _id: req.params.id })
