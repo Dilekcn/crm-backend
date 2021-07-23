@@ -1,13 +1,13 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const ComponentsSchema = new Schema(
+const SectionsSchema = new Schema(
 	{
 		secTitle: { type: String, required: true },
 		isActive: { type: Boolean, default: true },
-		isDeleted: { type: Boolean, default: false }, 
+		secType: { type: String, required: true },
 	},
 	{ timestamps: true }
-);
+); 
 
-module.exports = mongoose.model('component', ComponentsSchema);
+module.exports = mongoose.model('section', SectionsSchema);

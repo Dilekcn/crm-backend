@@ -1,13 +1,13 @@
-const ComponentModel = require('../model/Component.model');
+const SectionModel = require('../model/Section.model');
 
 exports.getAll = async (req, res) => {
 	try {
 		const { page = 1, limit } = req.query;
-		const response = await ComponentModel.find()
+		const response = await SectionModel.find()
 			.limit(limit * 1)
 			.skip((page - 1) * limit)
 			.sort({ createdAt: -1 })   
-		const total = await ComponentModel.find().count();
+		const total = await SectionModel.find().countDocuments();
 		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
 		res.json({ total: total, pages, status: 200, response });
 	} catch (error) {
@@ -16,26 +16,26 @@ exports.getAll = async (req, res) => {
 };
 
 exports.create = async (req, res) => {
-	const newComment = await new ComponentModel({
+	const newSection = await new SectionModel({
 		secTitle: req.body.title,
 		isActive: req.body.isActive,
-		isDeleted: req.body.isDeleted,
+		secType: req.body.secType,
 	});
 
-	newComponent
-		.save()
+	newSection 
+		.save() 
 		.then((response) =>
 			res.json({
 				status: 200,
-				message: 'New component is created successfully',
+				message: 'New Section is created successfully',
 				response,
 			})
 		)
 		.catch((err) => res.json({ status: false, message: err }));
 };
 
-exports.getSingleComponent = async (req, res) => {
-	await ComponentModel.findById({ _id: req.params.id }, (err, data) => {
+exports.getSingleSection = async (req, res) => {
+	await SectionModel.findById({ _id: req.params.id }, (err, data) => {
 		if (err) {
 			res.json({ status: false, message: err });
 		} else {
@@ -47,14 +47,14 @@ exports.getSingleComponent = async (req, res) => {
 
 
 
-exports.updateComponent = async (req, res) => {
-	await ComponentModel.findByIdAndUpdate({ _id: req.params.id }, { $set: req.body })
+exports.updateSection = async (req, res) => {
+	await SectionModel.findByIdAndUpdate({ _id: req.params.id }, { $set: req.body })
 		.then((data) => res.json({ message: 'Successfully updated', data }))
 		.catch((err) => res.json({ message: err }));
 };
 
-exports.removeSingleComponent = async (req, res) => {
-	await ComponentModel.findByIdAndDelete({ _id: req.params.id })
+exports.removeSingleSection = async (req, res) => {
+	await SectionModel.findByIdAndDelete({ _id: req.params.id })
 		.then((data) => res.json({ status: 200, data }))
 		.catch((err) => res.json({ status: false, message: err }));
 };

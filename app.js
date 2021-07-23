@@ -25,7 +25,7 @@ const productsRouter = require('./routes/products.routes');
 const socialMediaRouter = require('./routes/socialMedia.routes');
 const companyProfileRouter = require('./routes/companyProfile.routes');
 const commentsRouter = require('./routes/comments.routes');
-const componentsRouter = require('./routes/components.routes');
+const sectionsRouter = require('./routes/sections.routes');
 
 //middlewares
 // const verifyToken = require('./auth/verifyToken');
@@ -84,7 +84,7 @@ app.use('/', socialMediaRouter);
 app.use('/', companyProfileRouter);
 app.use('/', productsRouter);
 app.use('/', commentsRouter);
-app.use('/', componentsRouter);
+app.use('/', sectionsRouter);
 
 
 
