@@ -47,7 +47,6 @@ exports.getWithQuery = async (req, res) => {
 	}
 };
 
-
 exports.createExpert = async (req, res) => {
 	if (req.body.socialMediaId) {
 		const newSocialMedia =

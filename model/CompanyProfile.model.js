@@ -12,9 +12,9 @@ const CompanyProfileSchema = new Schema(
 			{ type: Schema.Types.ObjectId, description: 'Hello world', ref: 'social' },
 		],
 		email: { type: String, required: [true, `Field 'email' must be filled.`] },
+		copyright: String,
 		isActive: { type: Boolean, default: true },
 		isDeleted: { type: Boolean, default: false },
-		// componentId:{ type: Schema.Types.ObjectId, ref: 'component' }
 	},
 	{ timestamps: true }
 );

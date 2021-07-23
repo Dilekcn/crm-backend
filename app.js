@@ -15,7 +15,6 @@ const sliderRouter = require('./routes/slider.routes');
 const mediasRouter = require('./routes/medias.routes');
 const expertsRouter = require('./routes/experts.routes');
 const messagesRouter = require('./routes/messages.routes');
-const footerRouter = require('./routes/footer.routes');
 const subscribersRouter = require('./routes/subscribers.routes');
 const staticPagesRouter = require('./routes/staticPage.routes');
 const menusRouter = require('./routes/menus.routes');
@@ -33,7 +32,7 @@ const componentsRouter = require('./routes/components.routes');
 var app = express();
 app.use(function (req, res, next) {
 	res.header('Access-Control-Allow-Origin', '*');
-	res.header("Access-Control-Allow-Credentials", true);
+	res.header('Access-Control-Allow-Credentials', true);
 	res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
 	res.header(
 		'Access-Control-Allow-Headers',
@@ -74,7 +73,6 @@ app.use('/', companyIntroductionRouter);
 app.use('/', sliderRouter);
 app.use('/', expertsRouter);
 app.use('/', messagesRouter);
-app.use('/', footerRouter);
 app.use('/', subscribersRouter);
 app.use('/', staticPagesRouter);
 app.use('/', menusRouter);
@@ -86,8 +84,6 @@ app.use('/', productsRouter);
 app.use('/', commentsRouter);
 app.use('/', componentsRouter);
 
-
-
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
 	next(createError(404));
@@ -96,9 +92,9 @@ app.use(function (req, res, next) {
 // error handler
 app.use(function (err, req, res, next) {
 	res.status(err.status || 500);
-	if(err.message.name !== undefined && err.message.name === 'ValidationError') {
-		const keys = Object.keys(err.message.errors)
-		res.send(keys.map(key => err.message.errors[key].message+' ').join(''))
+	if (err.message.name !== undefined && err.message.name === 'ValidationError') {
+		const keys = Object.keys(err.message.errors);
+		res.send(keys.map((key) => err.message.errors[key].message + ' ').join(''));
 	}
 	res.send(err.message);
 });

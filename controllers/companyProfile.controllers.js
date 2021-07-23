@@ -64,13 +64,14 @@ exports.create = async (req, res) => {
 
 				newMedia.save();
 
-				const { name, address, email, isActive, isDeleted } = req.body;
+				const { name, address, email, copyright, isActive, isDeleted } = req.body;
 
 				const newCompanyProfile = new CompanyProfileModel({
 					name,
 					logo: newMedia._id,
 					address,
 					email,
+					copyright,
 					phones:
 						typeof req.body.phones === 'string'
 							? JSON.parse(req.body.phones)
@@ -93,13 +94,15 @@ exports.create = async (req, res) => {
 			};
 			await S3.uploadNewLogo(req, res, data);
 		} else if (req.body.logo) {
-			const { name, address, email, isActive, isDeleted, logo } = req.body;
+			const { name, address, email, copyright, isActive, isDeleted, logo } =
+				req.body;
 
 			const newCompanyProfile = new CompanyProfileModel({
 				name,
 				logo,
 				address,
 				email,
+				copyright,
 				phones:
 					typeof req.body.phones === 'string'
 						? JSON.parse(req.body.phones)
@@ -130,13 +133,15 @@ exports.create = async (req, res) => {
 
 				newMedia.save();
 
-				const { name, address, email, phone, isActive, isDeleted } = req.body;
+				const { name, address, email, copyright, phone, isActive, isDeleted } =
+					req.body;
 
 				const newCompanyProfile = new CompanyProfileModel({
 					name,
 					logo: newMedia._id,
 					address,
 					email,
+					copyright,
 					phone,
 					socialMediaId: socialMediaIds,
 					isActive,
@@ -168,12 +173,14 @@ exports.create = async (req, res) => {
 
 				newMedia.save();
 
-				const { address, email, phone, name, isActive, isDeleted } = req.body;
+				const { address, email, copyright, phone, name, isActive, isDeleted } =
+					req.body;
 
 				const newCompanyProfile = new CompanyProfileModel({
 					logo: newMedia._id,
 					address,
 					email,
+					copyright,
 					phone,
 					name,
 					isActive,
@@ -193,12 +200,14 @@ exports.create = async (req, res) => {
 			};
 			await S3.uploadNewLogo(req, res, data);
 		} else if (req.body.logo) {
-			const { address, email, phone, name, isActive, isDeleted, logo } = req.body;
+			const { address, email, copyright, phone, name, isActive, isDeleted, logo } =
+				req.body;
 
 			const newCompanyProfile = new CompanyProfileModel({
 				logo,
 				address,
 				email,
+				copyright,
 				phone,
 				name,
 				isActive,
@@ -225,12 +234,14 @@ exports.create = async (req, res) => {
 
 				newMedia.save();
 
-				const { address, email, phone, name, isActive, isDeleted } = req.body;
+				const { address, email, copyright, phone, name, isActive, isDeleted } =
+					req.body;
 
 				const newCompanyProfile = new CompanyProfileModel({
 					logo: newMedia._id,
 					address,
 					email,
+					copyright,
 					phone,
 					name,
 					isActive,
@@ -290,21 +301,36 @@ exports.update = async (req, res, next) => {
 									await S3.updateLogo(req, res, media.mediaKey, data);
 								});
 
-								await companyprofile.socialMediaId.map(
-									async (SMId, index) => {
-										await SocialMediaModel.findByIdAndUpdate(
-											{ _id: SMId },
-											{
-												$set: JSON.parse(req.body.socialMediaId)[
-													index
-												],
-											},
-											{ useFindAndModify: false, new: true }
-										);
-									}
-								);
+								await companyprofile.socialMediaId.map(async (SMId) => {
+									await SocialMediaModel.findByIdAndDelete({
+										_id: SMId,
+									})
+										.then((response) => res.json(response))
+										.catch((err) => res.json(err));
+								});
 
-								const { name, address, email } = req.body;
+								const newSocialMedia =
+									typeof req.body.socialMediaId === 'string'
+										? await JSON.parse(req.body.socialMediaId).map(
+												(sm) => {
+													return new SocialMediaModel({
+														title: sm.title || null,
+														link: sm.link || null,
+													});
+												}
+										  )
+										: req.body.socialMediaId.map((sm) => {
+												return new SocialMediaModel({
+													title: sm.title || null,
+													link: sm.link || null,
+												});
+										  });
+
+								newSocialMedia.map((sm) => sm.save());
+
+								const socialMediaIds = newSocialMedia.map((sm) => sm._id);
+
+								const { name, address, email, copyright } = req.body;
 
 								await CompanyProfileModel.findByIdAndUpdate(
 									{ _id: req.params.id },
@@ -319,8 +345,9 @@ exports.update = async (req, res, next) => {
 													? JSON.parse(req.body.phones)
 													: req.body.phones,
 											address,
-											socialMediaId: companyprofile.socialMediaId,
+											socialMediaId: socialMediaIds,
 											email,
+											copyright,
 											isActive: !req.body.isActive
 												? true
 												: req.body.isActive,
@@ -346,19 +373,37 @@ exports.update = async (req, res, next) => {
 					} else {
 						await CompanyProfileModel.findById({ _id: req.params.id })
 							.then(async (companyprofile) => {
-								await companyprofile.socialMediaId.map(
-									async (SMId, index) => {
-										await SocialMediaModel.findByIdAndUpdate(
-											{ _id: SMId },
-											{
-												$set: req.body.socialMediaId[index],
-											},
-											{ useFindAndModify: false, new: true }
-										);
-									}
-								);
+								await companyprofile.socialMediaId.map(async (SMId) => {
+									await SocialMediaModel.findByIdAndDelete({
+										_id: SMId,
+									})
+										.then((response) => res.json(response))
+										.catch((err) => res.json(err));
+								});
 
-								const { name, address, email, logo } = req.body;
+								const newSocialMedia =
+									typeof req.body.socialMediaId === 'string'
+										? await JSON.parse(req.body.socialMediaId).map(
+												(sm) => {
+													return new SocialMediaModel({
+														title: sm.title || null,
+														link: sm.link || null,
+													});
+												}
+										  )
+										: req.body.socialMediaId.map((sm) => {
+												return new SocialMediaModel({
+													title: sm.title || null,
+													link: sm.link || null,
+												});
+										  });
+
+								newSocialMedia.map((sm) => sm.save());
+
+								const socialMediaIds = newSocialMedia.map((sm) => sm._id);
+
+								const { name, address, email, copyright, logo } =
+									req.body;
 
 								await CompanyProfileModel.findByIdAndUpdate(
 									{ _id: req.params.id },
@@ -372,8 +417,9 @@ exports.update = async (req, res, next) => {
 													: req.body.phones
 												: companyprofile.phones,
 											address,
-											socialMediaId: companyprofile.socialMediaId,
+											socialMediaId: socialMediaIds,
 											email,
+											copyright,
 											isActive: !req.body.isActive
 												? true
 												: req.body.isActive,
