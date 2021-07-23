@@ -17,7 +17,7 @@ exports.getAll = async (req, res) => {
 
 exports.create = async (req, res) => {
 	const newSection = await new SectionModel({
-		secTitle: req.body.title,
+		secTitle: req.body.secTitle,
 		isActive: req.body.isActive,
 		secType: req.body.secType,
 	});
