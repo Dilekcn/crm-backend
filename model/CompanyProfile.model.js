@@ -8,9 +8,7 @@ const CompanyProfileSchema = new Schema(
 		logo: { type: Schema.Types.ObjectId, ref: 'media' },
 		phones: [{ type: String, required: true }],
 		address: String,
-		socialMediaId: [
-			{ type: Schema.Types.ObjectId, description: 'Hello world', ref: 'social' },
-		],
+		socialMediaId: [{ type: Schema.Types.ObjectId, ref: 'social', default: [] }],
 		email: { type: String, required: [true, `Field 'email' must be filled.`] },
 		copyright: String,
 		isActive: { type: Boolean, default: true },

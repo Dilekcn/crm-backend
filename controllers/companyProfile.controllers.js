@@ -295,7 +295,7 @@ exports.update = async (req, res, next) => {
 											},
 											{ useFindAndModify: false, new: true }
 										).catch((err) =>
-											res.json({ status: 404, message: err })
+											res.json({ status: 4040, message: err })
 										);
 									};
 									await S3.updateLogo(req, res, media.mediaKey, data);
@@ -305,8 +305,8 @@ exports.update = async (req, res, next) => {
 									await SocialMediaModel.findByIdAndDelete({
 										_id: SMId,
 									})
-										.then((response) => res.json(response))
-										.catch((err) => res.json(err));
+										.then((response) => console.log(response))
+										.catch((err) => console.log(err));
 								});
 
 								const newSocialMedia =
@@ -345,7 +345,9 @@ exports.update = async (req, res, next) => {
 													? JSON.parse(req.body.phones)
 													: req.body.phones,
 											address,
-											socialMediaId: socialMediaIds,
+											socialMediaId: !socialMediaIds
+												? []
+												: socialMediaIds,
 											email,
 											copyright,
 											isActive: !req.body.isActive
@@ -355,7 +357,8 @@ exports.update = async (req, res, next) => {
 												? false
 												: req.body.isDeleted,
 										},
-									}
+									},
+									{ useFindAndModify: false, new: true }
 								)
 									.then((companyprofile) =>
 										res.json({
@@ -366,20 +369,24 @@ exports.update = async (req, res, next) => {
 										})
 									)
 									.catch((err) =>
-										res.json({ status: 404, message: err })
+										res.json({ status: 4041, message: err })
 									);
 							})
-							.catch((err) => res.json({ status: 404, message: err }));
+							.catch((err) => res.json({ status: 4042, message: err }));
 					} else {
 						await CompanyProfileModel.findById({ _id: req.params.id })
 							.then(async (companyprofile) => {
-								await companyprofile.socialMediaId.map(async (SMId) => {
-									await SocialMediaModel.findByIdAndDelete({
-										_id: SMId,
-									})
-										.then((response) => res.json(response))
-										.catch((err) => res.json(err));
-								});
+								if (companyprofile.socialMediaId.length !== 0) {
+									await companyprofile.socialMediaId.map(
+										async (SMId) => {
+											await SocialMediaModel.findByIdAndDelete({
+												_id: SMId,
+											})
+												.then((response) => console.log(response))
+												.catch((err) => console.log(err));
+										}
+									);
+								}
 
 								const newSocialMedia =
 									typeof req.body.socialMediaId === 'string'
@@ -439,10 +446,10 @@ exports.update = async (req, res, next) => {
 										})
 									)
 									.catch((err) =>
-										res.json({ status: 404, message: err })
+										res.json({ status: 4043, message: err })
 									);
 							})
-							.catch((err) => res.json({ status: 404, message: err }));
+							.catch((err) => res.json({ status: 4044, message: err }));
 					}
 				}
 			})

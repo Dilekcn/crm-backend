@@ -68,7 +68,6 @@ app.use(fileUpload());
 app.use('/', indexRouter);
 app.use('/', usersRouter);
 app.use('/', mediasRouter);
-
 app.use('/', iconBoxRouter);
 app.use('/', companyIntroductionRouter);
 app.use('/', sliderRouter);
@@ -85,8 +84,6 @@ app.use('/', productsRouter);
 app.use('/', commentsRouter);
 app.use('/', sectionsRouter);
 app.use('/', blogsRouter);
-
-
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
