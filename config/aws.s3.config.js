@@ -46,7 +46,7 @@ const updateMedia = (req, res, mediaKey, callback) => {
 		const params = {
 			Bucket: Bucket_Name,
 			Key: mediaKey,
-			Body: req.files ? req.files.logo.data : null,
+			Body: req.files ? req.files.mediaId.data : null,
 			ContentType: 'image/JPG',
 		};
 		S3.upload(params, (err, data) => {

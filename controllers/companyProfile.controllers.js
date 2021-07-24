@@ -295,7 +295,7 @@ exports.update = async (req, res, next) => {
 											},
 											{ useFindAndModify: false, new: true }
 										).catch((err) =>
-											res.json({ status: 4040, message: err })
+											res.json({ status: 404, message: err })
 										);
 									};
 									await S3.updateLogo(req, res, media.mediaKey, data);
@@ -369,10 +369,10 @@ exports.update = async (req, res, next) => {
 										})
 									)
 									.catch((err) =>
-										res.json({ status: 4041, message: err })
+										res.json({ status: 404, message: err })
 									);
 							})
-							.catch((err) => res.json({ status: 4042, message: err }));
+							.catch((err) => res.json({ status: 404, message: err }));
 					} else {
 						await CompanyProfileModel.findById({ _id: req.params.id })
 							.then(async (companyprofile) => {
@@ -446,10 +446,10 @@ exports.update = async (req, res, next) => {
 										})
 									)
 									.catch((err) =>
-										res.json({ status: 4043, message: err })
+										res.json({ status: 404, message: err })
 									);
 							})
-							.catch((err) => res.json({ status: 4044, message: err }));
+							.catch((err) => res.json({ status: 404, message: err }));
 					}
 				}
 			})

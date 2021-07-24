@@ -346,14 +346,33 @@ exports.updateExpert = async (req, res) => {
 					};
 					await S3.updateMedia(req, res, media.mediaKey, data);
 				});
-				await expert.socialMediaId.map(async (SMId, index) => {
-					await SocialMediaModel.findByIdAndUpdate(
-						{ _id: SMId },
-						{
-							$set: JSON.parse(req.body.socialMediaId)[index],
-						}
-					);
+
+				await expert.socialMediaId.map(async (SMId) => {
+					await SocialMediaModel.findByIdAndDelete({
+						_id: SMId,
+					})
+						.then((response) => console.log(response))
+						.catch((err) => console.log(err));
 				});
+
+				const newSocialMedia =
+					typeof req.body.socialMediaId === 'string'
+						? await JSON.parse(req.body.socialMediaId).map((sm) => {
+								return new SocialMediaModel({
+									title: sm.title || null,
+									link: sm.link || null,
+								});
+						  })
+						: req.body.socialMediaId.map((sm) => {
+								return new SocialMediaModel({
+									title: sm.title || null,
+									link: sm.link || null,
+								});
+						  });
+
+				newSocialMedia.map((sm) => sm.save());
+
+				const socialMediaIds = newSocialMedia.map((sm) => sm._id);
 
 				const { firstname, lastname, expertise } = req.body;
 				await ExpertModel.findByIdAndUpdate(
@@ -364,7 +383,7 @@ exports.updateExpert = async (req, res) => {
 							lastname,
 							expertise,
 							mediaId: req.files ? expert.mediaId : req.body.mediaId,
-							socialMediaId: expert.socialMediaId,
+							socialMediaId: socialMediaIds,
 							isActive: !req.body.isActive ? true : req.body.isActive,
 							isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
 						},
@@ -379,21 +398,38 @@ exports.updateExpert = async (req, res) => {
 							data,
 						})
 					)
-					.catch((err) => res.json({ status: 404, message: err }));
+					.catch((err) => res.json({ status: 4040, message: err }));
 			})
-			.catch((err) => res.json({ status: 404, message: err }));
+			.catch((err) => res.json({ status: 4041, message: err }));
 	} else {
 		await ExpertModel.findById({ _id: req.params.expertid })
 			.then(async (expert) => {
-				await expert.socialMediaId.map(async (SMId, index) => {
-					await SocialMediaModel.findByIdAndUpdate(
-						{ _id: SMId },
-						{
-							$set: JSON.parse(req.body.socialMediaId)[index],
-						},
-						{ useFindAndModify: false, new: true }
-					);
+				await expert.socialMediaId.map(async (SMId) => {
+					await SocialMediaModel.findByIdAndDelete({
+						_id: SMId,
+					})
+						.then((response) => console.log(response))
+						.catch((err) => console.log(err));
 				});
+
+				const newSocialMedia =
+					typeof req.body.socialMediaId === 'string'
+						? await JSON.parse(req.body.socialMediaId).map((sm) => {
+								return new SocialMediaModel({
+									title: sm.title || null,
+									link: sm.link || null,
+								});
+						  })
+						: req.body.socialMediaId.map((sm) => {
+								return new SocialMediaModel({
+									title: sm.title || null,
+									link: sm.link || null,
+								});
+						  });
+
+				newSocialMedia.map((sm) => sm.save());
+
+				const socialMediaIds = newSocialMedia.map((sm) => sm._id);
 
 				const { firstname, lastname, expertise, mediaId } = req.body;
 				await ExpertModel.findByIdAndUpdate(
@@ -404,13 +440,13 @@ exports.updateExpert = async (req, res) => {
 							lastname,
 							expertise,
 							mediaId: !mediaId ? expert.mediaId : mediaId,
-							socialMediaId: expert.socialMediaId,
+							socialMediaId: socialMediaIds,
 							isActive: !req.body.isActive ? true : req.body.isActive,
 							isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
 						},
-					}
+					},
+					{ useFindAndModify: false, new: true }
 				)
-
 					.then((data) =>
 						res.json({
 							status: 200,
