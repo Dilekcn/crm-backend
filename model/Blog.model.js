@@ -10,6 +10,6 @@ const BlogsSchema = new Schema(
 		isDeleted: { type: Boolean, default: false }, 
 	},
 	{ timestamps: true }
-);
+); 
 
 module.exports = mongoose.model('blog', BlogsSchema); 
