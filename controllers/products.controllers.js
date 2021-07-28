@@ -279,7 +279,15 @@ exports.updateSingleProduct = async (req, res) => {
 						},
 					},
 					{ useFindAndModify: false, new: true }
-				).catch((err) => res.json({ status: 404, message: err }));
+				)
+					.then((data) =>
+						res.json({
+							status: 200,
+							message: 'Product is updated successfully',
+							data,
+						})
+					)
+					.catch((err) => res.json({ status: 404, message: err }));
 			})
 			.catch((err) => res.json({ status: 404, message: err }));
 	} else {
