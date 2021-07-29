@@ -208,9 +208,83 @@ exports.getBlogsByUserId = async (req, res) => {
 };
 
 exports.updateBlog = async (req, res) => {
-	await BlogsModel.findByIdAndUpdate({ _id: req.params.id }, { $set: req.body })
-		.then((data) => res.json({ status: 200, message: 'Successfully updated', data }))
-		.catch((err) => res.json({ status: 404, message: err }));
+	if (req.files) {
+		await BlogsModel.findById({ _id: req.params.id })
+			.then(async (blog) => {
+				await MediaModel.findById({ _id: blog.mediaId }).then(async (media) => {
+					const data = async (data) => {
+						await MediaModel.findByIdAndUpdate(
+							{ _id: blog.mediaId },
+							{
+								$set: {
+									title: 'blog',
+									url: data.Location || null,
+									mediaKey: data.Key,
+									alt: req.body.alt || null,
+								},
+							},
+							{ useFindAndModify: false, new: true }
+						).catch((err) => res.json({ status: 404, message: err }));
+					};
+					await S3.updateMedia(req, res, media.mediaKey, data);
+				});
+
+				const { userId, title, content } = req.body;
+
+				await BlogsModel.findByIdAndUpdate(
+					{ _id: req.params.id },
+					{
+						$set: {
+							userId,
+							title,
+							content,
+							isActive: !req.body.isActive ? true : req.body.isActive,
+							isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
+							mediaId: blog.mediaId,
+						},
+					},
+					{ useFindAndModify: false, new: true }
+				)
+					.then((response) =>
+						res.json({
+							status: 200,
+							message: 'Blog is updated successfully',
+							response,
+						})
+					)
+					.catch((err) => res.json({ status: 404, message: err }));
+			})
+			.catch((err) => res.json({ status: 404, message: err }));
+	} else {
+		await BlogsModel.findById({ _id: req.params.id })
+			.then(async (blog) => {
+				const { userId, title, content, mediaId } = req.body;
+
+				await BlogsModel.findByIdAndUpdate(
+					{ _id: req.params.id },
+					{
+						$set: {
+							userId,
+							title,
+							content,
+							isActive: !req.body.isActive ? true : req.body.isActive,
+							isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
+							mediaId: !mediaId ? slider.mediaId : mediaId,
+						},
+					},
+					{ useFindAndModify: false, new: true }
+				)
+					.then((response) =>
+						res.json({
+							status: 200,
+							message: 'Blog is updated successfully',
+							response,
+						})
+					)
+					.catch((err) => res.json({ status: 404, message: err }));
+			})
+			.catch((err) => res.json({ status: 404, message: err }));
+	}
 };
 
 exports.removeSingleBlog = async (req, res) => {
