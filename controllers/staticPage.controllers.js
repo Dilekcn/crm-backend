@@ -23,7 +23,7 @@ exports.getWithQuery = async (req, res) => {
 		const query =
 			typeof req.query === 'string' ? JSON.parse(req.body.query) : req.body.query;
 		const { page, limit } = req.query;
-		const total = await StaticPageModel.find().countDocuments();
+		const total = await StaticPageModel.find(query).countDocuments();
 		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
 		const response = await StaticPageModel.find(query)
 			.limit(limit * 1)

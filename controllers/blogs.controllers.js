@@ -27,34 +27,40 @@ exports.getAll = async (req, res) => {
 };
 
 exports.getWithQuery = async (req, res) => {
+	try {
+		const query =
+			typeof req.body.query === 'string'
+				? JSON.parse(req.body.query)
+				: req.body.query;
+		const { page = 1, limit } = req.query;
+		const response = await BlogsModel.find(query)
+			.limit(limit * 1)
+			.skip((page - 1) * limit)
+			.sort({ createdAt: -1 })
+			.populate({
+				path: 'userId',
+				model: 'user',
+				select: 'firstname lastname mediaId',
+				populate: {
+					path: 'mediaId',
+					model: 'media',
+					select: 'url',
+				},
+			});
 
-		try {
-			const  query  = typeof req.body.query==="string" ?  JSON.parse(req.body.query) : req.body.query
-			const { page = 1, limit } = req.query;	
-			const response = await BlogsModel.find(query)
-				.limit(limit * 1)
-				.skip((page - 1) * limit)
-				.sort({ createdAt: -1 })
-				.populate({
-					path: 'userId',
-					model: 'user',
-					select: 'firstname lastname mediaId',
-					populate: {
-						path: 'mediaId',
-						model: 'media',
-						select: 'url',
-					}, 
-				});
-	
-			const total = await BlogsModel.find().countDocuments();
-			const pages = limit === undefined ? 1 : Math.ceil(total / limit);
-			res.json({message: 'Filtered Blogs', total:response.length,pages,status: 200, response });
-		} catch (error) {
-			res.json({ status: 404, message: error });
-		}
-	};
-
-
+		const total = await BlogsModel.find(query).countDocuments();
+		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
+		res.json({
+			message: 'Filtered Blogs',
+			total,
+			pages,
+			status: 200,
+			response,
+		});
+	} catch (error) {
+		res.json({ status: 404, message: error });
+	}
+};
 
 exports.create = async (req, res) => {
 	const newBlog = await new BlogsModel({
@@ -68,12 +74,12 @@ exports.create = async (req, res) => {
 	newBlog
 		.save()
 		.then((response) =>
-			res.json({ 
+			res.json({
 				status: 200,
 				message: 'New Blog is created successfully',
 				response,
 			})
-		)   
+		)
 		.catch((err) => res.json({ status: 404, message: err }));
 };
 
