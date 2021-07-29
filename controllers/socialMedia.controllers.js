@@ -18,7 +18,9 @@ exports.getAllSocialMedia = async (req, res) => {
 exports.getWithQuery = async (req, res) => {
 	try {
 		const query =
-			typeof req.query === 'string' ? JSON.parse(req.body.query) : req.body.query;
+			typeof req.body.query === 'string'
+				? JSON.parse(req.body.query)
+				: req.body.query;
 		const { page, limit } = req.query;
 		const total = await SocialMediaModel.find(query).countDocuments();
 		const pages = limit === undefined ? 1 : Math.ceil(total / limit);

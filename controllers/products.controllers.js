@@ -30,7 +30,7 @@ exports.getWithQuery = async (req, res) => {
 			.limit(limit * 1)
 			.skip((page - 1) * limit)
 			.sort({ createdAt: -1 });
-		const total = await ProductModel.find(query).countDocuments;
+		const total = await ProductModel.find(query).countDocuments();
 		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
 		res.json({
 			message: 'Filtered products',

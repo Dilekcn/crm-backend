@@ -21,7 +21,9 @@ exports.getAll = async (req, res) => {
 exports.getWithQuery = async (req, res) => {
 	try {
 		const query =
-			typeof req.query === 'string' ? JSON.parse(req.body.query) : req.body.query;
+			typeof req.body.query === 'string'
+				? JSON.parse(req.body.query)
+				: req.body.query;
 		const { page, limit } = req.query;
 		const total = await StaticPageModel.find(query).countDocuments();
 		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
@@ -37,7 +39,7 @@ exports.getWithQuery = async (req, res) => {
 			response,
 		});
 	} catch (error) {
-		res.json({ status: 404, message: err });
+		res.json({ status: 404, message: error });
 	}
 };
 
