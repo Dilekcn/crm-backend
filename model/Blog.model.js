@@ -5,11 +5,12 @@ const BlogsSchema = new Schema(
 	{
 		userId: { type: Schema.Types.ObjectId, ref: 'user' },
 		title: { type: String, required: true },
-		content: { type: String},
+		content: { type: String },
+		mediaId: { type: Schema.Types.ObjectId, ref: 'media' },
 		isActive: { type: Boolean, default: true },
-		isDeleted: { type: Boolean, default: false }, 
+		isDeleted: { type: Boolean, default: false },
 	},
 	{ timestamps: true }
-); 
+);
 
-module.exports = mongoose.model('blog', BlogsSchema); 
+module.exports = mongoose.model('blog', BlogsSchema);

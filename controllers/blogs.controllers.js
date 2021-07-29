@@ -1,4 +1,6 @@
 const BlogsModel = require('../model/Blog.model');
+const MediaModel = require('../model/Media.model');
+const S3 = require('../config/aws.s3.config');
 
 exports.getAll = async (req, res) => {
 	try {
@@ -16,7 +18,8 @@ exports.getAll = async (req, res) => {
 					model: 'media',
 					select: 'url',
 				},
-			});
+			})
+			.populate('mediaId', 'url title alt');
 
 		const total = await BlogsModel.find().countDocuments();
 		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
@@ -46,7 +49,8 @@ exports.getWithQuery = async (req, res) => {
 					model: 'media',
 					select: 'url',
 				},
-			});
+			})
+			.populate('mediaId', 'url title alt');
 
 		const total = await BlogsModel.find(query).countDocuments();
 		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
@@ -63,24 +67,96 @@ exports.getWithQuery = async (req, res) => {
 };
 
 exports.create = async (req, res) => {
-	const newBlog = await new BlogsModel({
-		userId: req.body.userId,
-		title: req.body.title,
-		content: req.body.content,
-		isActive: req.body.isActive,
-		isDeleted: req.body.isDeleted,
-	});
+	if (req.files) {
+		const data = async (data) => {
+			const newMedia = await new MediaModel({
+				title: 'blog',
+				url: data.Location || null,
+				mediaKey: data.Key,
+				alt: req.body.alt || null,
+			});
 
-	newBlog
-		.save()
-		.then((response) =>
-			res.json({
-				status: 200,
-				message: 'New Blog is created successfully',
-				response,
-			})
-		)
-		.catch((err) => res.json({ status: 404, message: err }));
+			newMedia.save();
+
+			const { userId, title, content, isActive, isDeleted } = req.body;
+
+			const newBlog = await new BlogsModel({
+				userId,
+				title,
+				content,
+				mediaId: newMedia._id,
+				isActive,
+				isDeleted,
+			});
+			newBlog
+				.save()
+				.then((response) =>
+					res.json({
+						status: 200,
+						message: 'Added new blog successfully.',
+						response,
+					})
+				)
+				.catch((error) => res.json({ status: 404, message: error }));
+		};
+
+		await S3.uploadNewMedia(req, res, data);
+	} else if (req.body.mediaId) {
+		const { userId, title, content, mediaId, isActive, isDeleted } = req.body;
+
+		const newBlog = await new BlogsModel({
+			userId,
+			title,
+			content,
+			mediaId,
+			isActive,
+			isDeleted,
+		});
+		newBlog
+			.save()
+			.then((response) =>
+				res.json({
+					status: 200,
+					message: 'Added new blog successfully.',
+					response,
+				})
+			)
+			.catch((error) => res.json({ status: 404, message: error }));
+	} else {
+		const data = async (data) => {
+			const newMedia = await new MediaModel({
+				title: 'blog',
+				url: data.Location || null,
+				mediaKey: data.Key,
+				alt: req.body.alt || null,
+			});
+
+			newMedia.save();
+
+			const { userId, title, content, isActive, isDeleted } = req.body;
+
+			const newSlide = await new BlogsModel({
+				userId,
+				title,
+				content,
+				mediaId: newMedia._id,
+				isActive,
+				isDeleted,
+			});
+			newSlide
+				.save()
+				.then((response) =>
+					res.json({
+						status: 200,
+						message: 'Added new blog successfully.',
+						response,
+					})
+				)
+				.catch((error) => res.json({ status: 404, message: error }));
+		};
+
+		await S3.uploadNewMedia(req, res, data);
+	}
 };
 
 exports.getSingleBlog = async (req, res) => {
@@ -90,16 +166,18 @@ exports.getSingleBlog = async (req, res) => {
 		} else {
 			res.json({ status: 200, data });
 		}
-	}).populate({
-		path: 'userId',
-		model: 'user',
-		select: 'firstname lastname mediaId',
-		populate: {
-			path: 'mediaId',
-			model: 'media',
-			select: 'url',
-		},
-	});
+	})
+		.populate({
+			path: 'userId',
+			model: 'user',
+			select: 'firstname lastname mediaId',
+			populate: {
+				path: 'mediaId',
+				model: 'media',
+				select: 'url',
+			},
+		})
+		.populate('mediaId', 'url title alt');
 };
 
 exports.getBlogsByUserId = async (req, res) => {
@@ -125,7 +203,8 @@ exports.getBlogsByUserId = async (req, res) => {
 				model: 'media',
 				select: 'url',
 			},
-		});
+		})
+		.populate('mediaId', 'url title alt');
 };
 
 exports.updateBlog = async (req, res) => {
