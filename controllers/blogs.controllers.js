@@ -135,7 +135,7 @@ exports.create = async (req, res) => {
 
 			const { userId, title, content, isActive, isDeleted } = req.body;
 
-			const newSlide = await new BlogsModel({
+			const newBlog = await new BlogsModel({
 				userId,
 				title,
 				content,
@@ -143,7 +143,7 @@ exports.create = async (req, res) => {
 				isActive,
 				isDeleted,
 			});
-			newSlide
+			newBlog
 				.save()
 				.then((response) =>
 					res.json({
@@ -269,7 +269,7 @@ exports.updateBlog = async (req, res) => {
 							content,
 							isActive: !req.body.isActive ? true : req.body.isActive,
 							isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
-							mediaId: !mediaId ? slider.mediaId : mediaId,
+							mediaId: !mediaId ? blog.mediaId : mediaId,
 						},
 					},
 					{ useFindAndModify: false, new: true }
@@ -288,7 +288,25 @@ exports.updateBlog = async (req, res) => {
 };
 
 exports.removeSingleBlog = async (req, res) => {
-	await BlogsModel.findByIdAndDelete({ _id: req.params.id })
-		.then((data) => res.json({ status: 200, data }))
+	await BlogsModel.findById({ _id: req.params.id })
+		.then(async (blog) => {
+			await MediaModel.findByIdAndUpdate(
+				{ _id: blog.mediaId },
+				{
+					$set: { isActive: false },
+				},
+				{ useFindAndModify: false, new: true }
+			);
+
+			await BlogsModel.findByIdAndDelete({ _id: req.params.id })
+				.then(async (data) => {
+					res.json({
+						status: 200,
+						message: 'Blog is deleted successfully',
+						data,
+					});
+				})
+				.catch((err) => res.json({ status: 404, message: err }));
+		})
 		.catch((err) => res.json({ status: 404, message: err }));
 };
