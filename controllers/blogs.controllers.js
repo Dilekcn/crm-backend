@@ -19,7 +19,8 @@ exports.getAll = async (req, res, next) => {
 					model: 'media',
 					select: 'url',
 				},
-			});
+			})
+			.populate('mediaId', 'url title alt');
 
 		const total = await BlogsModel.find().countDocuments();
 		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
@@ -262,4 +263,4 @@ exports.removeSingleBlog = async (req, res, next) => {
 	} else {
 		next({ status: 400, message: 'Object Id is not valid.' })
 	}
-};
+}

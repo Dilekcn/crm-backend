@@ -138,7 +138,7 @@ exports.getWithQuery = async (req, res, next) => {
 				? JSON.parse(req.body.query)
 				: req.body.query;
 		const { page, limit } = req.query;
-		const total = await UserModel.find().countDocuments();
+		const total = await UserModel.find(query).countDocuments();
 		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
 		const response = await UserModel.find(query)
 			.limit(limit * 1)

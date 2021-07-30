@@ -26,7 +26,7 @@ exports.getWithQuery = async (req, res, next) => {
 				? JSON.parse(req.body.query)
 				: req.body.query;
 		const { page, limit } = req.query;
-		const total = await SliderModel.find().countDocuments();
+		const total = await SliderModel.find(query).countDocuments();
 		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
 		const response = await SliderModel.find(query)
 			.limit(limit * 1)

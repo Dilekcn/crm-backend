@@ -25,11 +25,11 @@ exports.getWithQuery = async (req, res, next) => {
 			.limit(limit * 1)
 			.skip((page - 1) * limit)
 			.sort({ createdAt: -1 });
-		const total = await CompanyIntroductionModel.find().countDocuments();
+		const total = await CompanyIntroductionModel.find(query).countDocuments();
 		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
 		res.json({
 			message: 'Filtered CompanyIntroduction',
-			total: response.length,
+			total,
 			pages,
 			status: 200,
 			response,
@@ -46,7 +46,7 @@ exports.createIntroduction = async (req, res, next) => {
 		title,
 		subTitle,
 		iconName,
-		shortDescription, 
+		shortDescription,
 		isActive,
 		isDeleted,
 	});
