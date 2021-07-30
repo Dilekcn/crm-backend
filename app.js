@@ -29,6 +29,7 @@ const blogsRouter = require('./routes/blogs.routes');
 
 //middlewares
 // const verifyToken = require('./auth/verifyToken');
+const errorHandling = require('./middlewares/errorHandling')
 
 var app = express();
 app.use(function (req, res, next) {
@@ -91,13 +92,6 @@ app.use(function (req, res, next) {
 });
 
 // error handler
-app.use(function (err, req, res, next) {
-	res.status(err.status || 500);
-	if (err.message.name !== undefined && err.message.name === 'ValidationError') {
-		const keys = Object.keys(err.message.errors);
-		res.send(keys.map((key) => err.message.errors[key].message + ' ').join(''));
-	}
-	res.send(err.message);
-});
+app.use(errorHandling);
 
 module.exports = app;

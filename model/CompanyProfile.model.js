@@ -6,7 +6,7 @@ const CompanyProfileSchema = new Schema(
 	{
 		name: { type: String, required: [true, `Field 'name' must be filled.`] },
 		logo: { type: Schema.Types.ObjectId, ref: 'media' },
-		phones: [{ type: String, required: true }],
+		phones: [{ type: String, required: [true, `Field 'phone' must be filled.`] }],
 		address: String,
 		socialMediaId: [{ type: Schema.Types.ObjectId, ref: 'social', default: [] }],
 		email: { type: String, required: [true, `Field 'email' must be filled.`] },

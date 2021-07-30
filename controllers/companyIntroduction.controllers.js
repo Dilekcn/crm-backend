@@ -1,6 +1,7 @@
 const CompanyIntroductionModel = require('../model/CompanyIntroduction.model');
+const mongoose = require('mongoose')
 
-exports.getAll = async (req, res) => {
+exports.getAll = async (req, res, next) => {
 	try {
 		const { page = 1, limit } = req.query;
 		const response = await CompanyIntroductionModel.find()
@@ -11,11 +12,11 @@ exports.getAll = async (req, res) => {
 		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
 		res.json({ total, pages, status: 200, response });
 	} catch (error) {
-		res.json({ status: 404, message: error });
+		next({ status: 404, message: error });
 	}
 };
 
-exports.getWithQuery = async (req, res) => {
+exports.getWithQuery = async (req, res, next) => {
 	try {	
 	const query =typeof req.body.query === 'string'	? JSON.parse(req.body.query): req.body.query;
 	const { page = 1, limit } = req.query;
@@ -34,11 +35,11 @@ exports.getWithQuery = async (req, res) => {
 			response,
 		});
 	} catch (error) {
-		res.json({ status: 404, message: error });
+		next({ status: 404, message: error });
 	}
 };
 
-exports.createIntroduction = async (req, res) => {
+exports.createIntroduction = async (req, res, next) => {
 	const { title, subTitle, iconName, shortDescription, isActive, isDeleted } = req.body;
 
 	const newIntroduction = await new CompanyIntroductionModel({
@@ -58,40 +59,84 @@ exports.createIntroduction = async (req, res) => {
 				response,
 			})
 		)
-		.catch((error) => res.json({ status: 404, message: error }));
+		.catch((error) => next({ status: 404, message: error }));
 };
 
-exports.getSingleIntroduction = async (req, res) => {
-	await CompanyIntroductionModel.findById({ _id: req.params.id }, (err, data) => {
-		if (err) {
-			res.json({ status: 404, message: err });
-		} else {
-			res.json({ status: 200, data });
-		}
-	});
+exports.getSingleIntroduction = async (req, res, next) => {
+	if(mongoose.isValidObjectId(req.params.id)) {
+		await CompanyIntroductionModel.findById({_id: req.params.id})
+			.then(async(isExist) => {
+				if(isExist === null) {
+					next({
+						status: 404,
+						message: 'This Id is not exist in Company Introductions Model.',
+					})
+				} else {
+					await CompanyIntroductionModel.findById({ _id: req.params.id }, (err, data) => {
+						if (err) {
+							next({ status: 404, message: err });
+						} else {
+							res.json({ status: 200, data });
+						}
+					});
+				}
+			}).catch(err => next({status: 500, message:err}))
+	} else {
+		next({ status: 400, message: 'Object Id is not valid.' })
+	}
 };
 
-exports.getSingleIntroductionByTitle = async (req, res) => {
+exports.getSingleIntroductionByTitle = async (req, res, next) => {
 	await CompanyIntroductionModel.findOne({ title: req.params.title }, (err, data) => {
 		if (err) {
-			res.json({ status: 404, message: err });
+			next({ status: 404, message: err });
+		} else if(data === null) {
+			res.json({status: 200, message:"Any title did not match"})
 		} else {
 			res.json({ status: 200, data });
 		}
 	});
 };
 
-exports.updateIntroductions = async (req, res) => {
-	await CompanyIntroductionModel.findByIdAndUpdate(
-		{ _id: req.params.id },
-		{ $set: req.body }
-	)
-		.then((data) => res.json({ status: 200, data }))
-		.catch((err) => res.json({ status: 404, message: err }));
+exports.updateIntroductions = async (req, res, next) => {
+	if(mongoose.isValidObjectId(req.params.id)) {
+		await CompanyIntroductionModel.findById({_id: req.params.id})
+			.then(async(isExist) => {
+				if(isExist === null) {
+					next({
+						status: 404,
+						message: 'This Id is not exist in Company Introductions Model.',
+					})
+				} else {
+					await CompanyIntroductionModel.findByIdAndUpdate(
+						{ _id: req.params.id },
+						{ $set: req.body }
+					)
+						.then((data) => res.json({ status: 200, data }))
+						.catch((err) => next({ status: 404, message: err }));
+				}
+			}).catch(err => next({status: 500, message:err}))
+	} else {
+		next({ status: 400, message: 'Object Id is not valid.' })
+	}
 };
 
-exports.removeIntroduction = async (req, res) => {
-	await CompanyIntroductionModel.findByIdAndDelete({ _id: req.params.id })
-		.then((data) => res.json({ status: 200, data }))
-		.catch((err) => res.json({ status: 404, message: err }));
+exports.removeIntroduction = async (req, res, next) => {
+	if(mongoose.isValidObjectId(req.params.id)) {
+		await CompanyIntroductionModel.findById({_id: req.params.id})
+			.then(async(isExist) => {
+				if(isExist === null) {
+					next({
+						status: 404,
+						message: 'This Id is not exist in Company Introductions Model.',
+					})
+				} else {
+					await CompanyIntroductionModel.findByIdAndDelete({ _id: req.params.id })
+					.then((data) => res.json({ status: 200, data }))
+					.catch((err) => next({ status: 404, message: err }));
+				}
+			}).catch(err => next({status: 500, message:err}))
+	} else {
+		next({ status: 400, message: 'Object Id is not valid.' })
+	}
 };

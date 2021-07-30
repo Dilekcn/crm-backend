@@ -3,8 +3,8 @@ const Schema = mongoose.Schema;
 
 const StaticPageSchema = new Schema(
 	{
-		name: { type: String, unique: true },
-		content: String,
+		name: { type: String, unique: true, required: [true, `Field 'name' must be filled.`] },
+		content: {type:String, required: [true, `Field 'content' must be filled.`]},
 		mediaId: { type: Schema.Types.ObjectId, ref: 'media' },
 		isActive: { type: Boolean, default: true },
 		isDeleted: { type: Boolean, default: false },

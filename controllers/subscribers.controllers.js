@@ -1,6 +1,6 @@
 const SubscribersModel = require('../model/Subscribers.model');
 const nodemailer = require('nodemailer');
-const { response } = require('express');
+const mongoose = require('mongoose')
 require('dotenv').config();
 
 const transporter = nodemailer.createTransport({
@@ -11,7 +11,7 @@ const transporter = nodemailer.createTransport({
 	},
 });
 
-exports.getAll = async (req, res) => {
+exports.getAll = async (req, res, next) => {
 	try {
 		const { page = 1, limit } = req.query;
 		const response = await SubscribersModel.find()
@@ -22,11 +22,11 @@ exports.getAll = async (req, res) => {
 		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
 		res.json({ total, pages, status: 200, response });
 	} catch (err) {
-		res.json({ status: 404, message: err });
+		next({ status: 404, message: err });
 	}
 };
 
-exports.getWithQuery = async (req, res) => {
+exports.getWithQuery = async (req, res, next) => {
 	try {
 		const query =
 			typeof req.body.query === 'string'
@@ -47,11 +47,35 @@ exports.getWithQuery = async (req, res) => {
 			response,
 		});
 	} catch (error) {
-		res.json({ status: 404, message: error });
+		next({ status: 404, message: error });
 	}
 };
 
-exports.create = (req, res) => {
+exports.getSingleSubscriber = async (req, res, next) => {
+	if(mongoose.isValidObjectId(req.params.id)) {
+		await SubscribersModel.findById({_id: req.params.id})
+			.then(async(isExist) => {
+				if(isExist === null) {
+					next({
+						status: 404,
+						message: 'This Id is not exist in Subscribers Model.',
+					})
+				} else {
+					await SubscribersModel.findById({ _id: req.params.id }, (err, data) => {
+						if (err) {
+							next({ status: 404, message: err });
+						} else {
+							res.json({ status: 200, data });
+						}
+					})
+				}
+			}).catch(err => next({status: 500, message:err}))
+	} else {
+		next({ status: 400, message: 'Object Id is not valid.' })
+	}
+};
+
+exports.create = (req, res, next) => {
 	const newSubscriber = new SubscribersModel({
 		email: req.body.email,
 		name: req.body.name,
@@ -84,15 +108,49 @@ exports.create = (req, res) => {
 				}
 			});
 		})
-		.catch((err) => res.json({ status: 404, message: err }));
+		.catch((err) => next({ status: 404, message: err }));
 };
 
-exports.delete = (req, res) => {
-	const { id } = req.params;
+exports.updateSubscriber = async (req, res, next) => {
+	if(mongoose.isValidObjectId(req.params.id)) {
+		await SubscribersModel.findById({_id: req.params.id})
+			.then(async(isExist) => {
+				if(isExist === null) {
+					next({
+						status: 404,
+						message: 'This Id is not exist in Subscribers Model.',
+					})
+				} else {
+					await SubscribersModel.findByIdAndUpdate({ _id: req.params.id }, { $set: req.body })
+					.then((data) => res.json({ status: 200, message: 'Successfully updated', data }))
+					.catch((err) => next({ status: 400, message: err }));
+				}
+			}).catch(err => next({status: 500, message:err}))
+	} else {
+		next({ status: 400, message: 'Object Id is not valid.' })
+	}
+}
 
-	SubscribersModel.findByIdAndDelete({ _id: id })
-		.then((data) =>
-			res.json({ status: 200, message: 'Subscriber is deleted successfully', data })
-		)
-		.catch((err) => res.json({ status: 404, error: err }));
+exports.delete = async (req, res, next) => {
+	if(mongoose.isValidObjectId(req.params.id)) {
+		await SubscribersModel.findById({_id: req.params.id})
+			.then(async(isExist) => {
+				if(isExist === null) {
+					next({
+						status: 404,
+						message: 'This Id is not exist in Subscribers Model.',
+					})
+				} else {
+					const { id } = req.params;
+
+					SubscribersModel.findByIdAndDelete({ _id: id })
+						.then((data) =>
+							res.json({ status: 200, message: 'Subscriber is deleted successfully', data })
+						)
+						.catch((err) => next({ status: 404, error: err }));
+				}
+			}).catch(err => next({status: 500, message:err}))
+	} else {
+		next({ status: 400, message: 'Object Id is not valid.' })
+	}
 };

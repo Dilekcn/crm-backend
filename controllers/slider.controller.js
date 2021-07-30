@@ -1,8 +1,9 @@
 const SliderModel = require('../model/Slider.model');
 const MediaModel = require('../model/Media.model');
 const S3 = require('../config/aws.s3.config');
+const mongoose = require('mongoose')
 
-exports.getAllSlides = async (req, res) => {
+exports.getAllSlides = async (req, res, next) => {
 	try {
 		const { page = 1, limit } = req.query;
 		const response = await SliderModel.find()
@@ -14,11 +15,11 @@ exports.getAllSlides = async (req, res) => {
 		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
 		res.json({ total, pages, status: 200, response });
 	} catch (error) {
-		res.json({ status: 404, error });
+		next({ status: 404, error });
 	}
 };
 
-exports.getWithQuery = async (req, res) => {
+exports.getWithQuery = async (req, res, next) => {
 	try {
 		const query =
 			typeof req.body.query === 'string'
@@ -33,11 +34,11 @@ exports.getWithQuery = async (req, res) => {
 			.sort({ createdAt: -1 });
 		res.json({ message: 'Filtered sliders', total, pages, status: 200, response });
 	} catch (error) {
-		res.json({ status: 404, message: error });
+		next({ status: 404, message: error });
 	}
 };
 
-exports.createSlide = async (req, res) => {
+exports.createSlide = async (req, res, next) => {
 	if (req.files) {
 		const data = async (data) => {
 			const newMedia = await new MediaModel({
@@ -80,7 +81,7 @@ exports.createSlide = async (req, res) => {
 						response,
 					})
 				)
-				.catch((error) => res.json({ status: 404, message: error }));
+				.catch((error) => next({ status: 404, message: error }));
 		};
 
 		await S3.uploadNewMedia(req, res, data);
@@ -117,7 +118,7 @@ exports.createSlide = async (req, res) => {
 					response,
 				})
 			)
-			.catch((error) => res.json({ status: 404, message: error }));
+			.catch((error) => next({ status: 404, message: error }));
 	} else {
 		const data = async (data) => {
 			const newMedia = await new MediaModel({
@@ -160,28 +161,42 @@ exports.createSlide = async (req, res) => {
 						response,
 					})
 				)
-				.catch((error) => res.json({ status: 404, message: error }));
+				.catch((error) => next({ status: 400, message: error }));
 		};
 
 		await S3.uploadNewMedia(req, res, data);
 	}
 };
 
-exports.getSingleSlide = async (req, res) => {
-	await SliderModel.findById({ _id: req.params.slideid }, (err, data) => {
-		if (err) {
-			res.json({ status: 404, message: err });
-		} else {
-			res.json({ status: 200, data });
-		}
-	}).populate('mediaId', 'url title alt');
+exports.getSingleSlide = async (req, res, next) => {
+	if(mongoose.isValidObjectId(req.params.slideid)) {
+		await SliderModel.findById({_id: req.params.slideid})
+			.then(async(isExist) => {
+				if(isExist === null) {
+					next({
+						status: 404,
+						message: 'This Id is not exist in Sliders Model.',
+					})
+				} else {
+					await SliderModel.findById({ _id: req.params.slideid }, (err, data) => {
+						if (err) {
+							next({ status: 404, message: err });
+						} else {
+							res.json({ status: 200, data });
+						}
+					}).populate('mediaId', 'url title alt');
+				}
+			}).catch(err => next({status: 500, message:err}))
+	} else {
+		next({ status: 400, message: 'Object Id is not valid.' })
+	}
 };
 
-exports.getSingleSlideByTitle = async (req, res) => {
+exports.getSingleSlideByTitle = async (req, res, next) => {
 	const { page, limit } = req.query;
 	await SliderModel.find({ title: req.params.titletext }, (err, data) => {
 		if (err) {
-			res.json({ status: 404, message: err });
+			next({ status: 404, message: err });
 		} else {
 			res.json({ status: 200, data });
 		}
@@ -191,117 +206,138 @@ exports.getSingleSlideByTitle = async (req, res) => {
 		.skip((page - 1) * limit);
 };
 
-exports.updateSlider = async (req, res) => {
-	if (req.files) {
-		await SliderModel.findById({ _id: req.params.slideid })
-			.then(async (slider) => {
-				await MediaModel.findById({ _id: slider.mediaId }).then(async (media) => {
-					const data = async (data) => {
-						await MediaModel.findByIdAndUpdate(
-							{ _id: slider.mediaId },
-							{
-								$set: {
-									title: 'slider',
-									url: data.Location || null,
-									mediaKey: data.Key,
-									alt: req.body.title || null,
-								},
-							},
-							{ useFindAndModify: false, new: true }
-						).catch((err) => res.json({ status: 404, message: err }));
-					};
-					await S3.updateMedia(req, res, media.mediaKey, data);
-				});
-				const { title, subtitle, url, buttonText, order } = req.body;
-				await SliderModel.findByIdAndUpdate(
-					{ _id: req.params.slideid },
-					{
-						$set: {
-							title,
-							subtitle,
-							url,
-							buttonText,
-							order,
-							isActive: !req.body.isActive ? true : req.body.isActive,
-							isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
-							mediaId: slider.mediaId,
-							isVideo: !req.body.isVideo ? false : req.body.isVideo,
-						},
-					},
-					{ useFindAndModify: false, new: true }
-				)
-					.then((response) =>
-						res.json({
-							status: 200,
-							message: 'Slide updated successfully',
-							response,
-						})
-					)
-					.catch((err) => res.json({ status: 404, message: err }));
-			})
-			.catch((err) => res.json({ status: 404, message: err }));
+exports.updateSlider = async (req, res, next) => {
+	if(mongoose.isValidObjectId(req.params.slideid)) {
+		await SliderModel.findById({_id: req.params.slideid})
+			.then(async(isExist) => {
+				if(isExist === null) {
+					next({
+						status: 404,
+						message: 'This Id is not exist in Sliders Model.',
+					})
+				} else {
+					if (req.files) {
+						await SliderModel.findById({ _id: req.params.slideid })
+							.then(async (slider) => {
+								await MediaModel.findById({ _id: slider.mediaId }).then(async (media) => {
+									const data = async (data) => {
+										await MediaModel.findByIdAndUpdate(
+											{ _id: slider.mediaId },
+											{
+												$set: {
+													title: 'slider',
+													url: data.Location || null,
+													mediaKey: data.Key,
+													alt: req.body.title || null,
+												},
+											},
+											{ useFindAndModify: false, new: true }
+										).catch((err) => next({ status: 404, message: err }));
+									};
+									await S3.updateMedia(req, res, media.mediaKey, data);
+								});
+								const { title, subtitle, url, buttonText, order } = req.body;
+								await SliderModel.findByIdAndUpdate(
+									{ _id: req.params.slideid },
+									{
+										$set: {
+											title,
+											subtitle,
+											url,
+											buttonText,
+											order,
+											isActive: !req.body.isActive ? true : req.body.isActive,
+											isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
+											mediaId: slider.mediaId,
+											isVideo: !req.body.isVideo ? false : req.body.isVideo,
+										},
+									},
+									{ useFindAndModify: false, new: true }
+								)
+									.then((response) =>
+										res.json({
+											status: 200,
+											message: 'Slide updated successfully',
+											response,
+										})
+									)
+									.catch((err) => next({ status: 404, message: err }));
+							})
+							.catch((err) => next({ status: 404, message: err }));
+					} else {
+						await SliderModel.findById({ _id: req.params.slideid })
+							.then(async (slider) => {
+								const { title, subtitle, url, buttonText, order, mediaId } = req.body;
+				
+								await SliderModel.findByIdAndUpdate(
+									{ _id: req.params.slideid },
+									{
+										$set: {
+											title,
+											subtitle,
+											url,
+											buttonText,
+											order,
+											isActive: !req.body.isActive ? true : req.body.isActive,
+											isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
+											mediaId: !mediaId ? slider.mediaId : mediaId,
+											isVideo: !req.body.isVideo ? false : req.body.isVideo,
+										},
+									},
+									{ useFindAndModify: false, new: true }
+								)
+									.then((response) =>
+										res.json({
+											status: 200,
+											message: 'Slide updated successfully',
+											response,
+										})
+									)
+									.catch((err) => next({ status: 404, message: err }));
+							})
+							.catch((err) => next({ status: 404, message: err }));
+					}
+				}
+			}).catch(err => next({status: 500, message:err}))
 	} else {
-		await SliderModel.findById({ _id: req.params.slideid })
-			.then(async (slider) => {
-				const { title, subtitle, url, buttonText, order, mediaId } = req.body;
-
-				await SliderModel.findByIdAndUpdate(
-					{ _id: req.params.slideid },
-					{
-						$set: {
-							title,
-							subtitle,
-							url,
-							buttonText,
-							order,
-							isActive: !req.body.isActive ? true : req.body.isActive,
-							isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
-							mediaId: !mediaId ? slider.mediaId : mediaId,
-							isVideo: !req.body.isVideo ? false : req.body.isVideo,
-						},
-					},
-					{ useFindAndModify: false, new: true }
-				)
-					.then((response) =>
-						res.json({
-							status: 200,
-							message: 'Slide updated successfully',
-							response,
-						})
-					)
-					.catch((err) => res.json({ status: 404, message: err }));
-			})
-			.catch((err) => res.json({ status: 404, message: err }));
+		next({ status: 400, message: 'Object Id is not valid.' })
 	}
 };
 
-exports.removeSlide = async (req, res) => {
-	await SliderModel.findById({ _id: req.params.slideid })
-		.then(async (slider) => {
-			await MediaModel.findByIdAndUpdate(
-				{ _id: slider.mediaId },
-				{
-					$set: { isActive: false },
-				},
-				{ useFindAndModify: false, new: true }
-			);
-
-			await SliderModel.findByIdAndDelete({ _id: req.params.slideid })
-				.then(async (data) => {
-					res.json({
-						status: 200,
-						message: 'Slide is deleted successfully',
-						data,
-					});
-				})
-				.catch((err) => res.json({ status: 404, message: err }));
-		})
-		.catch((err) => res.json({ status: 404, message: err }));
+exports.removeSlide = async (req, res, next) => {
+	if(mongoose.isValidObjectId(req.params.slideid)) {
+		await SliderModel.findById({_id: req.params.slideid})
+			.then(async(isExist) => {
+				if(isExist === null) {
+					next({
+						status: 404,
+						message: 'This Id is not exist in Sliders Model.',
+					})
+				} else {
+					await SliderModel.findById({ _id: req.params.slideid })
+					.then(async (slider) => {
+						await MediaModel.findByIdAndUpdate(
+							{ _id: slider.mediaId },
+							{
+								$set: { isActive: false },
+							},
+							{ useFindAndModify: false, new: true }
+						);
+			
+						await SliderModel.findByIdAndDelete({ _id: req.params.slideid })
+							.then(async (data) => {
+								res.json({
+									status: 200,
+									message: 'Slide is deleted successfully',
+									data,
+								});
+							})
+							.catch((err) => next({ status: 404, message: err }));
+					})
+					.catch((err) => next({ status: 404, message: err }));
+				}
+			}).catch(err => next({status: 500, message:err}))
+	} else {
+		next({ status: 400, message: 'Object Id is not valid.' })
+	}
 };
-
-// await SliderModel.findByIdAndDelete({ _id: req.params.slideid })
-// 	.then(async(data) => {
-// 		await MediaModel.findByIdAndRemove({_id:data.mediaId}).then(data => data).catch(err => res.json(err))
-// 		return res.json(data)
-// 	})
-// 	.catch((err) => res.json({ message: err }));

@@ -1,6 +1,7 @@
 const SocialMediaModel = require('../model/SocialMedia.model');
+const mongoose = require('mongoose')
 
-exports.getAllSocialMedia = async (req, res) => {
+exports.getAllSocialMedia = async (req, res, next) => {
 	try {
 		const { page = 1, limit } = req.query;
 		const response = await SocialMediaModel.find()
@@ -11,11 +12,11 @@ exports.getAllSocialMedia = async (req, res) => {
 		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
 		res.json({ total, pages, status: 200, response });
 	} catch (err) {
-		res.json({ status: 404, message: err });
+		next({ status: 404, message: err });
 	}
 };
 
-exports.getWithQuery = async (req, res) => {
+exports.getWithQuery = async (req, res, next) => {
 	try {
 		const query =
 			typeof req.query === 'string' ? JSON.parse(req.body.query) : req.body.query;
@@ -34,11 +35,35 @@ exports.getWithQuery = async (req, res) => {
 			response,
 		});
 	} catch (error) {
-		res.json({ status: 404, message: error });
+		next({ status: 404, message: error });
 	}
 };
 
-exports.createSocialMedia = (req, res) => {
+exports.getSingleSocialMediaById = async (req, res, next) => {
+	if(mongoose.isValidObjectId(req.params.id)) {
+		await SocialMediaModel.findById({_id: req.params.id})
+			.then(async(isExist) => {
+				if(isExist === null) {
+					next({
+						status: 404,
+						message: 'This Id is not exist in Social Medias Model.',
+					})
+				} else {
+					await SocialMediaModel.findById({ _id: req.params.id }, (err, data) => {
+						if (err) {
+							next({ status: 404, message: err });
+						} else {
+							res.json({ status: 200, data });
+						}
+					})
+				}
+			}).catch(err => next({status: 500, message:err}))
+	} else {
+		next({ status: 400, message: 'Object Id is not valid.' })
+	}
+}
+
+exports.createSocialMedia = (req, res, next) => {
 	const newSocialMedia = new SocialMediaModel(req.body);
 	newSocialMedia
 		.save()
@@ -50,47 +75,62 @@ exports.createSocialMedia = (req, res) => {
 			});
 		})
 		.catch((err) => {
-			res.json({ status: 404, message: err });
+			next({ status: 404, message: err });
 		});
 };
 
-// exports.createSocialMedia = (req, res) => {
-//     const newSocialMedia=  new SocialMediaModel({
-//         title: req.body.title,
-//         link:req.body.link,
-//         isActive: req.body.isActive,
-//         isDeleted: req.body.isDeleted
-//     })
-//     newSocialMedia.save()
-//     .then((data) =>{ res.json(data);})
-//     .catch((err) => {res.json( err)});
-
-// }
-
-exports.updateSocialMedia = (req, res) => {
-	SocialMediaModel.findByIdAndUpdate(req.params.socialmediaid, req.body)
-		.then((data) => {
-			res.json({
-				status: 200,
-				message: 'Social media info is updated successfully',
-				data,
-			});
-		})
-		.catch((err) => {
-			res.json({ status: 404, message: err });
-		});
+exports.updateSocialMedia = async (req, res, next) => {
+	if(mongoose.isValidObjectId(req.params.socialmediaid)) {
+		await SocialMediaModel.findById({_id: req.params.socialmediaid})
+			.then(async(isExist) => {
+				if(isExist === null) {
+					next({
+						status: 404,
+						message: 'This Id is not exist in Social Medias Model.',
+					})
+				} else {
+					SocialMediaModel.findByIdAndUpdate(req.params.socialmediaid, req.body)
+					.then((data) => {
+						res.json({
+							status: 200,
+							message: 'Social media info is updated successfully',
+							data,
+						});
+					})
+					.catch((err) => {
+						next({ status: 404, message: err });
+					});
+				}
+			}).catch(err => next({status: 500, message:err}))
+	} else {
+		next({ status: 400, message: 'Object Id is not valid.' })
+	}
 };
 
-exports.removeSocialMedia = (req, res) => {
-	SocialMediaModel.findByIdAndRemove(req.params.socialmediaid)
-		.then((data) => {
-			res.json({
-				status: 200,
-				message: 'Social media info is removed successfully',
-				data,
-			});
-		})
-		.catch((err) => {
-			res.json({ status: 404, message: err });
-		});
+exports.removeSocialMedia = async (req, res, next) => {
+	if(mongoose.isValidObjectId(req.params.socialmediaid)) {
+		await SocialMediaModel.findById({_id: req.params.socialmediaid})
+			.then(async(isExist) => {
+				if(isExist === null) {
+					next({
+						status: 404,
+						message: 'This Id is not exist in Social Medias Model.',
+					})
+				} else {
+					SocialMediaModel.findByIdAndRemove(req.params.socialmediaid)
+					.then((data) => {
+						res.json({
+							status: 200,
+							message: 'Social media info is removed successfully',
+							data,
+						});
+					})
+					.catch((err) => {
+						next({ status: 404, message: err });
+					});
+				}
+			}).catch(err => next({status: 500, message:err}))
+	} else {
+		next({ status: 400, message: 'Object Id is not valid.' })
+	}
 };

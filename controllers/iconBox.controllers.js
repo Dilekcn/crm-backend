@@ -1,6 +1,7 @@
 const IconBoxModel = require('../model/IconBox.model');
+const mongoose = require('mongoose')
 
-exports.getAll = async (req, res) => {
+exports.getAll = async (req, res, next) => {
 	try {
 		const { page, limit } = req.query;
 		const response = await IconBoxModel.find()
@@ -11,11 +12,11 @@ exports.getAll = async (req, res) => {
 		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
 		res.json({ total, pages, status: 200, response });
 	} catch (error) {
-		res.json({ status: 404, error });
+		next({ status: 404, error });
 	}
 };
 
-exports.getWithQuery = async (req, res) => {
+exports.getWithQuery = async (req, res, next) => {
 	try {
 		const query =
 			typeof req.body.query === 'string'
@@ -35,11 +36,11 @@ exports.getWithQuery = async (req, res) => {
 			response,
 		});
 	} catch (error) {
-		res.json({ status: 404, message: error });
+		next({ status: 404, message: error });
 	}
 };
 
-exports.create = async (req, res) => {
+exports.create = async (req, res, next) => {
 	const newIconBox = await new IconBoxModel({
 		contentName: req.body.contentName,
 		routeName: req.body.routeName,
@@ -59,51 +60,92 @@ exports.create = async (req, res) => {
 				response,
 			})
 		)
-		.catch((err) => res.json({ status: 404, message: err }));
+		.catch((err) => next({ status: 404, message: err }));
 };
 
-exports.getSingleIconBox = async (req, res) => {
-	await IconBoxModel.findById({ _id: req.params.id }, (err, data) => {
-		if (err) {
-			res.json({ status: 404, message: err });
-		} else {
-			res.json({ status: 200, data });
-		}
-	});
+exports.getSingleIconBox = async (req, res, next) => {
+	if(mongoose.isValidObjectId(req.params.id)) {
+		await IconBoxModel.findById({_id: req.params.id})
+			.then(async(isExist) => {
+				if(isExist === null) {
+					next({
+						status: 404,
+						message: 'This Id is not exist in Icon Box Model.',
+					})
+				} else {
+					await IconBoxModel.findById({ _id: req.params.id }, (err, data) => {
+						if (err) {
+							next({ status: 404, message: err });
+						} else {
+							res.json({ status: 200, data });
+						}
+					});
+				}
+			}).catch(err => next({status: 500, message:err}))
+	} else {
+		next({ status: 400, message: 'Object Id is not valid.' })
+	}
 };
 
-exports.getIconBoxByTitle = async (req, res) => {
+exports.getIconBoxByTitle = async (req, res, next) => {
 	await IconBoxModel.findOne({ title: req.params.title }, (err, data) => {
 		if (err) {
-			res.json({ status: 404, message: err });
+			next({ status: 404, message: err });
 		} else {
 			res.json({ status: 200, data });
 		}
 	});
 };
 
-exports.getIconBoxByAuthor = async (req, res) => {
+exports.getIconBoxByAuthor = async (req, res, next) => {
 	await IconBoxModel.findOne({ author: req.params.author }, (err, data) => {
 		if (err) {
-			res.json({ status: 404, message: err });
+			next({ status: 404, message: err });
 		} else {
 			res.json({ status: 200, data });
 		}
 	});
 };
 
-exports.updateIconBox = async (req, res) => {
-	await IconBoxModel.findByIdAndUpdate({ _id: req.params.id }, { $set: req.body })
-		.then((data) =>
-			res.json({ status: 200, message: 'Iconbox is updated successfully', data })
-		)
-		.catch((err) => res.json({ status: 404, message: err }));
+exports.updateIconBox = async (req, res, next) => {
+	if(mongoose.isValidObjectId(req.params.id)) {
+		await IconBoxModel.findById({_id: req.params.id})
+			.then(async(isExist) => {
+				if(isExist === null) {
+					next({
+						status: 404,
+						message: 'This Id is not exist in Icon Box Model.',
+					})
+				} else {
+					await IconBoxModel.findByIdAndUpdate({ _id: req.params.id }, { $set: req.body })
+					.then((data) =>
+						res.json({ status: 200, message: 'Iconbox is updated successfully', data }))
+					.catch((err) => next({ status: 404, message: err }));
+				}
+			}).catch(err => next({status: 500, message:err}))
+	} else {
+		next({ status: 400, message: 'Object Id is not valid.' })
+	}
 };
 
-exports.removeSingleIconBox = async (req, res) => {
-	await IconBoxModel.findByIdAndDelete({ _id: req.params.id })
-		.then((data) =>
-			res.json({ status: 200, message: 'Iconbox is deleted successfully', data })
-		)
-		.catch((err) => res.json({ status: 404, message: err }));
+exports.removeSingleIconBox = async (req, res, next) => {
+	if(mongoose.isValidObjectId(req.params.id)) {
+		await IconBoxModel.findById({_id: req.params.id})
+			.then(async(isExist) => {
+				if(isExist === null) {
+					next({
+						status: 404,
+						message: 'This Id is not exist in Icon Box Model.',
+					})
+				} else {
+					await IconBoxModel.findByIdAndDelete({ _id: req.params.id })
+					.then((data) =>
+						res.json({ status: 200, message: 'Iconbox is deleted successfully', data })
+					)
+					.catch((err) => next({ status: 404, message: err }));
+				}
+			}).catch(err => next({status: 500, message:err}))
+	} else {
+		next({ status: 400, message: 'Object Id is not valid.' })
+	}
 };

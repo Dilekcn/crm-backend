@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const MediaSchema = new Schema(
 	{
-		url: String,
+		url: {type:String, required: [true, `Field 'url' must be filled.`]},
 		title: String,
 		alt: String,
 		mediaKey: String,

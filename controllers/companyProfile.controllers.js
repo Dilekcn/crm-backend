@@ -22,18 +22,32 @@ exports.getAll = async (req, res, next) => {
 };
 
 exports.getSingle = async (req, res, next) => {
-	await CompanyProfileModel.findById({ _id: req.params.id }, (err, data) => {
-		if (err) {
-			next({ message: err, status: 404 });
-		} else {
-			res.json({ data, status: 200 });
-		}
-	})
-		.populate('socialMediaId', 'title link')
-		.populate('logo', 'url title alt');
+	if(mongoose.isValidObjectId(req.params.id)) {
+		await CompanyProfileModel.findById({_id: req.params.id})
+			.then(async(isExist) => {
+				if(isExist === null) {
+					next({
+						status: 404,
+						message: 'This Id does not exist in Blogs Model.',
+					})
+				} else {
+					await CompanyProfileModel.findById({ _id: req.params.id }, (err, data) => {
+						if (err) {
+							next({ message: err, status: 404 });
+						} else {
+							res.json({ status: 200, data });
+						}
+					})
+						.populate('socialMediaId', 'title link')
+						.populate('logo', 'url title alt');
+				}
+			}).catch(err => next({status: 500, message:err}))
+	} else {
+		next({ status: 400, message: 'Object Id is not valid.' })
+	}
 };
 
-exports.create = async (req, res) => {
+exports.create = async (req, res, next) => {
 	if (req.body.socialMediaId) {
 		const newSocialMedia =
 			typeof req.body.socialMediaId === 'string'
@@ -72,10 +86,9 @@ exports.create = async (req, res) => {
 					address,
 					email,
 					copyright,
-					phones:
-						typeof req.body.phones === 'string'
-							? JSON.parse(req.body.phones)
-							: req.body.phones,
+					phones: req.body.phones ? typeof req.body.phones === 'string'
+					? JSON.parse(req.body.phones)
+					: req.body.phones : null,
 					socialMediaId: socialMediaIds,
 					isActive,
 					isDeleted,
@@ -90,7 +103,7 @@ exports.create = async (req, res) => {
 							data,
 						})
 					)
-					.catch((err) => res.json({ status: 404, message: err }));
+					.catch((err) => next({ status: 404, message: err }));
 			};
 			await S3.uploadNewLogo(req, res, data);
 		} else if (req.body.logo) {
@@ -121,7 +134,7 @@ exports.create = async (req, res) => {
 						data,
 					})
 				)
-				.catch((err) => res.json({ status: 404, message: err }));
+				.catch((err) => next({ status: 404, message: err }));
 		} else {
 			const data = async (data) => {
 				const newMedia = await new MediaModel({
@@ -157,7 +170,7 @@ exports.create = async (req, res) => {
 							data,
 						})
 					)
-					.catch((err) => res.json({ status: 404, message: err }));
+					.catch((err) => next({ status: 404, message: err }));
 			};
 			await S3.uploadNewLogo(req, res, data);
 		}
@@ -196,7 +209,7 @@ exports.create = async (req, res) => {
 							data,
 						})
 					)
-					.catch((err) => res.json({ status: 404, message: err }));
+					.catch((err) => next({ status: 404, message: err }));
 			};
 			await S3.uploadNewLogo(req, res, data);
 		} else if (req.body.logo) {
@@ -222,7 +235,7 @@ exports.create = async (req, res) => {
 						data,
 					})
 				)
-				.catch((err) => res.json({ status: 404, message: err }));
+				.catch((err) => next({ status: 404, message: err }));
 		} else {
 			const data = async (data) => {
 				const newMedia = await new MediaModel({
@@ -257,7 +270,7 @@ exports.create = async (req, res) => {
 							data,
 						})
 					)
-					.catch((err) => res.json({ status: 404, message: err }));
+					.catch((err) => next({ status: 404, message: err }));
 			};
 			await S3.uploadNewLogo(req, res, data);
 		}
@@ -270,7 +283,7 @@ exports.update = async (req, res, next) => {
 			.then(async (isExist) => {
 				if (isExist === null) {
 					next({
-						status: 400,
+						status: 404,
 						message: 'This Id does not exist in Company Profile Model.',
 					});
 				} else {
@@ -464,7 +477,7 @@ exports.delete = async (req, res, next) => {
 		.then(async (isExist) => {
 			if (isExist === null) {
 				return next({
-					status: 400,
+					status: 404,
 					message: 'This Id is not exist in Company Profile Model.',
 				});
 			} else {

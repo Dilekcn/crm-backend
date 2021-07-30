@@ -3,8 +3,8 @@ const Schema = mongoose.Schema;
 
 const SocialMediaSchema = new Schema(
 	{
-		title: { type: String },
-		link: { type: String },
+		title: { type: String, required: [true, `Field 'title' must be filled.`]  },
+		link: { type: String, required: [true, `Field 'link' must be filled.`]  },
 		isActive: { type: Boolean, default: true },
 		isDeleted: { type: Boolean, default: false },
 	},

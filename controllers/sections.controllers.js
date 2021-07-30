@@ -1,6 +1,7 @@
 const SectionModel = require('../model/Section.model');
+const mongoose = require('mongoose')
 
-exports.getAll = async (req, res) => {
+exports.getAll = async (req, res, next) => {
 	try {
 		const { page = 1, limit } = req.query;
 		const response = await SectionModel.find()
@@ -11,11 +12,11 @@ exports.getAll = async (req, res) => {
 		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
 		res.json({ total: total, pages, status: 200, response });
 	} catch (error) {
-		res.status(500).json(error);
+		next({status:500, message:error});
 	}
 };
 
-exports.create = async (req, res) => {
+exports.create = async (req, res, next) => {
 	const newSection = await new SectionModel({
 		secTitle: req.body.secTitle,
 		isActive: req.body.isActive,
@@ -31,26 +32,40 @@ exports.create = async (req, res) => {
 				response,
 			})
 		)
-		.catch((err) => res.json({ status: false, message: err }));
+		.catch((err) => next({ status: 400, message: err }));
 };
 
-exports.getSingleSection = async (req, res) => {
-	await SectionModel.findById({ _id: req.params.id }, (err, data) => {
-		if (err) {
-			res.json({ status: false, message: err });
-		} else {
-			res.json({ data });
-		}
-	})
+exports.getSingleSection = async (req, res, next) => {
+	if(mongoose.isValidObjectId(req.params.id)) {
+		await SectionModel.findById({_id: req.params.id})
+			.then(async(isExist) => {
+				if(isExist === null) {
+					next({
+						status: 404,
+						message: 'This Id is not exist in Sections Model.',
+					})
+				} else {
+					await SectionModel.findById({ _id: req.params.id }, (err, data) => {
+						if (err) {
+							next({ status: 400, message: err });
+						} else {
+							res.json({ status: 200, data });
+						}
+					})
+				}
+			}).catch(err => next({status: 500, message:err}))
+	} else {
+		next({ status: 400, message: 'Object Id is not valid.' })
+	}
 };
-exports.getSingleSectionByType = async (req, res) => {
+exports.getSingleSectionByType = async (req, res, next) => {
 	const { page, limit } = req.query;
 	const secType = req.params.secType.toLowerCase();
 	const total = await SectionModel.find({ secType }).countDocuments();
 	const pages = limit === undefined ? 1 : Math.ceil(total / limit);
 	await SectionModel.find({ secType }, (err, data) => {
 		if (err) {
-			res.json({ status: 404, message: err });
+			next({ status: 404, message: err });
 		} else {
 			res.json({ total, pages, status: 200, data });
 		}
@@ -63,14 +78,42 @@ exports.getSingleSectionByType = async (req, res) => {
 
 
 
-exports.updateSection = async (req, res) => {
-	await SectionModel.findByIdAndUpdate({ _id: req.params.id }, { $set: req.body })
-		.then((data) => res.json({ message: 'Successfully updated', data }))
-		.catch((err) => res.json({ message: err }));
+exports.updateSection = async (req, res, next) => {
+	if(mongoose.isValidObjectId(req.params.id)) {
+		await SectionModel.findById({_id: req.params.id})
+			.then(async(isExist) => {
+				if(isExist === null) {
+					next({
+						status: 404,
+						message: 'This Id is not exist in Sections Model.',
+					})
+				} else {
+					await SectionModel.findByIdAndUpdate({ _id: req.params.id }, { $set: req.body })
+					.then((data) => res.json({ message: 'Successfully updated', data }))
+					.catch((err) => next({ message: err }));
+				}
+			}).catch(err => next({status: 500, message:err}))
+	} else {
+		next({ status: 400, message: 'Object Id is not valid.' })
+	}
 };
 
-exports.removeSingleSection = async (req, res) => {
-	await SectionModel.findByIdAndDelete({ _id: req.params.id })
-		.then((data) => res.json({ status: 200, data }))
-		.catch((err) => res.json({ status: false, message: err }));
+exports.removeSingleSection = async (req, res, next) => {
+	if(mongoose.isValidObjectId(req.params.id)) {
+		await SectionModel.findById({_id: req.params.id})
+			.then(async(isExist) => {
+				if(isExist === null) {
+					next({
+						status: 404,
+						message: 'This Id is not exist in Sections Model.',
+					})
+				} else {
+					await SectionModel.findByIdAndDelete({ _id: req.params.id })
+					.then((data) => res.json({ status: 200, data }))
+					.catch((err) => next({ status: false, message: err }));
+				}
+			}).catch(err => next({status: 500, message:err}))
+	} else {
+		next({ status: 400, message: 'Object Id is not valid.' })
+	}
 };

@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const SliderSchema = new Schema(
 	{
-		title: { type: String, unique: true },
+		title: { type: String, unique: true, required: [true, `Field 'title' must be filled.`]  },
 		subtitle: { type: String },
 		url: { type: String },
 		buttonText: { type: String },
