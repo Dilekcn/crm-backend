@@ -28,7 +28,7 @@ exports.getWithQuery = async (req, res, next) => {
 			.limit(limit * 1)
 			.skip((page - 1) * limit)
 			.sort({ createdAt: -1 })
-			.populate('parentId')
+			.populate('children','text link')
 		const total = await MenusModel.find(query).countDocuments();
 		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
 		res.json({
@@ -44,7 +44,7 @@ exports.getWithQuery = async (req, res, next) => {
 };
 
 exports.create = async (req, res, next) => {
-	const { parentId, text, link, iconClassName, order, isActive, isDeleted } = req.body;
+	const { parentId, text, link, iconClassName, order, isActive, isDeleted,children } = req.body;
 	const newMenu = await new MenusModel({
 		parentId,
 		text,
@@ -53,6 +53,7 @@ exports.create = async (req, res, next) => {
 		order,
 		isActive,
 		isDeleted,
+		children
 	});
 	newMenu
 		.save()
