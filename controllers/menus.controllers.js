@@ -46,7 +46,7 @@ exports.getWithQuery = async (req, res, next) => {
 exports.create = async (req, res, next) => {
 	const { parentId, text, link, iconClassName, order, isActive, isDeleted,children } = req.body;
 	const newMenu = await new MenusModel({
-		parentId,
+		parentId:req.body.parentId === '' ? null : parentId ,
 		text,
 		link,
 		iconClassName,
