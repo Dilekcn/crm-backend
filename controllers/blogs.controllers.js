@@ -45,9 +45,10 @@ exports.getWithQuery = async (req, res, next) => {
 					populate: {
 						path: 'mediaId',
 						model: 'media',
-						select: 'url',
-					}, 
-				});
+						select: 'url alt',
+					},
+				})
+				.populate('mediaId')
 	
 			const total = await BlogsModel.find().countDocuments();
 			const pages = limit === undefined ? 1 : Math.ceil(total / limit);
@@ -216,9 +217,10 @@ exports.getBlogsByUserId = async (req, res, next) => {
 				populate: {
 					path: 'mediaId',
 					model: 'media',
-					select: 'url',
+					select: 'url alt',
 				},
-			});
+			})
+			.populate('mediaId')
 			}
 		}).catch(err => next({status: 500, message:err}))
 	} else {
