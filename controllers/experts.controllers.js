@@ -49,7 +49,7 @@ exports.getWithQuery = async (req, res, next) => {
 };
 
 exports.createExpert = async (req, res, next) => {
-	if (req.body.socialMediaId) {
+	if (req.body.socialMediaId) { 
 		const newSocialMedia =
 			typeof req.body.socialMediaId === 'string'
 				? await JSON.parse(req.body.socialMediaId).map((sm) => {
