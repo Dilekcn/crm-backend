@@ -81,7 +81,7 @@ exports.getSingleMenu = async (req, res, next) => {
 						if (err) {
 							next({ status: 404, message: err });
 						} else {
-							res.json({ status: 200, message: data });
+							res.json({ status: 200, data });
 						}
 					})
 					.populate('parentId')
