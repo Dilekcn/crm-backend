@@ -175,9 +175,10 @@ exports.getSingleBlog = async (req, res, next) => {
 						populate: {
 							path: 'mediaId',
 							model: 'media',
-							select: 'url',
+							select: 'url alt',
 						},
-					});
+					})
+					.populate('mediaId')
 				}
 			}).catch(err => next({status: 500, message:err}))
 	} else {
