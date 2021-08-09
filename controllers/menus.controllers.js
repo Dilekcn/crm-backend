@@ -5,9 +5,10 @@ exports.getAll = async (req, res, next) => {
 	try {
 		const { page = 1, limit } = req.query;
 		const response = await MenusModel.find()
-			.limit(limit * 1)
+			.limit(limit * 1) 
 			.skip((page - 1) * limit)
-			.sort({ createdAt: -1 });
+			.sort({ createdAt: -1 })
+			.populate('parentId')
 		const total = await MenusModel.find().countDocuments();
 		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
 		res.json({ total: total, pages, status: 200, response });
@@ -20,13 +21,14 @@ exports.getWithQuery = async (req, res, next) => {
 	try {
 		const query =
 			typeof req.body.query === 'string'
-				? JSON.parse(req.body.query)
+				? JSON.parse(req.body.query) 
 				: req.body.query;
 		const { page = 1, limit } = req.query;
 		const response = await MenusModel.find(query)
 			.limit(limit * 1)
 			.skip((page - 1) * limit)
-			.sort({ createdAt: -1 });
+			.sort({ createdAt: -1 })
+			.populate('children','text link')
 		const total = await MenusModel.find(query).countDocuments();
 		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
 		res.json({
@@ -42,15 +44,16 @@ exports.getWithQuery = async (req, res, next) => {
 };
 
 exports.create = async (req, res, next) => {
-	const { parentId, text, link, iconClassName, order, isActive, isDeleted } = req.body;
+	const { parentId, text, link, iconClassName, order, isActive, isDeleted,children } = req.body;
 	const newMenu = await new MenusModel({
-		parentId,
+		parentId:req.body.parentId === '' ? null : parentId ,
 		text,
 		link,
 		iconClassName,
 		order,
 		isActive,
 		isDeleted,
+		children
 	});
 	newMenu
 		.save()
@@ -71,16 +74,17 @@ exports.getSingleMenu = async (req, res, next) => {
 				if(isExist === null) {
 					next({
 						status: 404,
-						message: 'This Id is not exist in Menus Model.',
+						message: 'This Id does not exist in Menus Model.',
 					})
 				} else {
 					await MenusModel.findById({ _id: req.params.id }, (err, data) => {
 						if (err) {
 							next({ status: 404, message: err });
 						} else {
-							res.json({ status: 200, message: data });
+							res.json({ status: 200, data });
 						}
-					});
+					})
+					.populate('parentId')
 				}
 			}).catch(err => next({status: 500, message:err}))
 	} else {
@@ -93,10 +97,11 @@ exports.getMenuByParentId = async (req, res, next) => {
 		await MenusModel.find({ parentId: req.params.parentid }, (err, data) => {
 			if (err) {
 				next({ status: 404, message: err });
-			} else {
-				res.json({ status: 200, data });
+			} else { 
+				res.json({ status: 200, data }); 
 			}
-		});
+		})
+		.populate('parentId')
 	} else {
 		next ({status:400, message: 'Enter parent id.'})
 	}
