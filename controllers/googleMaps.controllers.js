@@ -23,7 +23,7 @@ exports.getSingleGoogleMapById = async (req, res, next) => {
 				if(isExist === null) {
 					next({
 						status: 404,
-						message: 'This Id is not exist in Google Maps Model.',
+						message: 'This Id does not exist in Google Maps Model.',
 					})
 				} else {
 					await GoogleMapsModel.findById({ _id: req.params.id }, (err, data) => {
@@ -62,7 +62,7 @@ exports.updateGoogleMapsById = async (req, res, next) => {
 				if(isExist === null) {
 					next({
 						status: 404,
-						message: 'This Id is not exist in Google Maps Model.',
+						message: 'This Id does not exist in Google Maps Model.',
 					})
 				} else {
 					const id = req.params.id;
@@ -83,7 +83,7 @@ exports.removeGoogleMapsById = async (req, res, next) => {
 				if(isExist === null) {
 					next({
 						status: 404,
-						message: 'This Id is not exist in Google Maps Model.',
+						message: 'This Id does not exist in Google Maps Model.',
 					})
 				} else {
 					const id = req.params.id;
