@@ -1,5 +1,5 @@
 const GoogleMapsModel = require('../model/GoogleMaps.model');
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
 
 exports.getAll = async (req, res, next) => {
 	try {
@@ -17,28 +17,32 @@ exports.getAll = async (req, res, next) => {
 };
 
 exports.getSingleGoogleMapById = async (req, res, next) => {
-	if(mongoose.isValidObjectId(req.params.id)) {
-		await GoogleMapsModel.findById({_id: req.params.id})
-			.then(async(isExist) => {
-				if(isExist === null) {
+	if (mongoose.isValidObjectId(req.params.id)) {
+		await GoogleMapsModel.findById({ _id: req.params.id })
+			.then(async (isExist) => {
+				if (isExist === null) {
 					next({
 						status: 404,
 						message: 'This Id does not exist in Google Maps Model.',
-					})
+					});
 				} else {
-					await GoogleMapsModel.findById({ _id: req.params.id }, (err, data) => {
-						if (err) {
-							next({ status: 404, message: err });
-						} else {
-							res.json({ status: 200, data });
+					await GoogleMapsModel.findById(
+						{ _id: req.params.id },
+						(err, data) => {
+							if (err) {
+								next({ status: 404, message: err });
+							} else {
+								res.json({ status: 200, data });
+							}
 						}
-					})
+					);
 				}
-			}).catch(err => next({status: 500, message:err}))
+			})
+			.catch((err) => next({ status: 500, message: err }));
 	} else {
-		next({ status: 400, message: 'Object Id is not valid.' })
+		next({ status: 400, message: 'Object Id is not valid.' });
 	}
-}
+};
 
 exports.createGoogleMaps = (req, res, next) => {
 	const newGoogleMaps = new GoogleMapsModel({
@@ -47,6 +51,7 @@ exports.createGoogleMaps = (req, res, next) => {
 		lng: req.body.lng,
 		infoText: req.body.infoText,
 		markerName: req.body.markerName,
+		iframesrc: req.body.iframesrc,
 	});
 
 	newGoogleMaps
@@ -56,43 +61,45 @@ exports.createGoogleMaps = (req, res, next) => {
 };
 
 exports.updateGoogleMapsById = async (req, res, next) => {
-	if(mongoose.isValidObjectId(req.params.id)) {
-		await GoogleMapsModel.findById({_id: req.params.id})
-			.then(async(isExist) => {
-				if(isExist === null) {
+	if (mongoose.isValidObjectId(req.params.id)) {
+		await GoogleMapsModel.findById({ _id: req.params.id })
+			.then(async (isExist) => {
+				if (isExist === null) {
 					next({
 						status: 404,
 						message: 'This Id does not exist in Google Maps Model.',
-					})
+					});
 				} else {
 					const id = req.params.id;
-					GoogleMapsModel.findByIdAndUpdate({ _id: id }, {$set: req.body})
+					GoogleMapsModel.findByIdAndUpdate({ _id: id }, { $set: req.body })
 						.then((data) => res.json({ status: 200, data }))
 						.catch((err) => next({ status: 404, message: err }));
 				}
-			}).catch(err => next({status: 500, message:err}))
+			})
+			.catch((err) => next({ status: 500, message: err }));
 	} else {
-		next({ status: 400, message: 'Object Id is not valid.' })
+		next({ status: 400, message: 'Object Id is not valid.' });
 	}
 };
 
 exports.removeGoogleMapsById = async (req, res, next) => {
-	if(mongoose.isValidObjectId(req.params.id)) {
-		await GoogleMapsModel.findById({_id: req.params.id})
-			.then(async(isExist) => {
-				if(isExist === null) {
+	if (mongoose.isValidObjectId(req.params.id)) {
+		await GoogleMapsModel.findById({ _id: req.params.id })
+			.then(async (isExist) => {
+				if (isExist === null) {
 					next({
 						status: 404,
 						message: 'This Id does not exist in Google Maps Model.',
-					})
+					});
 				} else {
 					const id = req.params.id;
 					GoogleMapsModel.findByIdAndDelete({ _id: id })
 						.then((data) => res.json({ status: 200, data }))
 						.catch((err) => next({ status: 404, message: err }));
 				}
-			}).catch(err => next({status: 500, message:err}))
+			})
+			.catch((err) => next({ status: 500, message: err }));
 	} else {
-		next({ status: 400, message: 'Object Id is not valid.' })
+		next({ status: 400, message: 'Object Id is not valid.' });
 	}
 };

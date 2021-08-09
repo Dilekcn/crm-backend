@@ -8,6 +8,7 @@ const GoogleMapsSchema = new Schema(
 		lng: { type: Number, required: [true, `Field 'lng' must be filled.`] },
 		infoText: { type: String },
 		markerName: { type: String },
+		iframesrc: String,
 	},
 	{ timestamps: true }
 );
