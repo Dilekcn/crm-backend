@@ -78,7 +78,7 @@ exports.create = async (req, res, next) => {
 
 				newMedia.save();
 
-				const { name, address, email, copyright, isActive, isDeleted } = req.body;
+				const { name, address, email, copyright, isActive, isDeleted,googlemap_iframe } = req.body;
 
 				const newCompanyProfile = new CompanyProfileModel({
 					name,
@@ -92,6 +92,7 @@ exports.create = async (req, res, next) => {
 					socialMediaId: socialMediaIds,
 					isActive,
 					isDeleted,
+					googlemap_iframe,
 				});
 
 				newCompanyProfile
@@ -107,7 +108,7 @@ exports.create = async (req, res, next) => {
 			};
 			await S3.uploadNewLogo(req, res, data);
 		} else if (req.body.logo) {
-			const { name, address, email, copyright, isActive, isDeleted, logo } =
+			const { name, address, email, copyright, isActive, isDeleted, logo,googlemap_iframe } =
 				req.body;
 
 			const newCompanyProfile = new CompanyProfileModel({
@@ -123,6 +124,7 @@ exports.create = async (req, res, next) => {
 				socialMediaId: socialMediaIds,
 				isActive,
 				isDeleted,
+				googlemap_iframe
 			});
 
 			newCompanyProfile
@@ -146,7 +148,7 @@ exports.create = async (req, res, next) => {
 
 				newMedia.save();
 
-				const { name, address, email, copyright, phone, isActive, isDeleted } =
+				const { name, address, email, copyright, phone, isActive, isDeleted,googlemap_iframe } =
 					req.body;
 
 				const newCompanyProfile = new CompanyProfileModel({
@@ -159,6 +161,7 @@ exports.create = async (req, res, next) => {
 					socialMediaId: socialMediaIds,
 					isActive,
 					isDeleted,
+					googlemap_iframe
 				});
 
 				newCompanyProfile
@@ -186,7 +189,7 @@ exports.create = async (req, res, next) => {
 
 				newMedia.save();
 
-				const { address, email, copyright, phone, name, isActive, isDeleted } =
+				const { address, email, copyright, phone, name, isActive, isDeleted,googlemap_iframe } =
 					req.body;
 
 				const newCompanyProfile = new CompanyProfileModel({
@@ -198,6 +201,7 @@ exports.create = async (req, res, next) => {
 					name,
 					isActive,
 					isDeleted,
+					googlemap_iframe
 				});
 
 				newCompanyProfile
@@ -213,7 +217,7 @@ exports.create = async (req, res, next) => {
 			};
 			await S3.uploadNewLogo(req, res, data);
 		} else if (req.body.logo) {
-			const { address, email, copyright, phone, name, isActive, isDeleted, logo } =
+			const { address, email, copyright, phone, name, isActive, isDeleted, logo,googlemap_iframe } =
 				req.body;
 
 			const newCompanyProfile = new CompanyProfileModel({
@@ -225,6 +229,7 @@ exports.create = async (req, res, next) => {
 				name,
 				isActive,
 				isDeleted,
+				googlemap_iframe
 			});
 			newCompanyProfile
 				.save()
@@ -247,7 +252,7 @@ exports.create = async (req, res, next) => {
 
 				newMedia.save();
 
-				const { address, email, copyright, phone, name, isActive, isDeleted } =
+				const { address, email, copyright, phone, name, isActive, isDeleted,googlemap_iframe } =
 					req.body;
 
 				const newCompanyProfile = new CompanyProfileModel({
@@ -259,6 +264,7 @@ exports.create = async (req, res, next) => {
 					name,
 					isActive,
 					isDeleted,
+					googlemap_iframe
 				});
 
 				newCompanyProfile
@@ -343,7 +349,7 @@ exports.update = async (req, res, next) => {
 
 								const socialMediaIds = newSocialMedia.map((sm) => sm._id);
 
-								const { name, address, email, copyright } = req.body;
+								const { name, address, email, copyright,googlemap_iframe } = req.body;
 
 								await CompanyProfileModel.findByIdAndUpdate(
 									{ _id: req.params.id },
@@ -369,6 +375,7 @@ exports.update = async (req, res, next) => {
 											isDeleted: !req.body.isDeleted
 												? false
 												: req.body.isDeleted,
+											googlemap_iframe
 										},
 									},
 									{ useFindAndModify: false, new: true }
@@ -422,7 +429,7 @@ exports.update = async (req, res, next) => {
 
 								const socialMediaIds = newSocialMedia.map((sm) => sm._id);
 
-								const { name, address, email, copyright, logo } =
+								const { name, address, email, copyright, logo,googlemap_iframe } =
 									req.body;
 
 								await CompanyProfileModel.findByIdAndUpdate(
@@ -446,6 +453,7 @@ exports.update = async (req, res, next) => {
 											isDeleted: !req.body.isDeleted
 												? false
 												: req.body.isDeleted,
+											googlemap_iframe
 										},
 									},
 									{ useFindAndModify: false, new: true }
