@@ -29,7 +29,7 @@ exports.getSingleUserById = async (req, res, next) => {
 				if(isExist === null) {
 					next({
 						status: 404,
-						message: 'This Id is not exist in Users Model.',
+						message: 'This Id does not exist in Users Model.',
 					})
 				} else {
 					await UserModel.findById({ _id: req.params.id }, (err, data) => {
@@ -257,6 +257,8 @@ exports.createUser = async (req, res, next) => {
 exports.login = async (req, res, next) => {
 	const { email, password } = req.body;
 	await UserModel.findOne({ email: email })
+	.populate('roleId', 'name')
+	.populate('mediaId', 'url title alt');
 		.then(async (data) => {
 			if (await bcrypt.compare(password, data.password)) {
 				const token = jwt.sign(
