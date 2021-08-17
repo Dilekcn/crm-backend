@@ -264,7 +264,7 @@ exports.getSingleExpert = async (req, res, next) => {
 				if (isExist === null) {
 					next({
 						status: 404,
-						message: 'This Id is not exist in Experts Model.',
+						message: 'This Id does not exist in Experts Model.',
 					});
 				} else {
 					await ExpertModel.findById(
@@ -351,7 +351,7 @@ exports.updateExpert = async (req, res, next) => {
 				if (isExist === null) {
 					next({
 						status: 404,
-						message: 'This Id is not exist in Experts Model.',
+						message: 'This Id does not exist in Experts Model.',
 					});
 				} else {
 					if (req.files) {
