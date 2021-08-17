@@ -258,7 +258,7 @@ exports.login = async (req, res, next) => {
 	const { email, password } = req.body;
 	await UserModel.findOne({ email: email })
 	.populate('roleId', 'name')
-	.populate('mediaId', 'url title alt');
+	.populate('mediaId', 'url title alt')
 		.then(async (data) => {
 			if (await bcrypt.compare(password, data.password)) {
 				const token = jwt.sign(
