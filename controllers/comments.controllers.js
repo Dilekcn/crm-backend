@@ -172,22 +172,22 @@ exports.updateComment = async (req, res) => {
 	}
 };
 
-// exports.removeSingleComment = async (req, res) => {
-// 	if(mongoose.isValidObjectId(req.params.id)) {
-// 		await CommentsModel.findById({_id: req.params.id})
-// 			.then(async(isExist) => {
-// 				if(isExist === null) {
-// 					next({
-// 						status: 404,
-// 						message: 'This Id does not exist in Comments Model.',
-// 					})
-// 				} else {
-// 					await CommentsModel.findByIdAndDelete({ _id: req.params.id })
-// 					.then((data) => res.json({ status: 200, data }))
-// 					.catch((err) => res.json({ status: 404, message: err }));
-// 				}
-// 			}).catch(err => next({status: 500, message:err}))
-// 	} else {
-// 		next({ status: 400, message: 'Object Id is not valid.' })
-// 	}
-// };
+exports.removeSingleComment = async (req, res) => {
+	if(mongoose.isValidObjectId(req.params.id)) {
+		await CommentsModel.findById({_id: req.params.id})
+			.then(async(isExist) => {
+				if(isExist === null) {
+					next({
+						status: 404,
+						message: 'This Id does not exist in Comments Model.',
+					})
+				} else {
+					await CommentsModel.findByIdAndDelete({ _id: req.params.id })
+					.then((data) => res.json({ status: 200, data }))
+					.catch((err) => res.json({ status: 404, message: err }));
+				}
+			}).catch(err => next({status: 500, message:err}))
+	} else {
+		next({ status: 400, message: 'Object Id is not valid.' })
+	}
+};
