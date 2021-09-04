@@ -82,7 +82,7 @@ exports.create = async (req, res, next) => {
 exports.getSingleComment = async (req, res, next) => {
 	if(mongoose.isValidObjectId(req.params.id)) {
 		await CommentsModel.findById({_id: req.params.id})
-			.then(async(isExist) => {
+			.then(async(isExist) => { 
 				if(isExist === null) {
 					next({
 						status: 404,
