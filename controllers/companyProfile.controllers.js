@@ -22,28 +22,32 @@ exports.getAll = async (req, res, next) => {
 };
 
 exports.getSingle = async (req, res, next) => {
-	if(mongoose.isValidObjectId(req.params.id)) {
-		await CompanyProfileModel.findById({_id: req.params.id})
-			.then(async(isExist) => {
-				if(isExist === null) {
+	if (mongoose.isValidObjectId(req.params.id)) {
+		await CompanyProfileModel.findById({ _id: req.params.id })
+			.then(async (isExist) => {
+				if (isExist === null) {
 					next({
 						status: 404,
 						message: 'This Id does not exist in Blogs Model.',
-					})
+					});
 				} else {
-					await CompanyProfileModel.findById({ _id: req.params.id }, (err, data) => {
-						if (err) {
-							next({ message: err, status: 404 });
-						} else {
-							res.json({ status: 200, data });
+					await CompanyProfileModel.findById(
+						{ _id: req.params.id },
+						(err, data) => {
+							if (err) {
+								next({ message: err, status: 404 });
+							} else {
+								res.json({ status: 200, data });
+							}
 						}
-					})
+					)
 						.populate('socialMediaId', 'title link')
 						.populate('logo', 'url title alt');
 				}
-			}).catch(err => next({status: 500, message:err}))
+			})
+			.catch((err) => next({ status: 500, message: err }));
 	} else {
-		next({ status: 400, message: 'Object Id is not valid.' })
+		next({ status: 400, message: 'Object Id is not valid.' });
 	}
 };
 
@@ -78,7 +82,19 @@ exports.create = async (req, res, next) => {
 
 				newMedia.save();
 
-				const { name, address, email, copyright, isActive, isDeleted,googlemap_iframe } = req.body;
+				const {
+					name,
+					address,
+					email,
+					copyright,
+					basecolor,
+					maincolor,
+					basefontcolor,
+					mainfontcolor,
+					isActive,
+					isDeleted,
+					googlemap_iframe,
+				} = req.body;
 
 				const newCompanyProfile = new CompanyProfileModel({
 					name,
@@ -86,9 +102,15 @@ exports.create = async (req, res, next) => {
 					address,
 					email,
 					copyright,
-					phones: req.body.phones ? typeof req.body.phones === 'string'
-					? JSON.parse(req.body.phones)
-					: req.body.phones : null,
+					basecolor,
+					maincolor,
+					basefontcolor,
+					mainfontcolor,
+					phones: req.body.phones
+						? typeof req.body.phones === 'string'
+							? JSON.parse(req.body.phones)
+							: req.body.phones
+						: null,
 					socialMediaId: socialMediaIds,
 					isActive,
 					isDeleted,
@@ -108,8 +130,20 @@ exports.create = async (req, res, next) => {
 			};
 			await S3.uploadNewLogo(req, res, data);
 		} else if (req.body.logo) {
-			const { name, address, email, copyright, isActive, isDeleted, logo,googlemap_iframe } =
-				req.body;
+			const {
+				name,
+				address,
+				email,
+				copyright,
+				basecolor,
+				maincolor,
+				basefontcolor,
+				mainfontcolor,
+				isActive,
+				isDeleted,
+				logo,
+				googlemap_iframe,
+			} = req.body;
 
 			const newCompanyProfile = new CompanyProfileModel({
 				name,
@@ -117,6 +151,10 @@ exports.create = async (req, res, next) => {
 				address,
 				email,
 				copyright,
+				basecolor,
+				maincolor,
+				basefontcolor,
+				mainfontcolor,
 				phones:
 					typeof req.body.phones === 'string'
 						? JSON.parse(req.body.phones)
@@ -124,7 +162,7 @@ exports.create = async (req, res, next) => {
 				socialMediaId: socialMediaIds,
 				isActive,
 				isDeleted,
-				googlemap_iframe
+				googlemap_iframe,
 			});
 
 			newCompanyProfile
@@ -148,8 +186,20 @@ exports.create = async (req, res, next) => {
 
 				newMedia.save();
 
-				const { name, address, email, copyright, phone, isActive, isDeleted,googlemap_iframe } =
-					req.body;
+				const {
+					name,
+					address,
+					email,
+					copyright,
+					basecolor,
+					maincolor,
+					basefontcolor,
+					mainfontcolor,
+					phone,
+					isActive,
+					isDeleted,
+					googlemap_iframe,
+				} = req.body;
 
 				const newCompanyProfile = new CompanyProfileModel({
 					name,
@@ -157,11 +207,15 @@ exports.create = async (req, res, next) => {
 					address,
 					email,
 					copyright,
+					basecolor,
+					maincolor,
+					basefontcolor,
+					mainfontcolor,
 					phone,
 					socialMediaId: socialMediaIds,
 					isActive,
 					isDeleted,
-					googlemap_iframe
+					googlemap_iframe,
 				});
 
 				newCompanyProfile
@@ -189,8 +243,20 @@ exports.create = async (req, res, next) => {
 
 				newMedia.save();
 
-				const { address, email, copyright, phone, name, isActive, isDeleted,googlemap_iframe } =
-					req.body;
+				const {
+					address,
+					email,
+					copyright,
+					phone,
+					name,
+					basecolor,
+					maincolor,
+					basefontcolor,
+					mainfontcolor,
+					isActive,
+					isDeleted,
+					googlemap_iframe,
+				} = req.body;
 
 				const newCompanyProfile = new CompanyProfileModel({
 					logo: newMedia._id,
@@ -198,10 +264,14 @@ exports.create = async (req, res, next) => {
 					email,
 					copyright,
 					phone,
+					basecolor,
+					maincolor,
+					basefontcolor,
+					mainfontcolor,
 					name,
 					isActive,
 					isDeleted,
-					googlemap_iframe
+					googlemap_iframe,
 				});
 
 				newCompanyProfile
@@ -217,8 +287,21 @@ exports.create = async (req, res, next) => {
 			};
 			await S3.uploadNewLogo(req, res, data);
 		} else if (req.body.logo) {
-			const { address, email, copyright, phone, name, isActive, isDeleted, logo,googlemap_iframe } =
-				req.body;
+			const {
+				address,
+				email,
+				copyright,
+				phone,
+				name,
+				basecolor,
+				maincolor,
+				basefontcolor,
+				mainfontcolor,
+				isActive,
+				isDeleted,
+				logo,
+				googlemap_iframe,
+			} = req.body;
 
 			const newCompanyProfile = new CompanyProfileModel({
 				logo,
@@ -226,10 +309,14 @@ exports.create = async (req, res, next) => {
 				email,
 				copyright,
 				phone,
+				basecolor,
+				maincolor,
+				basefontcolor,
+				mainfontcolor,
 				name,
 				isActive,
 				isDeleted,
-				googlemap_iframe
+				googlemap_iframe,
 			});
 			newCompanyProfile
 				.save()
@@ -252,8 +339,20 @@ exports.create = async (req, res, next) => {
 
 				newMedia.save();
 
-				const { address, email, copyright, phone, name, isActive, isDeleted,googlemap_iframe } =
-					req.body;
+				const {
+					address,
+					email,
+					copyright,
+					phone,
+					name,
+					basecolor,
+					maincolor,
+					basefontcolor,
+					mainfontcolor,
+					isActive,
+					isDeleted,
+					googlemap_iframe,
+				} = req.body;
 
 				const newCompanyProfile = new CompanyProfileModel({
 					logo: newMedia._id,
@@ -262,9 +361,13 @@ exports.create = async (req, res, next) => {
 					copyright,
 					phone,
 					name,
+					basecolor,
+					maincolor,
+					basefontcolor,
+					mainfontcolor,
 					isActive,
 					isDeleted,
-					googlemap_iframe
+					googlemap_iframe,
 				});
 
 				newCompanyProfile
@@ -349,7 +452,17 @@ exports.update = async (req, res, next) => {
 
 								const socialMediaIds = newSocialMedia.map((sm) => sm._id);
 
-								const { name, address, email, copyright,googlemap_iframe } = req.body;
+								const {
+									name,
+									address,
+									email,
+									copyright,
+									basecolor,
+									maincolor,
+									basefontcolor,
+									mainfontcolor,
+									googlemap_iframe,
+								} = req.body;
 
 								await CompanyProfileModel.findByIdAndUpdate(
 									{ _id: req.params.id },
@@ -369,13 +482,17 @@ exports.update = async (req, res, next) => {
 												: socialMediaIds,
 											email,
 											copyright,
+											basecolor,
+											maincolor,
+											basefontcolor,
+											mainfontcolor,
 											isActive: !req.body.isActive
 												? true
 												: req.body.isActive,
 											isDeleted: !req.body.isDeleted
 												? false
 												: req.body.isDeleted,
-											googlemap_iframe
+											googlemap_iframe,
 										},
 									},
 									{ useFindAndModify: false, new: true }
@@ -429,8 +546,18 @@ exports.update = async (req, res, next) => {
 
 								const socialMediaIds = newSocialMedia.map((sm) => sm._id);
 
-								const { name, address, email, copyright, logo,googlemap_iframe } =
-									req.body;
+								const {
+									name,
+									address,
+									email,
+									copyright,
+									logo,
+									basecolor,
+									maincolor,
+									basefontcolor,
+									mainfontcolor,
+									googlemap_iframe,
+								} = req.body;
 
 								await CompanyProfileModel.findByIdAndUpdate(
 									{ _id: req.params.id },
@@ -447,13 +574,17 @@ exports.update = async (req, res, next) => {
 											socialMediaId: socialMediaIds,
 											email,
 											copyright,
+											basecolor,
+											maincolor,
+											basefontcolor,
+											mainfontcolor,
 											isActive: !req.body.isActive
 												? true
 												: req.body.isActive,
 											isDeleted: !req.body.isDeleted
 												? false
 												: req.body.isDeleted,
-											googlemap_iframe
+											googlemap_iframe,
 										},
 									},
 									{ useFindAndModify: false, new: true }
