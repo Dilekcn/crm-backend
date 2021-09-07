@@ -48,7 +48,7 @@ exports.getSingleSocialMediaById = async (req, res, next) => {
 				if(isExist === null) {
 					next({
 						status: 404,
-						message: 'This Id is not exist in Social Medias Model.',
+						message: 'This Id does not exist in Social Medias Model.',
 					})
 				} else {
 					await SocialMediaModel.findById({ _id: req.params.id }, (err, data) => {
@@ -88,7 +88,7 @@ exports.updateSocialMedia = async (req, res, next) => {
 				if(isExist === null) {
 					next({
 						status: 404,
-						message: 'This Id is not exist in Social Medias Model.',
+						message: 'This Id does not exist in Social Medias Model.',
 					})
 				} else {
 					SocialMediaModel.findByIdAndUpdate(req.params.socialmediaid, req.body)
@@ -116,7 +116,7 @@ exports.removeSocialMedia = async (req, res, next) => {
 				if(isExist === null) {
 					next({
 						status: 404,
-						message: 'This Id is not exist in Social Medias Model.',
+						message: 'This Id does not exist in Social Medias Model.',
 					})
 				} else {
 					SocialMediaModel.findByIdAndRemove(req.params.socialmediaid)

@@ -154,7 +154,7 @@ exports.create = async (req, res, next) => {
 				basecolor,
 				maincolor,
 				basefontcolor,
-				mainfontcolor,
+				mainfontcolor, 
 				phones:
 					typeof req.body.phones === 'string'
 						? JSON.parse(req.body.phones)

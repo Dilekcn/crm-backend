@@ -56,12 +56,14 @@ exports.createExpert = async (req, res, next) => {
 						return new SocialMediaModel({
 							title: sm.title || null,
 							link: sm.link || null,
+							iconName: sm.iconName || null,
 						});
 				  })
 				: req.body.socialMediaId.map((sm) => {
 						return new SocialMediaModel({
 							title: sm.title || null,
 							link: sm.link || null,
+							iconName: sm.iconName || null,
 						});
 				  });
 

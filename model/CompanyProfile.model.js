@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
-const CompanyProfileSchema = new Schema(
+const CompanyProfileSchema = new Schema(  
 	{
 		name: { type: String, required: [true, `Field 'name' must be filled.`] },
 		logo: { type: Schema.Types.ObjectId, ref: 'media' },
