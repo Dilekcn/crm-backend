@@ -14,7 +14,7 @@ exports.getAll = async (req, res, next) => {
 				select: 'firstname lastname mediaId',
 				populate: {
 					path: 'mediaId',
-					model: 'media',
+					model: 'media', 
 					select: 'url',
 				},
 			});

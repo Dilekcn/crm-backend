@@ -34,7 +34,7 @@ exports.getWithQuery = async (req, res, next) => {
 			.sort({ createdAt: -1 })
 			.populate('socialMediaId', 'title link description')
 			.populate('mediaId', 'url title alt');
-		const total = await ExpertModel.find(query).countDocuments();
+		const total = await ExpertModel.find(query).countDocuments(); 
 		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
 		res.json({
 			message: 'Filtered expert',
