@@ -6,6 +6,7 @@ const ProductsSchema = new Schema(
 		title: { type: String, required: [true, `Field 'title' must be filled.`] },
 		order: { type: Number },
 		mediaId: { type: Schema.Types.ObjectId, ref: 'media' },
+		videoId: { type: Schema.Types.ObjectId, ref: 'video' },
 		isHomePage: { type: Boolean, default: false },
 		content: { type: String, required: [true, `Field 'content' must be filled.`] },
 		shortDescription: { type: String, required: [true, `Field 'shortDescription' must be filled.`] },

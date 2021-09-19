@@ -11,6 +11,7 @@ exports.getAllProducts = async (req, res, next) => {
 			.skip((page - 1) * limit)
 			.sort({ createdAt: -1 })
 			.populate('mediaId', 'title url alt')
+			.populate('videoId', 'title url alt')
 			.populate('userId', 'firstname lastname email');
 		const total = await ProductModel.find().countDocuments();
 		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
@@ -57,6 +58,7 @@ exports.getSingleProduct = async (req, res, next) => {
 				} else {
 					ProductModel.findById({ _id: req.params.productid })
 					.populate('mediaId', 'title url alt')
+					.populate('videoId', 'title url alt')
 					.populate('userId', 'firstname lastname email')
 					.then((data) => res.json({ status: 200, data }))
 					.catch((err) => next({ status: 404, message: err }));
@@ -92,6 +94,7 @@ exports.getProductsByUserId = async (req, res, next) => {
 					.skip((page - 1) * limit)
 					.sort({ createdAt: -1 })
 					.populate('mediaId', 'title url alt')
+					.populate('videoId', 'title url alt')
 					.populate('userId', 'firstname lastname email');
 			}
 		}).catch(err => next({status: 500, message:err}))
@@ -116,6 +119,7 @@ exports.getProductsByTitle = async (req, res, next) => {
 		.skip((page - 1) * limit)
 		.sort({ createdAt: -1 })
 		.populate('mediaId', 'title url alt')
+		.populate('videoId', 'title url alt')
 		.populate('userId', 'firstname lastname email');
 };
 
