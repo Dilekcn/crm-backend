@@ -125,48 +125,56 @@ exports.getProductsByTitle = async (req, res, next) => {
 };
 
 exports.createProduct = async (req, res, next) => {
-	if (req.files) {
+	const {
+		title,
+		order,
+		isHomePage, 
+		content,
+		shortDescription,
+		buttonText,
+		userId,
+		isActive,
+		isDeleted,
+		isBlog,
+		isAboveFooter,
+		mediaId,
+		videoId
+	} = req.body; 
+
+	if (req.files && req.files.mediaId && req.files.videoId ) { 
 		const data = async (data) => {
 			const newMedia = await new MediaModel({
-				url: data.Location || null,
+				url: data.Location || null, 
 				title: 'product',
-				mediaKey: data.Key,
-				alt: req.body.alt || null,   
+				mediaKey: data.Key, 
+				alt: req.body.alt || null,     
 			});
-
-			newMedia.save();
-
-			const mediaIds = newMedia._id; 
-
-			const {
-				title,
-				order,
-				isHomePage, 
-				content,
-				shortDescription,
-				buttonText,
-				userId,
-				isActive,
-				isDeleted,
-				isBlog,
-				isAboveFooter,
-			} = req.body;
-
-			const newProduct = await new ProductModel({
+			newMedia.save(); 
+			const mediaIds = newMedia._id;  
+		const videoData = async (data) => {
+				const newVideo = await new VideoModel({    
+					url: data.Location || null, 
+					title: 'product',
+					mediaKey: data.Key,
+					alt: req.body.alt || null,       
+				});
+				newVideo.save(); 
+				const videoIds = newVideo._id; 
+			const newProduct = await new ProductModel({ 
 				title,
 				order,
 				mediaId: mediaIds,
+				videoId: videoIds,
 				isHomePage,
 				content,
-				shortDescription,
+				shortDescription, 
 				buttonText,
 				userId,
 				isActive,
 				isDeleted,
 				isBlog,
-				isAboveFooter,
+				isAboveFooter, 
 			});
-
 			newProduct
 				.save()
 				.then((response) =>
@@ -177,28 +185,89 @@ exports.createProduct = async (req, res, next) => {
 					})
 				)
 				.catch((error) => next({ status: 404, message: error }));
-		};
-		await S3.uploadNewMedia(req, res, data);
-	} else if (req.body.mediaId) {
-		const { 
+		}
+		await S3.uploadNewVideo(req, res, videoData)
+	}
+	await S3.uploadNewMedia(req, res, data) 
+    } else if (req.files && req.files.mediaId && !req.files.videoId && !req.body.videoId) { 
+		const data = async (data) => {
+			const newMedia = await new MediaModel({
+				url: data.Location || null, 
+				title: 'product',
+				mediaKey: data.Key, 
+				alt: req.body.alt || null,     
+			});
+			newMedia.save(); 
+			const mediaIds = newMedia._id;  
+			const newProduct = await new ProductModel({   
+				title,
+				order,
+				mediaId:mediaIds,
+				isHomePage,
+				content,
+				shortDescription,  
+				buttonText,
+				userId,
+				isActive,   
+				isDeleted,
+				isBlog,
+				isAboveFooter, 
+			});
+			newProduct
+				.save()
+				.then((response) =>   
+					res.json({
+						status: 200,
+						message: 'New product is created successfully',
+						response,
+					})
+				)
+				.catch((error) => next({ status: 404, message: error }));
+	   }
+	    await S3.uploadNewMedia(req, res, data) 
+	
+	} else if (req.files && req.files.videoId && !req.files.mediaId && !req.body.mediaId) {
+		const videoData = async (data) => {
+			const newVideo = await new VideoModel({
+				url: data.Location || null, 
+				title: 'product',
+				mediaKey: data.Key, 
+				alt: req.body.alt || null,     
+			});
+			newVideo.save(); 
+			const videoIds = newVideo._id;  
+			const newProduct = await new ProductModel({   
+				title,
+				order,
+				videoId:videoIds,
+				isHomePage,
+				content,
+				shortDescription,  
+				buttonText,
+				userId,
+				isActive,    
+				isDeleted,
+				isBlog,
+				isAboveFooter, 
+			});
+			newProduct
+				.save()
+				.then((response) =>   
+					res.json({
+						status: 200,
+						message: 'New product is created successfully',
+						response,
+					})
+				)
+				.catch((error) => next({ status: 404, message: error }));
+	   }
+	    await S3.uploadNewVideo(req, res, videoData) 
+	} else if (req.body.mediaId && req.body.videoId) {
+		const newProduct = await new ProductModel({   
 			title,
 			order,
-			isHomePage,
-			content,
-			shortDescription,
-			buttonText,
-			userId,
-			isActive,
-			isDeleted,
-			isBlog,
-			isAboveFooter,
 			mediaId,
-		} = req.body;
-
-		const newProduct = await new ProductModel({
-			title,
-			order,
-			mediaId,
+			videoId,
 			isHomePage,
 			content,
 			shortDescription,
@@ -209,8 +278,7 @@ exports.createProduct = async (req, res, next) => {
 			isBlog,
 			isAboveFooter,
 		});
-          
-		newProduct
+		newProduct 
 			.save()
 			.then((response) =>
 				res.json({
@@ -220,49 +288,167 @@ exports.createProduct = async (req, res, next) => {
 				})
 			)
 			.catch((error) => next({ status: 404, message: error }));
-	} else {
-		const {
-			title,
-			order,
-			isHomePage,
-			content,
-			shortDescription,
-			buttonText,
-			userId,
-			isActive,
-			isDeleted,
-			isBlog,
-			isAboveFooter,
-			mediaId,
-		} = req.body;
-
+	} else if (req.files && req.files.mediaId && req.body.videoId) { 
+		const data = async (data) => {
+			const newMedia = await new MediaModel({
+				url: data.Location || null, 
+				title: 'product',
+				mediaKey: data.Key, 
+				alt: req.body.alt || null,     
+			});
+			newMedia.save(); 
+			const mediaIds = newMedia._id;  
+			const newProduct = await new ProductModel({   
+				title,
+				order,
+				mediaId:mediaIds,
+				videoId:videoId,
+				isHomePage,
+				content,
+				shortDescription,  
+				buttonText,
+				userId,
+				isActive,   
+				isDeleted,
+				isBlog,
+				isAboveFooter, 
+			});
+			newProduct
+				.save()
+				.then((response) =>   
+					res.json({
+						status: 200,
+						message: 'New product is created successfully',
+						response,
+					})
+				)
+				.catch((error) => next({ status: 404, message: error }));
+	   }
+	    await S3.uploadNewMedia(req, res, data) 
+	
+	} else if (req.files && req.files.videoId && req.body.mediaId) {
+		const videoData = async (data) => {
+			const newVideo = await new VideoModel({
+				url: data.Location || null, 
+				title: 'product',
+				mediaKey: data.Key, 
+				alt: req.body.alt || null,     
+			});
+			newVideo.save(); 
+			const videoIds = newVideo._id;  
+			const newProduct = await new ProductModel({   
+				title,
+				order,
+				videoId:videoIds,
+				mediaId:mediaId,
+				isHomePage,
+				content,
+				shortDescription,  
+				buttonText,
+				userId,
+				isActive,    
+				isDeleted,
+				isBlog,
+				isAboveFooter, 
+			});
+			newProduct
+				.save()
+				.then((response) =>   
+					res.json({
+						status: 200,
+						message: 'New product is created successfully',
+						response,
+					})
+				)
+				.catch((error) => next({ status: 404, message: error }));
+	   }
+	    await S3.uploadNewVideo(req, res, videoData) 
+	}  else if (req.body.mediaId && !req.body.videoId && !req.files){
 		const newProduct = await new ProductModel({
 			title,
 			order,
-			mediaId,
 			isHomePage,
-			content,
+			mediaId:mediaId,
+			content, 
 			shortDescription,
 			buttonText,
 			userId,
 			isActive,
 			isDeleted,
 			isBlog,
-			isAboveFooter,
+			isAboveFooter,    
 		});
-
+            
 		newProduct
 			.save()
 			.then((response) =>
 				res.json({
 					status: 200,
-					message: 'New product is created successfully',
+					message: 'New product is created successfully', 
+					response,
+				})
+			)
+			.catch((error) => next({ status: 404, message: error }));
+	}  else if (req.body.videoId && !req.body.mediaId && !req.files){
+		const newProduct = await new ProductModel({
+			title,
+			order,
+			isHomePage,
+			videoId:videoId,
+			content, 
+			shortDescription,
+			buttonText,
+			userId,
+			isActive,
+			isDeleted,
+			isBlog,
+			isAboveFooter,    
+		});
+            
+		newProduct
+			.save()
+			.then((response) =>
+				res.json({
+					status: 200,
+					message: 'New product is created successfully', 
+					response,
+				})
+			)
+			.catch((error) => next({ status: 404, message: error }));
+	} else {
+		const newProduct = await new ProductModel({
+			title,
+			order,
+			isHomePage,
+			content, 
+			shortDescription,
+			buttonText,
+			userId,
+			isActive,
+			isDeleted,
+			isBlog,
+			isAboveFooter,    
+		});
+            
+		newProduct
+			.save()
+			.then((response) =>
+				res.json({
+					status: 200,
+					message: 'New product is created successfully', 
 					response,
 				})
 			)
 			.catch((error) => next({ status: 404, message: error }));
 	}
 };
+
+
+
+
+
+
+
 
 exports.updateSingleProduct = async (req, res, next) => {
 	if(mongoose.isValidObjectId(req.params.productid)) {
