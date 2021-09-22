@@ -18,6 +18,7 @@ const CompanyProfileSchema = new Schema(
 		mainFontColor: String,
 		secondaryColor:String,
 		secondaryFontColor:String,
+		slogan:String,
 		isActive: { type: Boolean, default: true },
 		isDeleted: { type: Boolean, default: false },
 	},

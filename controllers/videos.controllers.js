@@ -141,7 +141,7 @@ exports.updateSingleVideo = async (req, res, next) => {
 						};
 						await S3.updateVideo(req, res, response.mediaKey, data);
 					})
-					.catch((err) => next({ status: 404, message: err }));
+					.catch((err) => next({ status: 404, message: err })); 
 				}
 			}).catch(err => next({status: 500, message:err}))
 	} else {

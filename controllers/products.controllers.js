@@ -1,5 +1,6 @@
 const ProductModel = require('../model/Products.model');
 const MediaModel = require('../model/Media.model');
+const VideoModel = require('../model/Video.model');
 const S3 = require('../config/aws.s3.config');
 const mongoose = require('mongoose')
 
@@ -130,17 +131,17 @@ exports.createProduct = async (req, res, next) => {
 				url: data.Location || null,
 				title: 'product',
 				mediaKey: data.Key,
-				alt: req.body.alt || null,
+				alt: req.body.alt || null,   
 			});
 
 			newMedia.save();
 
-			const mediaIds = newMedia._id;
+			const mediaIds = newMedia._id; 
 
 			const {
 				title,
 				order,
-				isHomePage,
+				isHomePage, 
 				content,
 				shortDescription,
 				buttonText,
@@ -179,7 +180,7 @@ exports.createProduct = async (req, res, next) => {
 		};
 		await S3.uploadNewMedia(req, res, data);
 	} else if (req.body.mediaId) {
-		const {
+		const { 
 			title,
 			order,
 			isHomePage,
@@ -208,7 +209,7 @@ exports.createProduct = async (req, res, next) => {
 			isBlog,
 			isAboveFooter,
 		});
-
+          
 		newProduct
 			.save()
 			.then((response) =>

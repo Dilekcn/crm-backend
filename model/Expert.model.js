@@ -9,7 +9,8 @@ const ExpertSchema = new Schema(
 		mediaId: { type: Schema.Types.ObjectId, ref: 'media' },
 		socialMediaId: [{ type: Schema.Types.ObjectId, ref: 'social', default: [] }],
 		isActive: { type: Boolean, default: true },
-		isDeleted: { type: Boolean, default: false },
+		isDeleted: { type: Boolean, default: false }, 
+		content: { type: String },
 		alt: { type: String },
 	},
 	{ timestamps: true }

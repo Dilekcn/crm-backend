@@ -21,9 +21,59 @@ exports.getAllExperts = async (req, res, next) => {
 	}
 };
 
+ 
+// exports.searchExperts = async (req, res, next) => {  
+// 	const total = await ExpertModel.find({
+// 		"$or":[
+// 			{"firstname": { "$regex": req.body.query, "$options": "i" }},
+// 			{"lastname": { "$regex": req.body.query, "$options": "i" }},
+// 			{"expertise": { "$regex": req.body.query, "$options": "i" }}    
+// 		] 
+// 	}).countDocuments(); 
+// 	try {
+// 		const response = await ExpertModel.find({  
+// 			"$or":[
+// 				{"firstname": { "$regex": req.body.query, "$options": "i" }} ,
+// 				{"lastname": { "$regex": req.body.query, "$options": "i" }},
+// 				{"expertise": { "$regex": req.body.query, "$options": "i" }}  
+// 			],
+// 			// "isActive":req.body.isActive ? req.body.isActive : "true"
+// 		})
+// 		res.json({status:200,total,message: 'Search results', response });  
+// 	} catch (error) {
+// 		next({ status: 404, message: error });  
+// 	}
+// }; 
+
+
+exports.searchExperts = async (req, res, next) => { 
+
+	const total = await ExpertModel.find({ 
+		"$or":[
+			{"firstname": req.body.firstname ? { "$regex": req.body.firstname, "$options": "i" }:null} ,
+			{"lastname": req.body.lastname ? { "$regex": req.body.lastname, "$options": "i" }:null},
+			{"expertise": req.body.expertise ? { "$regex": req.body.expertise, "$options": "i" } : null}    
+		] 
+	}).countDocuments(); 
+	try {
+		const response = await ExpertModel.find({   
+			"$or":[
+				{"firstname": req.body.firstname ? { "$regex": req.body.firstname, "$options": "i" }:null} ,
+				{"lastname": req.body.lastname ? { "$regex": req.body.lastname, "$options": "i" }:null},
+				{"expertise": req.body.expertise ? { "$regex": req.body.expertise, "$options": "i" } : null} 
+			],
+			// "isActive":req.body.isActive ? req.body.isActive : "true"
+		})
+		res.json({status:200,total,message: 'Search results', response });  
+	} catch (error) {
+		next({ status: 404, message: error });  
+	}
+};
+
+ 
 exports.getWithQuery = async (req, res, next) => {
 	try {
-		const query =
+		const query = 
 			typeof req.body.query === 'string'
 				? JSON.parse(req.body.query)
 				: req.body.query;
@@ -88,6 +138,7 @@ exports.createExpert = async (req, res, next) => {
 					firstname,
 					lastname,
 					expertise,
+					content,
 					mediaId: newMedia._id,
 					socialMediaId: socialMediaIds,
 					isActive,
@@ -98,7 +149,7 @@ exports.createExpert = async (req, res, next) => {
 					.then((response) =>
 						res.json({
 							status: 200,
-							message: 'Added new expert successfully.',
+							message: 'Added new expert successfully.', 
 							response,
 						})
 					)
@@ -114,6 +165,7 @@ exports.createExpert = async (req, res, next) => {
 				lastname,
 				expertise,
 				mediaId,
+				content,
 				socialMediaId: socialMediaIds,
 				isActive,
 				isDeleted,
@@ -145,6 +197,7 @@ exports.createExpert = async (req, res, next) => {
 					firstname,
 					lastname,
 					expertise,
+					content,
 					mediaId: newMedia._id,
 					socialMediaId: socialMediaIds,
 					isActive,
@@ -182,6 +235,7 @@ exports.createExpert = async (req, res, next) => {
 					firstname,
 					lastname,
 					expertise,
+					content,
 					mediaId: newMedia._id,
 					isActive,
 					isDeleted,
@@ -207,6 +261,7 @@ exports.createExpert = async (req, res, next) => {
 				firstname,
 				lastname,
 				expertise,
+				content,
 				mediaId,
 				isActive,
 				isDeleted,
@@ -238,6 +293,7 @@ exports.createExpert = async (req, res, next) => {
 					firstname,
 					lastname,
 					expertise,
+					content,
 					mediaId: newMedia._id,
 					isActive,
 					isDeleted,
@@ -425,6 +481,7 @@ exports.updateExpert = async (req, res, next) => {
 											firstname,
 											lastname,
 											expertise,
+											content,
 											mediaId: req.files
 												? expert.mediaId
 												: req.body.mediaId,
@@ -437,7 +494,7 @@ exports.updateExpert = async (req, res, next) => {
 												: req.body.isDeleted,
 										},
 									},
-									{ useFindAndModify: false, new: true }
+									{ useFindAndModify: false, new: true } 
 								)
 
 									.then((data) =>
@@ -493,6 +550,7 @@ exports.updateExpert = async (req, res, next) => {
 											firstname,
 											lastname,
 											expertise,
+											content,
 											mediaId: !mediaId ? expert.mediaId : mediaId,
 											socialMediaId: socialMediaIds,
 											isActive: !req.body.isActive

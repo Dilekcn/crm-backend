@@ -93,6 +93,7 @@ exports.create = async (req, res, next) => {
 					mainFontColor,
 					secondaryColor,
 					secondaryFontColor,
+					slogan,
 					isActive,
 					isDeleted,
 					googlemap_iframe,
@@ -110,6 +111,7 @@ exports.create = async (req, res, next) => {
 					mainFontColor,
 					secondaryColor,
 					secondaryFontColor,
+					slogan,
 					phones: req.body.phones
 						? typeof req.body.phones === 'string'
 							? JSON.parse(req.body.phones)
@@ -148,6 +150,7 @@ exports.create = async (req, res, next) => {
 				isActive,
 				isDeleted,
 				logo,
+				slogan,
 				googlemap_iframe,
 			} = req.body;
 
@@ -163,6 +166,7 @@ exports.create = async (req, res, next) => {
 				mainFontColor,
 				secondaryColor,
 				secondaryFontColor, 
+				slogan,
 				phones:
 					typeof req.body.phones === 'string'
 						? JSON.parse(req.body.phones)
@@ -206,6 +210,7 @@ exports.create = async (req, res, next) => {
 					secondaryColor,
 					secondaryFontColor,
 					phone,
+					slogan,
 					isActive,
 					isDeleted,
 					googlemap_iframe,
@@ -224,6 +229,7 @@ exports.create = async (req, res, next) => {
 					secondaryColor,
 					secondaryFontColor,
 					phone,
+					slogan,
 					socialMediaId: socialMediaIds,
 					isActive,
 					isDeleted,
@@ -267,6 +273,7 @@ exports.create = async (req, res, next) => {
 					mainFontColor,
 					secondaryColor,
 					secondaryFontColor,
+					slogan,
 					isActive,
 					isDeleted,
 					googlemap_iframe,
@@ -284,6 +291,7 @@ exports.create = async (req, res, next) => {
 					mainFontColor,
 					secondaryColor,
 					secondaryFontColor,
+					slogan,
 					name,
 					isActive,
 					isDeleted,
@@ -315,6 +323,7 @@ exports.create = async (req, res, next) => {
 				mainFontColor,
 				secondaryColor,
 				secondaryFontColor,
+				slogan,
 				isActive,
 				isDeleted,
 				logo,
@@ -333,6 +342,7 @@ exports.create = async (req, res, next) => {
 				mainFontColor,
 				secondaryColor,
 				secondaryFontColor,
+				slogan,
 				name,
 				isActive,
 				isDeleted,
@@ -371,6 +381,7 @@ exports.create = async (req, res, next) => {
 					mainFontColor,
 					secondaryColor,
 					secondaryFontColor,
+					slogan,
 					isActive,
 					isDeleted,
 					googlemap_iframe,
@@ -389,6 +400,7 @@ exports.create = async (req, res, next) => {
 					mainFontColor,
 					secondaryColor,
 					secondaryFontColor,
+					slogan,
 					isActive,
 					isDeleted,
 					googlemap_iframe,
@@ -488,6 +500,7 @@ exports.update = async (req, res, next) => {
 									secondaryColor,
 									secondaryFontColor,
 									googlemap_iframe,
+									slogan,
 								} = req.body;
 
 								await CompanyProfileModel.findByIdAndUpdate(
@@ -514,6 +527,7 @@ exports.update = async (req, res, next) => {
 											mainFontColor,
 											secondaryColor,
 											secondaryFontColor,
+											slogan,
 											isActive: !req.body.isActive
 												? true
 												: req.body.isActive,
@@ -587,6 +601,7 @@ exports.update = async (req, res, next) => {
 									secondaryColor,
 									secondaryFontColor,
 									googlemap_iframe,
+									slogan,
 								} = req.body;
 
 								await CompanyProfileModel.findByIdAndUpdate(
@@ -610,6 +625,7 @@ exports.update = async (req, res, next) => {
 											mainFontColor,
 											secondaryColor,
 											secondaryFontColor,
+											slogan,
 											isActive: !req.body.isActive
 												? true
 												: req.body.isActive,
@@ -656,7 +672,7 @@ exports.delete = async (req, res, next) => {
 					.then((data) =>
 						res.json({
 							status: 200,
-							message: 'Company profile is deleted successfully',
+							message: 'Company profile is deleted successfully', 
 							data,
 						})
 					)

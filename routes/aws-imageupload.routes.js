@@ -10,7 +10,7 @@ const BUCKET_NAME = process.env.BUCKET_NAME;
 router.post('/aws', (req, res) => {
 	const s3 = new AWS.S3({
 		accessKeyId: ACCESS_KEY,
-		secretAccessKey: SECRET_KEY,
+		secretAccessKey: SECRET_KEY, 
 	});
 
 	const params = {
@@ -24,7 +24,7 @@ router.post('/aws', (req, res) => {
 		if (err) {
 			console.log(err);
 		} else {
-			console.log('File uploaded successfully ', data.Location);
+			console.log('File uploaded successfully ', data.Location); 
 			res.json(data);
 		}
 	});
