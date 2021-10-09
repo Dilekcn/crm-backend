@@ -507,7 +507,7 @@ exports.update = async (req, res, next) => {
 									{ _id: req.params.id },
 									{
 										$set: {
-											name,
+											name:req.body.name ? name : companyprofile.name,
 											logo: req.files
 												? companyprofile.logo
 												: req.body.logo,
@@ -519,22 +519,18 @@ exports.update = async (req, res, next) => {
 											socialMediaId: !socialMediaIds
 												? []
 												: socialMediaIds,
-											email,
-											copyright,
-											baseColor,
-											mainColor,
-											baseFontColor,
-											mainFontColor,
-											secondaryColor,
-											secondaryFontColor,
-											slogan,
-											isActive: !req.body.isActive
-												? true
-												: req.body.isActive,
-											isDeleted: !req.body.isDeleted
-												? false
-												: req.body.isDeleted,
-											googlemap_iframe,
+											email:req.body.email ? email : companyprofile.email,
+											copyright:req.body.copyright ? copyright : companyprofile.copyright,
+											baseColor:req.body.baseColor ? baseColor : companyprofile.baseColor,
+											mainColor:req.body.mainColor ? mainColor : companyprofile.mainColor,
+											baseFontColor:req.body.baseFontColor ? baseFontColor : companyprofile.baseFontColor,
+											mainFontColor:req.body.mainFontColor ? mainFontColor : companyprofile.mainFontColor,
+											secondaryColor:req.body.secondaryColor ? secondaryColor : companyprofile.secondaryColor,
+											secondaryFontColor:req.body.secondaryFontColor ? secondaryFontColor : companyprofile.secondaryFontColor,
+											slogan:req.body.slogan ? slogan : companyprofile.slogan,
+											isActive: req.body.isActive ? isActive : companyprofile.isActive,
+											isDeleted: req.body.isDeleted ? isDeleted : companyprofile.isDeleted,
+											googlemap_iframe:req.body.googlemap_iframe ? googlemap_iframe : companyprofile.googlemap_iframe,
 										},
 									},
 									{ useFindAndModify: false, new: true }
@@ -608,31 +604,26 @@ exports.update = async (req, res, next) => {
 									{ _id: req.params.id },
 									{
 										$set: {
-											name,
+											name:req.body.name ? name : companyprofile.name,
 											logo: !logo ? companyprofile.logo : logo,
-											phones: req.body.phones
-												? typeof req.body.phones === 'string'
+											phones:
+												typeof req.body.phones === 'string'
 													? JSON.parse(req.body.phones)
-													: req.body.phones
-												: companyprofile.phones,
+													: req.body.phones,
 											address,
 											socialMediaId: socialMediaIds,
-											email,
-											copyright,
-											baseColor,
-											mainColor,
-											baseFontColor,
-											mainFontColor,
-											secondaryColor,
-											secondaryFontColor,
-											slogan,
-											isActive: !req.body.isActive
-												? true
-												: req.body.isActive,
-											isDeleted: !req.body.isDeleted
-												? false
-												: req.body.isDeleted,
-											googlemap_iframe,
+											email:req.body.email ? email : companyprofile.email,
+											copyright:req.body.copyright ? copyright : companyprofile.copyright,
+											baseColor:req.body.baseColor ? baseColor : companyprofile.baseColor,
+											mainColor:req.body.mainColor ? mainColor : companyprofile.mainColor,
+											baseFontColor:req.body.baseFontColor ? baseFontColor : companyprofile.baseFontColor,
+											mainFontColor:req.body.mainFontColor ? mainFontColor : companyprofile.mainFontColor,
+											secondaryColor:req.body.secondaryColor ? secondaryColor : companyprofile.secondaryColor,
+											secondaryFontColor:req.body.secondaryFontColor ? secondaryFontColor : companyprofile.secondaryFontColor,
+											slogan:req.body.slogan ? slogan : companyprofile.slogan,
+											isActive: req.body.isActive ? isActive : companyprofile.isActive,
+											isDeleted: req.body.isDeleted ? isDeleted : companyprofile.isDeleted,
+											googlemap_iframe:req.body.googlemap_iframe ? googlemap_iframe : companyprofile.googlemap_iframe,
 										},
 									},
 									{ useFindAndModify: false, new: true }
