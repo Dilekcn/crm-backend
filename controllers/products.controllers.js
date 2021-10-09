@@ -54,7 +54,7 @@ exports.getSingleProduct = async (req, res, next) => {
 				if(isExist === null) {
 					next({
 						status: 404,
-						message: 'This Id is not exist in Products Model.',
+						message: 'This Id does not exist in Products Model.',
 					})
 				} else {
 					ProductModel.findById({ _id: req.params.productid })
@@ -135,13 +135,13 @@ exports.createProduct = async (req, res, next) => {
 		userId,
 		isActive,
 		isDeleted,
-		isBlog,
+		isBlog, 
 		isAboveFooter,
 		mediaId,
 		videoId
 	} = req.body; 
 
-	if (req.files && req.files.mediaId && req.files.videoId ) { 
+	if (req.files && req.files.mediaId && req.files.videoId ) {   
 		const data = async (data) => {
 			const newMedia = await new MediaModel({
 				url: data.Location || null, 
@@ -349,7 +349,7 @@ exports.createProduct = async (req, res, next) => {
 				isActive,    
 				isDeleted,
 				isBlog,
-				isAboveFooter, 
+				isAboveFooter,  
 			});
 			newProduct
 				.save()
@@ -426,11 +426,10 @@ exports.createProduct = async (req, res, next) => {
 			userId,
 			isActive,
 			isDeleted,
-			isBlog,
+			isBlog, 
 			isAboveFooter,    
-		});
-            
-		newProduct
+		});    
+		newProduct 
 			.save()
 			.then((response) =>
 				res.json({
@@ -441,7 +440,7 @@ exports.createProduct = async (req, res, next) => {
 			)
 			.catch((error) => next({ status: 404, message: error }));
 	}
-};
+}; 
 
 
 
@@ -453,14 +452,14 @@ exports.createProduct = async (req, res, next) => {
 exports.updateSingleProduct = async (req, res, next) => {
 	if(mongoose.isValidObjectId(req.params.productid)) {
 		await ProductModel.findById({_id: req.params.productid})
-			.then(async(isExist) => {
-				if(isExist === null) {
+			.then(async(doesExist) => {
+				if(doesExist === null) {
 					next({
 						status: 404,
-						message: 'This Id is not exist in Products Model.',
+						message: 'This Id does not exist in Products Model.',
 					})
 				} else {
-					if (req.files) {
+					if (req.files && req.files.mediaId && req.files.videoId ) {
 						await ProductModel.findById({ _id: req.params.productid })
 							.then(async (product) => {
 								await MediaModel.findById({ _id: product.mediaId }).then(
@@ -477,9 +476,26 @@ exports.updateSingleProduct = async (req, res, next) => {
 													},
 												},
 												{ useFindAndModify: false, new: true }
-											).catch((err) => next({ status: 404, message: err }));
+											).catch((err) => next({ status: 404, message: err }))
+											
 										};
 										await S3.updateMedia(req, res, media.mediaKey, data);
+										const videoData = async (data) => {
+											await VideoModel.findByIdAndUpdate(
+												{ _id: product.mediaId },
+												{
+													$set: {
+														url: data.Location || null,
+														title: 'product',
+														mediaKey: data.Key,
+														alt: req.body.alt,
+													},
+												},
+												{ useFindAndModify: false, new: true }
+											).catch((err) => next({ status: 404, message: err }))
+											
+										}
+										await S3.updateVideo(req, res, media.mediaKey, videoData);
 									}
 								);
 				
@@ -490,15 +506,16 @@ exports.updateSingleProduct = async (req, res, next) => {
 									{ _id: req.params.productid },
 									{
 										$set: {
-											title,
-											order,
+											title:!req.body.title ? product.title : req.body.title,
+											order:!req.body.order ? product.order : req.body.order,
 											mediaId: product.mediaId,
+											videoId: product.videoId,
 											isHomePage: !req.body.isHomePage
 												? false
 												: req.body.isHomePage,
-											content,
-											shortDescription,
-											buttonText,
+											content:!req.body.content ? product.content : req.body.content,
+											shortDescription:!req.body.shortDescription ? product.shortDescription : req.body.shortDescription,
+											buttonText:!req.body.buttonText ? product.buttonText : req.body.buttonText,
 											userId: !req.body.userId ? product.userId : req.body.userId,
 											isActive: !req.body.isActive ? true : req.body.isActive,
 											isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
@@ -577,7 +594,7 @@ exports.updateSingleProduct = async (req, res, next) => {
 
 exports.deleteProduct = async (req, res, next) => {
 	if(mongoose.isValidObjectId(req.params.productid)) {
-		await ProductModel.findById({_id: req.params.productid})
+		await ProductModel.findById({_id: req.params.productid}) 
 			.then(async(isExist) => {
 				if(isExist === null) {
 					next({

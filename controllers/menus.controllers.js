@@ -14,7 +14,7 @@ exports.getAll = async (req, res, next) => {
 		res.json({ total: total, pages, status: 200, response });
 	} catch (error) {
 		next({ status: 404, message: error });
-	}
+	} 
 };
 
 exports.getWithQuery = async (req, res, next) => {
