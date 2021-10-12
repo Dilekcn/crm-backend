@@ -13,10 +13,11 @@ router.get(
 	companyIntroductionControllers.getSingleIntroductionByTitle
 );
 router.post('/companyintroduction/filter', companyIntroductionControllers.getWithQuery);
+router.post('/companyintroduction/search', companyIntroductionControllers.searchCompanyIntroductions);
 
 router.post('/companyintroduction', companyIntroductionControllers.createIntroduction);
 router.put(
-	'/companyintroduction/:id',
+	'/companyintroduction/:id', 
 	companyIntroductionControllers.updateIntroductions
 );
 router.delete(

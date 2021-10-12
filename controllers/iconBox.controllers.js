@@ -40,6 +40,34 @@ exports.getWithQuery = async (req, res, next) => {
 		next({ status: 404, message: error });
 	}
 };
+exports.searchIconBox = async (req, res, next) => {  
+	const total = await IconBoxModel.find({
+		"$or":[
+			{"title": { "$regex": req.body.query, "$options": "i" }},
+			{"content": { "$regex": req.body.query, "$options": "i" }},  
+			{"author": { "$regex": req.body.query, "$options": "i" }}, 
+			{"contentName": { "$regex": req.body.query, "$options": "i" }}, 
+			{"routeName": { "$regex": req.body.query, "$options": "i" }}, 
+			{"iconName": { "$regex": req.body.query, "$options": "i" }}, 
+		] 
+	}).countDocuments(); 
+	try {
+		const response = await IconBoxModel.find({  
+			"$or":[
+				{"title": { "$regex": req.body.query, "$options": "i" }} ,
+				{"content": { "$regex": req.body.query, "$options": "i" }}, 
+				{"author": { "$regex": req.body.query, "$options": "i" }}, 
+				{"contentName": { "$regex": req.body.query, "$options": "i" }}, 
+			    {"routeName": { "$regex": req.body.query, "$options": "i" }}, 
+			    {"iconName": { "$regex": req.body.query, "$options": "i" }}, 
+			],
+			// "isActive":req.body.isActive ? req.body.isActive : "true"
+		})
+		res.json({status:200,total,message: 'Search results', response });  
+	} catch (error) {
+		next({ status: 404, message: error });  
+	}
+};
 
 exports.create = async (req, res, next) => {
 	const newIconBox = await new IconBoxModel({

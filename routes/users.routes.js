@@ -12,6 +12,7 @@ router.get('/users/role/:roleid', userControllers.getSingleUserByRoleId);
 router.post('/users', userControllers.createUser);
 router.post('/users/login', userControllers.login);
 router.post('/users/filter', userControllers.getWithQuery);
+router.post('/users/search', userControllers.searchUsers);
 router.put('/users/:id', userControllers.updateUser);
 router.delete('/users/:id', userControllers.deleteUser);
 router.put('/users/changepassword/:id', userControllers.changePassword); 

@@ -20,47 +20,22 @@ exports.getAllExperts = async (req, res, next) => {
 		next({ status: 404, message: error });
 	}
 };
-
  
-// exports.searchExperts = async (req, res, next) => {  
-// 	const total = await ExpertModel.find({
-// 		"$or":[
-// 			{"firstname": { "$regex": req.body.query, "$options": "i" }},
-// 			{"lastname": { "$regex": req.body.query, "$options": "i" }},
-// 			{"expertise": { "$regex": req.body.query, "$options": "i" }}    
-// 		] 
-// 	}).countDocuments(); 
-// 	try {
-// 		const response = await ExpertModel.find({  
-// 			"$or":[
-// 				{"firstname": { "$regex": req.body.query, "$options": "i" }} ,
-// 				{"lastname": { "$regex": req.body.query, "$options": "i" }},
-// 				{"expertise": { "$regex": req.body.query, "$options": "i" }}  
-// 			],
-// 			// "isActive":req.body.isActive ? req.body.isActive : "true"
-// 		})
-// 		res.json({status:200,total,message: 'Search results', response });  
-// 	} catch (error) {
-// 		next({ status: 404, message: error });  
-// 	}
-// }; 
-
-
-exports.searchExperts = async (req, res, next) => { 
-
-	const total = await ExpertModel.find({ 
+ 
+exports.searchExperts = async (req, res, next) => {  
+	const total = await ExpertModel.find({
 		"$or":[
-			{"firstname": req.body.firstname ? { "$regex": req.body.firstname, "$options": "i" }:null} ,
-			{"lastname": req.body.lastname ? { "$regex": req.body.lastname, "$options": "i" }:null},
-			{"expertise": req.body.expertise ? { "$regex": req.body.expertise, "$options": "i" } : null}    
+			{"firstname": { "$regex": req.body.query, "$options": "i" }},
+			{"lastname": { "$regex": req.body.query, "$options": "i" }},
+			{"expertise": { "$regex": req.body.query, "$options": "i" }}    
 		] 
 	}).countDocuments(); 
 	try {
-		const response = await ExpertModel.find({   
+		const response = await ExpertModel.find({  
 			"$or":[
-				{"firstname": req.body.firstname ? { "$regex": req.body.firstname, "$options": "i" }:null} ,
-				{"lastname": req.body.lastname ? { "$regex": req.body.lastname, "$options": "i" }:null},
-				{"expertise": req.body.expertise ? { "$regex": req.body.expertise, "$options": "i" } : null} 
+				{"firstname": { "$regex": req.body.query, "$options": "i" }} ,
+				{"lastname": { "$regex": req.body.query, "$options": "i" }},
+				{"expertise": { "$regex": req.body.query, "$options": "i" }}    
 			],
 			// "isActive":req.body.isActive ? req.body.isActive : "true"
 		})
@@ -68,7 +43,32 @@ exports.searchExperts = async (req, res, next) => {
 	} catch (error) {
 		next({ status: 404, message: error });  
 	}
-};
+}; 
+
+
+// exports.searchExperts = async (req, res, next) => { 
+
+// 	const total = await ExpertModel.find({ 
+// 		"$or":[
+// 			{"firstname": req.body.firstname ? { "$regex": req.body.firstname, "$options": "i" }:null} ,
+// 			{"lastname": req.body.lastname ? { "$regex": req.body.lastname, "$options": "i" }:null},
+// 			{"expertise": req.body.expertise ? { "$regex": req.body.expertise, "$options": "i" } : null}    
+// 		] 
+// 	}).countDocuments(); 
+// 	try {
+// 		const response = await ExpertModel.find({   
+// 			"$or":[
+// 				{"firstname": req.body.firstname ? { "$regex": req.body.firstname, "$options": "i" }:null} ,
+// 				{"lastname": req.body.lastname ? { "$regex": req.body.lastname, "$options": "i" }:null},
+// 				{"expertise": req.body.expertise ? { "$regex": req.body.expertise, "$options": "i" } : null} 
+// 			],
+// 			// "isActive":req.body.isActive ? req.body.isActive : "true"
+// 		})
+// 		res.json({status:200,total,message: 'Search results', response });  
+// 	} catch (error) {
+// 		next({ status: 404, message: error });  
+// 	}
+// };
 
  
 exports.getWithQuery = async (req, res, next) => {

@@ -149,6 +149,27 @@ exports.getWithQuery = async (req, res, next) => {
 		next({ status: 404, message: error });
 	}
 };
+exports.searchUsers = async (req, res, next) => {  
+	const total = await UserModel.find({
+		"$or":[
+			{"email": { "$regex": req.body.query, "$options": "i" }},
+			{"firstname": { "$regex": req.body.query, "$options": "i" }},
+			{"lastname": { "$regex": req.body.query, "$options": "i" }},  
+		] 
+	}).countDocuments(); 
+	try {
+		const response = await UserModel.find({  
+			"$or":[
+			{"email": { "$regex": req.body.query, "$options": "i" }},
+			{"firstname": { "$regex": req.body.query, "$options": "i" }},
+			{"lastname": { "$regex": req.body.query, "$options": "i" }},  
+			],
+		})
+		res.json({status:200,total,message: 'Search results', response });  
+	} catch (error) {
+		next({ status: 404, message: error });  
+	}
+};
 
 exports.createUser = async (req, res, next) => {
 	if (req.files) {

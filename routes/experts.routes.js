@@ -12,7 +12,7 @@ router.post('/experts/filter', ExpertsController.getWithQuery);
 router.post('/experts/search', ExpertsController.searchExperts);
 router.post('/experts', ExpertsController.createExpert);
 router.put('/experts/:expertid', ExpertsController.updateExpert);
-router.delete('/experts/:expertid', ExpertsController.removeExpert);
+router.delete('/experts/:expertid', ExpertsController.removeExpert); 
 
 module.exports = router;
  

@@ -46,6 +46,28 @@ exports.getWithQuery = async (req, res, next) => {
 		next({ status: 404, message: error });
 	}
 };
+exports.searchProducts = async (req, res, next) => {  
+	const total = await ProductModel.find({
+		"$or":[
+			{"title": { "$regex": req.body.query, "$options": "i" }},
+			{"content": { "$regex": req.body.query, "$options": "i" }}, 
+			{"shortDescription": { "$regex": req.body.query, "$options": "i" }}
+
+		] 
+	}).countDocuments(); 
+	try {
+		const response = await ProductModel.find({  
+			"$or":[
+			{"title": { "$regex": req.body.query, "$options": "i" }},
+			{"content": { "$regex": req.body.query, "$options": "i" }}, 
+			{"shortDescription": { "$regex": req.body.query, "$options": "i" }}
+			],
+		})
+		res.json({status:200,total,message: 'Search results', response });  
+	} catch (error) {
+		next({ status: 404, message: error });  
+	}
+};
 
 exports.getSingleProduct = async (req, res, next) => {
 	if(mongoose.isValidObjectId(req.params.productid)) {

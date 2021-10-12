@@ -40,6 +40,32 @@ exports.getWithQuery = async (req, res, next) => {
 		next({ status: 404, message: error });
 	}
 };
+exports.searchMessages = async (req, res, next) => {  
+	const total = await MessagesModel.find({
+		"$or":[
+			{"firstname": { "$regex": req.body.query, "$options": "i" }},
+			{"lastname": { "$regex": req.body.query, "$options": "i" }}, 
+			{"subject": { "$regex": req.body.query, "$options": "i" }}, 
+			{"content": { "$regex": req.body.query, "$options": "i" }}, 
+			{"email": { "$regex": req.body.query, "$options": "i" }}, 
+		] 
+	}).countDocuments(); 
+	try {
+		const response = await MessagesModel.find({  
+			"$or":[
+			{"firstname": { "$regex": req.body.query, "$options": "i" }},
+			{"lastname": { "$regex": req.body.query, "$options": "i" }}, 
+			{"subject": { "$regex": req.body.query, "$options": "i" }}, 
+			{"content": { "$regex": req.body.query, "$options": "i" }}, 
+			{"email": { "$regex": req.body.query, "$options": "i" }},  
+			],
+			// "isActive":req.body.isActive ? req.body.isActive : "true"
+		})
+		res.json({status:200,total,message: 'Search results', response });  
+	} catch (error) {
+		next({ status: 404, message: error });  
+	}
+};
 
 exports.create = async (req, res, next) => {
 	const {

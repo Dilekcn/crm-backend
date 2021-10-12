@@ -39,6 +39,29 @@ exports.getWithQuery = async (req, res, next) => {
 	}
 };
 
+exports.searchCompanyIntroductions = async (req, res, next) => {  
+	const total = await CompanyIntroductionModel.find({
+		"$or":[
+			{"title": { "$regex": req.body.query, "$options": "i" }},
+			{"subTitle": { "$regex": req.body.query, "$options": "i" }},  
+			{"shortDescription": { "$regex": req.body.query, "$options": "i" }}, 
+		] 
+	}).countDocuments(); 
+	try {
+		const response = await CompanyIntroductionModel.find({  
+			"$or":[
+				{"title": { "$regex": req.body.query, "$options": "i" }} ,
+				{"subTitle": { "$regex": req.body.query, "$options": "i" }}, 
+				{"shortDescription": { "$regex": req.body.query, "$options": "i" }}, 
+			],
+			// "isActive":req.body.isActive ? req.body.isActive : "true"
+		})
+		res.json({status:200,total,message: 'Search results', response });  
+	} catch (error) {
+		next({ status: 404, message: error });  
+	}
+}; 
+
 exports.createIntroduction = async (req, res, next) => {
 	const { title, subTitle, iconName, shortDescription, isActive, isDeleted } = req.body;
 

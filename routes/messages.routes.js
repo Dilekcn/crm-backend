@@ -9,6 +9,7 @@ router.get('/messages/subject/:subject', messagesControllers.getMessagesBySubjec
 router.get('/messages/email/:email', messagesControllers.getMessagesByEmail);
 router.post('/messages', messagesControllers.create);
 router.post('/messages/filter', messagesControllers.getWithQuery);
+router.post('/messages/search', messagesControllers.searchMessages);
 router.put('/messages/:id', messagesControllers.updateMessage);
 router.delete('/messages/:id', messagesControllers.removeSingleMessage);
 

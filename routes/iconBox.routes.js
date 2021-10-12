@@ -9,7 +9,9 @@ router.get('/iconbox/title/:title', iconBoxControllers.getIconBoxByTitle);
 router.get('/iconbox/author/:author', iconBoxControllers.getIconBoxByAuthor);
 router.post('/iconbox', iconBoxControllers.create);
 router.post('/iconbox/filter', iconBoxControllers.getWithQuery);
+router.post('/iconbox/search', iconBoxControllers.searchIconBox); 
 router.put('/iconbox/:id', iconBoxControllers.updateIconBox);
 router.delete('/iconbox/:id', iconBoxControllers.removeSingleIconBox);
 
 module.exports = router;
+ 

@@ -58,7 +58,26 @@ exports.getWithQuery = async (req, res, next) => {
 		}
 	};
 
-
+exports.searchBlogs = async (req, res, next) => {  
+		const total = await BlogsModel.find({
+			"$or":[
+				{"title": { "$regex": req.body.query, "$options": "i" }},
+				{"content": { "$regex": req.body.query, "$options": "i" }},   
+			] 
+		}).countDocuments(); 
+		try {
+			const response = await BlogsModel.find({  
+				"$or":[
+					{"title": { "$regex": req.body.query, "$options": "i" }} ,
+					{"content": { "$regex": req.body.query, "$options": "i" }}, 
+				],
+				// "isActive":req.body.isActive ? req.body.isActive : "true"
+			})
+			res.json({status:200,total,message: 'Search results', response });  
+		} catch (error) {
+			next({ status: 404, message: error });  
+		}
+}; 
 
 exports.create = async (req, res, next) => {
 	if (req.files) {

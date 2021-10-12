@@ -42,6 +42,26 @@ exports.getWithQuery = async (req, res, next) => {
 		next({ status: 404, message: error });
 	}
 };
+exports.searchMenus = async (req, res, next) => {  
+	const total = await MenusModel.find({
+		"$or":[
+			{"text": { "$regex": req.body.query, "$options": "i" }},
+			{"iconClassName": { "$regex": req.body.query, "$options": "i" }}, 
+		] 
+	}).countDocuments(); 
+	try {
+		const response = await MenusModel.find({  
+			"$or":[
+				{"text": { "$regex": req.body.query, "$options": "i" }},
+			    {"iconClassName": { "$regex": req.body.query, "$options": "i" }}, 
+			],
+			// "isActive":req.body.isActive ? req.body.isActive : "true"
+		})
+		res.json({status:200,total,message: 'Search results', response });  
+	} catch (error) {
+		next({ status: 404, message: error });  
+	}
+};
 
 exports.create = async (req, res, next) => {
 	const { parentId, text, link, iconClassName, order, isActive, isDeleted,children } = req.body;

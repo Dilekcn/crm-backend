@@ -50,6 +50,25 @@ exports.getWithQuery = async (req, res, next) => {
 		next({ status: 404, message: error });
 	}
 };
+exports.searchSubscribers = async (req, res, next) => {  
+	const total = await SubscribersModel.find({
+		"$or":[
+			{"email": { "$regex": req.body.query, "$options": "i" }},
+			{"name": { "$regex": req.body.query, "$options": "i" }}, 
+		] 
+	}).countDocuments(); 
+	try {
+		const response = await SubscribersModel.find({  
+			"$or":[
+			{"email": { "$regex": req.body.query, "$options": "i" }},
+			{"name": { "$regex": req.body.query, "$options": "i" }}, 
+			],
+		})
+		res.json({status:200,total,message: 'Search results', response });  
+	} catch (error) {
+		next({ status: 404, message: error });  
+	}
+};
 
 exports.getSingleSubscriber = async (req, res, next) => {
 	if(mongoose.isValidObjectId(req.params.id)) {

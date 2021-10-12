@@ -55,7 +55,28 @@ exports.getWithQuery = async (req, res, next) => {
 		}
 	};
 
-
+exports.searchComments = async (req, res, next) => {  
+		const total = await CommentsModel.find({
+			"$or":[
+				{"title": { "$regex": req.body.query, "$options": "i" }},
+				{"content": { "$regex": req.body.query, "$options": "i" }},  
+				{"reasonToBlock": { "$regex": req.body.query, "$options": "i" }}, 
+			] 
+		}).countDocuments(); 
+		try {
+			const response = await CommentsModel.find({  
+				"$or":[
+					{"title": { "$regex": req.body.query, "$options": "i" }} ,
+					{"content": { "$regex": req.body.query, "$options": "i" }}, 
+					{"reasonToBlock": { "$regex": req.body.query, "$options": "i" }}, 
+				],
+				// "isActive":req.body.isActive ? req.body.isActive : "true"
+			})
+			res.json({status:200,total,message: 'Search results', response });  
+		} catch (error) {
+			next({ status: 404, message: error });  
+		}
+}; 
 
 exports.create = async (req, res, next) => {
 	const newComment = await new CommentsModel({
