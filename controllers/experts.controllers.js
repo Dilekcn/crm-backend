@@ -104,16 +104,16 @@ exports.createExpert = async (req, res, next) => {
 			typeof req.body.socialMediaId === 'string'
 				? await JSON.parse(req.body.socialMediaId).map((sm) => {
 						return new SocialMediaModel({
-							title: sm.title || null,
-							link: sm.link || null,
-							iconName: sm.iconName || null,
+							title: sm.title || '',
+							link: sm.link || '',
+							iconName: sm.iconName || '',
 						});
 				  })
 				: req.body.socialMediaId.map((sm) => {
 						return new SocialMediaModel({
-							title: sm.title || null,
-							link: sm.link || null,
-							iconName: sm.iconName || null,
+							title: sm.title || '',
+							link: sm.link || '',
+							iconName: sm.iconName || '',
 						});
 				  });
 
@@ -344,63 +344,9 @@ exports.getSingleExpert = async (req, res, next) => {
 		next({ status: 400, message: 'Object Id is not valid.' });
 	}
 };
+ 
 
-exports.getExpertsByFirstname = async (req, res, next) => {
-	const { page, limit } = req.query;
-	const total = await ExpertModel.find().countDocuments();
-	const pages = limit === undefined ? 1 : Math.ceil(total / limit);
 
-	await ExpertModel.find({ firstname: req.params.firstname }, (err, data) => {
-		if (err) {
-			next({ status: 404, message: err });
-		} else {
-			res.json({ total, pages, status: 200, data });
-		}
-	})
-		.limit(limit * 1)
-		.skip((page - 1) * limit)
-		.sort({ createdAt: -1 })
-		.populate('socialMediaId', 'title link description')
-		.populate('mediaId', 'url title alt');
-};
-
-exports.getExpertsByLastname = async (req, res, next) => {
-	const { page, limit } = req.query;
-	const total = await ExpertModel.find().countDocuments();
-	const pages = limit === undefined ? 1 : Math.ceil(total / limit);
-
-	await ExpertModel.find({ lastname: req.params.lastname }, (err, data) => {
-		if (err) {
-			next({ status: 404, message: err });
-		} else {
-			res.json({ total, pages, status: 200, data });
-		}
-	})
-		.limit(limit * 1)
-		.skip((page - 1) * limit)
-		.sort({ createdAt: -1 })
-		.populate('socialMediaId', 'title link description')
-		.populate('mediaId', 'url title alt');
-};
-
-exports.getExpertsByExpertise = async (req, res, next) => {
-	const { page, limit } = req.query;
-	const total = await ExpertModel.find().countDocuments();
-	const pages = limit === undefined ? 1 : Math.ceil(total / limit);
-
-	await ExpertModel.find({ expertise: req.params.expertise }, (err, data) => {
-		if (err) {
-			next({ status: 404, message: err });
-		} else {
-			res.json({ total, pages, status: 200, data });
-		}
-	})
-		.limit(limit * 1)
-		.skip((page - 1) * limit)
-		.sort({ createdAt: -1 })
-		.populate('socialMediaId', 'title link description')
-		.populate('mediaId', 'url title alt');
-};
 
 exports.updateExpert = async (req, res, next) => {
 	if (mongoose.isValidObjectId(req.params.expertid)) {
@@ -478,19 +424,19 @@ exports.updateExpert = async (req, res, next) => {
 									{ _id: req.params.expertid },
 									{
 										$set: {
-											firstname,
-											lastname,
-											expertise,
-											content,
+											firstname: req.body.firstname ? req.body.firstname : expert.firstname,
+											lastname: req.body.lastname ? req.body.lastname : expert.lastname,
+											expertise: req.body.expertise ? req.body.expertise : expert.expertise,
+											content: req.body.content ? req.body.content : expert.content,
 											mediaId: req.files
 												? expert.mediaId
 												: req.body.mediaId,
 											socialMediaId: socialMediaIds,
 											isActive: !req.body.isActive
-												? true
+												? expert.isActive
 												: req.body.isActive,
 											isDeleted: !req.body.isDeleted
-												? false
+												? expert.isDeleted
 												: req.body.isDeleted,
 										},
 									},
@@ -547,17 +493,17 @@ exports.updateExpert = async (req, res, next) => {
 									{ _id: req.params.expertid },
 									{
 										$set: {
-											firstname,
-											lastname,
-											expertise,
-											content,
+											firstname: req.body.firstname ? req.body.firstname : expert.firstname,
+											lastname: req.body.lastname ? req.body.lastname : expert.lastname,
+											expertise: req.body.expertise ? req.body.expertise : expert.expertise,
+											content: req.body.content ? req.body.content : expert.content,
 											mediaId: !mediaId ? expert.mediaId : mediaId,
 											socialMediaId: socialMediaIds,
 											isActive: !req.body.isActive
-												? true
+												? expert.isActive
 												: req.body.isActive,
 											isDeleted: !req.body.isDeleted
-												? false
+												? expert.isDeleted
 												: req.body.isDeleted,
 										},
 									},
@@ -613,7 +559,7 @@ exports.removeExpert = async (req, res, next) => {
 										data,
 									});
 								})
-								.catch((err) => {
+								.catch((err) => { 
 									next({ status: 404, message: err });
 								});
 						})

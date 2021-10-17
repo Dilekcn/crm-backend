@@ -130,7 +130,7 @@ exports.updateSingleMedia = async (req, res, next) => {
 				if(isExist === null) {
 					next({
 						status: 404,
-						message: 'This Id is not exist in Medias Model.',
+						message: 'This Id does not exist in Medias Model.',
 					})
 				} else {
 					await MediaModel.findById({ _id: req.params.mediaid })
@@ -172,7 +172,7 @@ exports.removeSingleMedia = async (req, res, next) => {
 				if(isExist === null) {
 					next({
 						status: 404,
-						message: 'This Id is not exist in Medias Model.',
+						message: 'This Id does not exist in Medias Model.',
 					})
 				} else {
 					await MediaModel.findById({ _id: req.params.mediaid })

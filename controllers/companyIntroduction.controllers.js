@@ -92,7 +92,7 @@ exports.getSingleIntroduction = async (req, res, next) => {
 				if(isExist === null) {
 					next({
 						status: 404,
-						message: 'This Id is not exist in Company Introductions Model.',
+						message: 'This Id does not exist in Company Introductions Model.',
 					})
 				} else {
 					await CompanyIntroductionModel.findById({ _id: req.params.id }, (err, data) => {
@@ -114,7 +114,7 @@ exports.getSingleIntroductionByTitle = async (req, res, next) => {
 		if (err) {
 			next({ status: 404, message: err });
 		} else if(data === null) {
-			res.json({status: 200, message:"Any title did not match"})
+			res.json({status: 200, message:"Title did not match"})
 		} else {
 			res.json({ status: 200, data });
 		}
@@ -128,7 +128,7 @@ exports.updateIntroductions = async (req, res, next) => {
 				if(isExist === null) {
 					next({
 						status: 404,
-						message: 'This Id is not exist in Company Introductions Model.',
+						message: 'This Id does not exist in Company Introductions Model.',
 					})
 				} else {
 					await CompanyIntroductionModel.findByIdAndUpdate(
@@ -151,7 +151,7 @@ exports.removeIntroduction = async (req, res, next) => {
 				if(isExist === null) {
 					next({
 						status: 404,
-						message: 'This Id is not exist in Company Introductions Model.',
+						message: 'This Id does not exist in Company Introductions Model.',
 					})
 				} else {
 					await CompanyIntroductionModel.findByIdAndDelete({ _id: req.params.id })

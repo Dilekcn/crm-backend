@@ -134,7 +134,7 @@ exports.updateMenu = async (req, res, next) => {
 				if(isExist === null) {
 					next({
 						status: 404,
-						message: 'This Id is not exist in Menus Model.',
+						message: 'This Id does not exist in Menus Model.',
 					})
 				} else {
 					await MenusModel.findByIdAndUpdate({ _id: req.params.id }, { $set: req.body })
@@ -156,7 +156,7 @@ exports.removeSingleMenu = async (req, res, next) => {
 				if(isExist === null) {
 					next({
 						status: 404,
-						message: 'This Id is not exist in Menus Model.',
+						message: 'This Id does not exist in Menus Model.',
 					})
 				} else {
 					await MenusModel.findByIdAndDelete({ _id: req.params.id })

@@ -254,7 +254,7 @@ exports.updateBlog = async (req, res, next) => {
 				if(isExist === null) {
 					next({
 						status: 404,
-						message: 'This Id is not exist in Blogs Model.',
+						message: 'This Id does not exist in Blogs Model.',
 					})
 				} else {
 					await BlogsModel.findByIdAndUpdate({ _id: req.params.id }, { $set: req.body })

@@ -530,17 +530,17 @@ exports.updateSingleProduct = async (req, res, next) => {
 											mediaId: product.mediaId,
 											videoId: product.videoId,
 											isHomePage: !req.body.isHomePage
-												? false
+												? product.isHomePage
 												: req.body.isHomePage,
 											content:!req.body.content ? product.content : req.body.content,
 											shortDescription:!req.body.shortDescription ? product.shortDescription : req.body.shortDescription,
 											buttonText:!req.body.buttonText ? product.buttonText : req.body.buttonText,
 											userId: !req.body.userId ? product.userId : req.body.userId,
-											isActive: !req.body.isActive ? true : req.body.isActive,
-											isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
-											isBlog: !req.body.isBlog ? false : req.body.isBlog,
+											isActive: !req.body.isActive ? product.isActive : req.body.isActive,
+											isDeleted: !req.body.isDeleted ? product.isDeleted : req.body.isDeleted,
+											isBlog: !req.body.isBlog ? product.isBlog : req.body.isBlog,
 											isAboveFooter: !req.body.isAboveFooter
-												? false
+												? product.isAboveFooter
 												: req.body.isAboveFooter,
 										},
 									},
@@ -589,17 +589,17 @@ exports.updateSingleProduct = async (req, res, next) => {
 											mediaId: product.mediaId,
 											videoId: product.videoId,
 											isHomePage: !req.body.isHomePage
-												? false
+												? product.isHomePage
 												: req.body.isHomePage,
 											content:!req.body.content ? product.content : req.body.content,
 											shortDescription:!req.body.shortDescription ? product.shortDescription : req.body.shortDescription,
 											buttonText:!req.body.buttonText ? product.buttonText : req.body.buttonText,
 											userId: !req.body.userId ? product.userId : req.body.userId,
-											isActive: !req.body.isActive ? true : req.body.isActive,
-											isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
-											isBlog: !req.body.isBlog ? false : req.body.isBlog,
+											isActive: !req.body.isActive ? product.isActive : req.body.isActive,
+											isDeleted: !req.body.isDeleted ? product.isDeleted : req.body.isDeleted,
+											isBlog: !req.body.isBlog ? product.isBlog : req.body.isBlog,
 											isAboveFooter: !req.body.isAboveFooter
-												? false
+												? product.isAboveFooter
 												: req.body.isAboveFooter,
 										},
 									},
@@ -649,17 +649,17 @@ exports.updateSingleProduct = async (req, res, next) => {
 											mediaId: product.mediaId,
 											videoId: req.body.videoId,
 											isHomePage: !req.body.isHomePage
-												? false
+												? product.isHomePage
 												: req.body.isHomePage,
 											content:!req.body.content ? product.content : req.body.content,
 											shortDescription:!req.body.shortDescription ? product.shortDescription : req.body.shortDescription,
 											buttonText:!req.body.buttonText ? product.buttonText : req.body.buttonText,
 											userId: !req.body.userId ? product.userId : req.body.userId,
-											isActive: !req.body.isActive ? true : req.body.isActive,
-											isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
-											isBlog: !req.body.isBlog ? false : req.body.isBlog,
+											isActive: !req.body.isActive ? product.isActive : req.body.isActive,
+											isDeleted: !req.body.isDeleted ? product.isDeleted : req.body.isDeleted,
+											isBlog: !req.body.isBlog ? product.isBlog : req.body.isBlog,
 											isAboveFooter: !req.body.isAboveFooter
-												? false
+												? product.isAboveFooter
 												: req.body.isAboveFooter,
 										},
 									},
@@ -708,17 +708,17 @@ exports.updateSingleProduct = async (req, res, next) => {
 											mediaId: product.mediaId,
 											videoId: product.videoId,
 											isHomePage: !req.body.isHomePage
-												? false
+												? product.isHomePage
 												: req.body.isHomePage,
 											content:!req.body.content ? product.content : req.body.content,
 											shortDescription:!req.body.shortDescription ? product.shortDescription : req.body.shortDescription,
 											buttonText:!req.body.buttonText ? product.buttonText : req.body.buttonText,
 											userId: !req.body.userId ? product.userId : req.body.userId,
-											isActive: !req.body.isActive ? true : req.body.isActive,
-											isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
-											isBlog: !req.body.isBlog ? false : req.body.isBlog,
+											isActive: !req.body.isActive ? product.isActive : req.body.isActive,
+											isDeleted: !req.body.isDeleted ? product.isDeleted : req.body.isDeleted,
+											isBlog: !req.body.isBlog ? product.isBlog : req.body.isBlog,
 											isAboveFooter: !req.body.isAboveFooter
-												? false
+												? product.isAboveFooter
 												: req.body.isAboveFooter,
 										},
 									},
@@ -768,17 +768,17 @@ exports.updateSingleProduct = async (req, res, next) => {
 											mediaId: product.mediaId,
 											videoId: product.videoId,
 											isHomePage: !req.body.isHomePage
-												? false
+												? product.isHomePage
 												: req.body.isHomePage,
 											content:!req.body.content ? product.content : req.body.content,
 											shortDescription:!req.body.shortDescription ? product.shortDescription : req.body.shortDescription,
 											buttonText:!req.body.buttonText ? product.buttonText : req.body.buttonText,
 											userId: !req.body.userId ? product.userId : req.body.userId,
-											isActive: !req.body.isActive ? true : req.body.isActive,
-											isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
-											isBlog: !req.body.isBlog ? false : req.body.isBlog,
+											isActive: !req.body.isActive ? product.isActive : req.body.isActive,
+											isDeleted: !req.body.isDeleted ? product.isDeleted : req.body.isDeleted,
+											isBlog: !req.body.isBlog ? product.isBlog : req.body.isBlog,
 											isAboveFooter: !req.body.isAboveFooter
-												? false
+												? product.isAboveFooter
 												: req.body.isAboveFooter,
 										},
 									},
@@ -807,20 +807,17 @@ exports.updateSingleProduct = async (req, res, next) => {
 											mediaId: req.body.mediaId,
 											videoId: req.body.videoId,
 											isHomePage: !req.body.isHomePage
-												? false
-												: req.body.isHomePage,
-												isHomePage: !req.body.isHomePage
-												? false
+												? product.isHomePage
 												: req.body.isHomePage,
 											content:!req.body.content ? product.content : req.body.content,
 											shortDescription:!req.body.shortDescription ? product.shortDescription : req.body.shortDescription,
 											buttonText:!req.body.buttonText ? product.buttonText : req.body.buttonText,
 											userId: !req.body.userId ? product.userId : req.body.userId,
-											isActive: !req.body.isActive ? true : req.body.isActive,
-											isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
-											isBlog: !req.body.isBlog ? false : req.body.isBlog,
+											isActive: !req.body.isActive ? product.isActive : req.body.isActive,
+											isDeleted: !req.body.isDeleted ? product.isDeleted : req.body.isDeleted,
+											isBlog: !req.body.isBlog ? product.isBlog : req.body.isBlog,
 											isAboveFooter: !req.body.isAboveFooter
-												? false
+												? product.isAboveFooter
 												: req.body.isAboveFooter,
 										},
 									},
@@ -849,20 +846,17 @@ exports.updateSingleProduct = async (req, res, next) => {
 											mediaId: req.body.mediaId,
 											videoId: product.videoId,
 											isHomePage: !req.body.isHomePage
-												? false
-												: req.body.isHomePage,
-												isHomePage: !req.body.isHomePage
-												? false
+												? product.isHomePage
 												: req.body.isHomePage,
 											content:!req.body.content ? product.content : req.body.content,
 											shortDescription:!req.body.shortDescription ? product.shortDescription : req.body.shortDescription,
 											buttonText:!req.body.buttonText ? product.buttonText : req.body.buttonText,
 											userId: !req.body.userId ? product.userId : req.body.userId,
-											isActive: !req.body.isActive ? true : req.body.isActive,
-											isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
-											isBlog: !req.body.isBlog ? false : req.body.isBlog,
+											isActive: !req.body.isActive ? product.isActive : req.body.isActive,
+											isDeleted: !req.body.isDeleted ? product.isDeleted : req.body.isDeleted,
+											isBlog: !req.body.isBlog ? product.isBlog : req.body.isBlog,
 											isAboveFooter: !req.body.isAboveFooter
-												? false
+												? product.isAboveFooter
 												: req.body.isAboveFooter,
 										},
 									},
@@ -891,21 +885,18 @@ exports.updateSingleProduct = async (req, res, next) => {
 										mediaId: product.mediaId,
 										videoId: req.body.videoId,
 										isHomePage: !req.body.isHomePage
-											? false
-											: req.body.isHomePage,
-											isHomePage: !req.body.isHomePage
-											? false
-											: req.body.isHomePage,
+												? product.isHomePage
+												: req.body.isHomePage,
 										content:!req.body.content ? product.content : req.body.content,
 										shortDescription:!req.body.shortDescription ? product.shortDescription : req.body.shortDescription,
 										buttonText:!req.body.buttonText ? product.buttonText : req.body.buttonText,
 										userId: !req.body.userId ? product.userId : req.body.userId,
-										isActive: !req.body.isActive ? true : req.body.isActive,
-										isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
-										isBlog: !req.body.isBlog ? false : req.body.isBlog,
+										isActive: !req.body.isActive ? product.isActive : req.body.isActive,
+										isDeleted: !req.body.isDeleted ? product.isDeleted : req.body.isDeleted,
+										isBlog: !req.body.isBlog ? product.isBlog : req.body.isBlog,
 										isAboveFooter: !req.body.isAboveFooter
-											? false
-											: req.body.isAboveFooter,
+												? product.isAboveFooter
+												: req.body.isAboveFooter,
 									},
 								},
 								{ useFindAndModify: false, new: true }
@@ -924,16 +915,6 @@ exports.updateSingleProduct = async (req, res, next) => {
 						console.log('nine')
 						await ProductModel.findById({ _id: req.params.productid })
 							.then(async (product) => {
-								const {
-									title,
-									order,
-									content,
-									shortDescription,
-									buttonText,
-									userId,
-									mediaId,
-								} = req.body;
-				
 								await ProductModel.findByIdAndUpdate(
 									{ _id: req.params.productid },
 									{
@@ -943,20 +924,17 @@ exports.updateSingleProduct = async (req, res, next) => {
 											mediaId: product.mediaId,
 											videoId: product.videoId,
 											isHomePage: !req.body.isHomePage
-												? false
-												: req.body.isHomePage,
-												isHomePage: !req.body.isHomePage
-												? false
+												? product.isHomePage
 												: req.body.isHomePage,
 											content:!req.body.content ? product.content : req.body.content,
 											shortDescription:!req.body.shortDescription ? product.shortDescription : req.body.shortDescription,
 											buttonText:!req.body.buttonText ? product.buttonText : req.body.buttonText,
 											userId: !req.body.userId ? product.userId : req.body.userId,
-											isActive: !req.body.isActive ? true : req.body.isActive,
-											isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
-											isBlog: !req.body.isBlog ? false : req.body.isBlog,
+											isActive: !req.body.isActive ? product.isActive : req.body.isActive,
+											isDeleted: !req.body.isDeleted ? product.isDeleted : req.body.isDeleted,
+											isBlog: !req.body.isBlog ? product.isBlog : req.body.isBlog,
 											isAboveFooter: !req.body.isAboveFooter
-												? false
+												? product.isAboveFooter
 												: req.body.isAboveFooter,
 										},
 									},

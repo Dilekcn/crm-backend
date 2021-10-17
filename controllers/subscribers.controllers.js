@@ -77,7 +77,7 @@ exports.getSingleSubscriber = async (req, res, next) => {
 				if(isExist === null) {
 					next({
 						status: 404,
-						message: 'This Id is not exist in Subscribers Model.',
+						message: 'This Id does not exist in Subscribers Model.',
 					})
 				} else {
 					await SubscribersModel.findById({ _id: req.params.id }, (err, data) => {
@@ -137,7 +137,7 @@ exports.updateSubscriber = async (req, res, next) => {
 				if(isExist === null) {
 					next({
 						status: 404,
-						message: 'This Id is not exist in Subscribers Model.',
+						message: 'This Id does not exist in Subscribers Model.',
 					})
 				} else {
 					await SubscribersModel.findByIdAndUpdate({ _id: req.params.id }, { $set: req.body })

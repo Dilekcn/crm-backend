@@ -232,7 +232,7 @@ exports.updateSlider = async (req, res, next) => {
 				if(isExist === null) {
 					next({
 						status: 404,
-						message: 'This Id is not exist in Sliders Model.',
+						message: 'This Id does not exist in Sliders Model.',
 					})
 				} else {
 					if (req.files) {
@@ -260,15 +260,15 @@ exports.updateSlider = async (req, res, next) => {
 									{ _id: req.params.slideid },
 									{
 										$set: {
-											title,
-											subtitle,
-											url,
-											buttonText,
-											order,
-											isActive: !req.body.isActive ? true : req.body.isActive,
-											isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
+											title:!req.body.title ? slider.title : req.body.title,
+											subtitle:!req.body.subtitle ? slider.subtitle : req.body.subtitle,
+											url:!req.body.url ? slider.url : req.body.url,
+											buttonText:!req.body.buttonText ? slider.buttonText : req.body.buttonText,
+											order:!req.body.order ? slider.order : req.body.order,
+											isActive: !req.body.isActive ? slider.isActive : req.body.isActive,
+											isDeleted: !req.body.isDeleted ? slider.isDeleted : req.body.isDeleted,
 											mediaId: slider.mediaId,
-											isVideo: !req.body.isVideo ? false : req.body.isVideo,
+											isVideo: !req.body.isVideo ? slider.isVideo : req.body.isVideo,
 										},
 									},
 									{ useFindAndModify: false, new: true }
@@ -292,15 +292,15 @@ exports.updateSlider = async (req, res, next) => {
 									{ _id: req.params.slideid },
 									{
 										$set: {
-											title,
-											subtitle,
-											url,
-											buttonText,
-											order,
-											isActive: !req.body.isActive ? true : req.body.isActive,
-											isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
+											title:!req.body.title ? slider.title : req.body.title,
+											subtitle:!req.body.subtitle ? slider.subtitle : req.body.subtitle,
+											url:!req.body.url ? slider.url : req.body.url,
+											buttonText:!req.body.buttonText ? slider.buttonText : req.body.buttonText,
+											order:!req.body.order ? slider.order : req.body.order,
+											isActive: !req.body.isActive ? slider.isActive : req.body.isActive,
+											isDeleted: !req.body.isDeleted ? slider.isDeleted : req.body.isDeleted,
 											mediaId: !mediaId ? slider.mediaId : mediaId,
-											isVideo: !req.body.isVideo ? false : req.body.isVideo,
+											isVideo: !req.body.isVideo ? slider.isVideo : req.body.isVideo,
 										},
 									},
 									{ useFindAndModify: false, new: true }
@@ -330,7 +330,7 @@ exports.removeSlide = async (req, res, next) => {
 				if(isExist === null) {
 					next({
 						status: 404,
-						message: 'This Id is not exist in Sliders Model.',
+						message: 'This Id does not exist in Sliders Model.',
 					})
 				} else {
 					await SliderModel.findById({ _id: req.params.slideid })

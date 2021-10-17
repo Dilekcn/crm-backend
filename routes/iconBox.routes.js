@@ -5,8 +5,6 @@ const iconBoxControllers = require('../controllers/iconBox.controllers');
 
 router.get('/iconbox', iconBoxControllers.getAll);
 router.get('/iconbox/:id', iconBoxControllers.getSingleIconBox);
-router.get('/iconbox/title/:title', iconBoxControllers.getIconBoxByTitle);
-router.get('/iconbox/author/:author', iconBoxControllers.getIconBoxByAuthor);
 router.post('/iconbox', iconBoxControllers.create);
 router.post('/iconbox/filter', iconBoxControllers.getWithQuery);
 router.post('/iconbox/search', iconBoxControllers.searchIconBox); 

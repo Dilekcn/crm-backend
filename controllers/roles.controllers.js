@@ -23,7 +23,7 @@ exports.getSingleRole = async (req, res, next) => {
 				if(isExist === null) {
 					next({
 						status: 404,
-						message: 'This Id is not exist in Roles Model.',
+						message: 'This Id does not exist in Roles Model.',
 					})
 				} else {
 					await RolesModel.findById({ _id: req.params.roleid }, (err, data) => {
@@ -64,7 +64,7 @@ exports.updateRole = async (req, res, next) => {
 				if(isExist === null) {
 					next({
 						status: 404,
-						message: 'This Id is not exist in Roles Model.',
+						message: 'This Id does not exist in Roles Model.',
 					})
 				} else {
 					await RolesModel.findByIdAndUpdate({ _id: req.params.roleid }, { $set: req.body })
@@ -86,7 +86,7 @@ exports.removeRole = async (req, res, next) => {
 				if(isExist === null) {
 					next({
 						status: 404,
-						message: 'This Id is not exist in Roles Model.',
+						message: 'This Id does not exist in Roles Model.',
 					})
 				} else {
 					await RolesModel.findByIdAndDelete({ _id: req.params.roleid })

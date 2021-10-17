@@ -116,25 +116,6 @@ exports.getSingleIconBox = async (req, res, next) => {
 	}
 };
 
-exports.getIconBoxByTitle = async (req, res, next) => {
-	await IconBoxModel.findOne({ title: req.params.title }, (err, data) => {
-		if (err) {
-			next({ status: 404, message: err });
-		} else {
-			res.json({ status: 200, data });
-		}
-	});
-};
-
-exports.getIconBoxByAuthor = async (req, res, next) => {
-	await IconBoxModel.findOne({ author: req.params.author }, (err, data) => {
-		if (err) {
-			next({ status: 404, message: err });
-		} else {
-			res.json({ status: 200, data });
-		}
-	});
-};
 
 exports.updateIconBox = async (req, res, next) => {
 	if(mongoose.isValidObjectId(req.params.id)) {
@@ -143,7 +124,7 @@ exports.updateIconBox = async (req, res, next) => {
 				if(isExist === null) {
 					next({
 						status: 404,
-						message: 'This Id is not exist in Icon Box Model.',
+						message: 'This Id does not exist in Icon Box Model.',
 					})
 				} else {
 					await IconBoxModel.findByIdAndUpdate({ _id: req.params.id }, { $set: req.body })

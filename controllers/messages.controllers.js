@@ -112,7 +112,7 @@ exports.getSingleMessage = async (req, res, next) => {
 				if(isExist === null) {
 					next({
 						status: 404,
-						message: 'This Id is not exist in Messages Model.',
+						message: 'This Id does not exist in Messages Model.',
 					})
 				} else {
 					await MessagesModel.findById({ _id: req.params.id }, (err, data) => {
@@ -170,7 +170,7 @@ exports.updateMessage = async (req, res, next) => {
 				if(isExist === null) {
 					next({
 						status: 404,
-						message: 'This Id is not exist in Messages Model.',
+						message: 'This Id does not exist in Messages Model.',
 					})
 				} else {
 					await MessagesModel.findByIdAndUpdate({ _id: req.params.id }, { $set: req.body })
@@ -192,7 +192,7 @@ exports.removeSingleMessage = async (req, res, next) => {
 				if(isExist === null) {
 					next({
 						status: 404,
-						message: 'This Id is not exist in Messages Model.',
+						message: 'This Id does not exist in Messages Model.',
 					})
 				} else {
 					await MessagesModel.findByIdAndDelete({ _id: req.params.id })

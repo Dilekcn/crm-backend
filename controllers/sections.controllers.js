@@ -42,7 +42,7 @@ exports.getSingleSection = async (req, res, next) => {
 				if(isExist === null) {
 					next({
 						status: 404,
-						message: 'This Id is not exist in Sections Model.',
+						message: 'This Id does not exist in Sections Model.',
 					})
 				} else {
 					await SectionModel.findById({ _id: req.params.id }, (err, data) => {
@@ -85,7 +85,7 @@ exports.updateSection = async (req, res, next) => {
 				if(isExist === null) {
 					next({
 						status: 404,
-						message: 'This Id is not exist in Sections Model.',
+						message: 'This Id does not exist in Sections Model.',
 					})
 				} else {
 					await SectionModel.findByIdAndUpdate({ _id: req.params.id }, { $set: req.body })
@@ -105,7 +105,7 @@ exports.removeSingleSection = async (req, res, next) => {
 				if(isExist === null) {
 					next({
 						status: 404,
-						message: 'This Id is not exist in Sections Model.',
+						message: 'This Id does not exist in Sections Model.',
 					})
 				} else {
 					await SectionModel.findByIdAndDelete({ _id: req.params.id })

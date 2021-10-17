@@ -173,7 +173,7 @@ exports.updatePages = async (req, res, next) => {
 				if(isExist === null) {
 					next({
 						status: 404,
-						message: 'This Id is not exist in Static Pages Model.',
+						message: 'This Id does not exist in Static Pages Model.',
 					})
 				} else {
 					if (req.files) {
@@ -198,17 +198,16 @@ exports.updatePages = async (req, res, next) => {
 										await S3.updateMedia(req, res, media.mediaKey, data);
 									}
 								);
-								const { name, content } = req.body;
 				
 								await StaticPageModel.findByIdAndUpdate(
 									{ _id: req.params.id },
 									{
 										$set: {
-											name,
-											content,
+											name:req.body.name ? req.body.name : staticpage.name,
+											content:req.body.content ? req.body.content : staticpage.content,
 											mediaId: staticpage.mediaId,
-											isActive: !req.body.isActive ? true : req.body.isActive,
-											isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
+											isActive: !req.body.isActive ? staticpage.isActive : req.body.isActive,
+											isDeleted: !req.body.isDeleted ? staticpage.isDeleted : req.body.isDeleted,
 										},
 									},
 									{ useFindAndModify: false, new: true }
@@ -232,11 +231,11 @@ exports.updatePages = async (req, res, next) => {
 									{ _id: req.params.id },
 									{
 										$set: {
-											name,
-											content,
+											name:req.body.name ? req.body.name : staticpage.name,
+											content:req.body.content ? req.body.content : staticpage.content,
 											mediaId: !mediaId ? staticpage.mediaId : mediaId,
-											isActive: !req.body.isActive ? true : req.body.isActive,
-											isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
+											isActive: !req.body.isActive ? staticpage.isActive : req.body.isActive,
+											isDeleted: !req.body.isDeleted ? staticpage.isDeleted : req.body.isDeleted,
 										},
 									},
 									{ useFindAndModify: false, new: true }

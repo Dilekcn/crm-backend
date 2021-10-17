@@ -48,55 +48,6 @@ exports.getSingleUserById = async (req, res, next) => {
 	}
 };
 
-exports.getSingleUserByFirstName = async (req, res, next) => {
-	const { page, limit } = req.query;
-	const total = await UserModel.find().countDocuments();
-	const pages = limit === undefined ? 1 : Math.ceil(total / limit);
-
-	await UserModel.find({ firstname: req.params.firstname }, (err, data) => {
-		if (err) {
-			next({ status: 404, message: err });
-		} else {
-			res.json({ total, pages, status: 200, data });
-		}
-	})
-		.limit(limit * 1)
-		.skip((page - 1) * limit)
-		.sort({ createdAt: -1 })
-		.populate('roleId', 'name')
-		.populate('mediaId', 'url title alt');
-};
-
-exports.getSingleUserByLastName = async (req, res, next) => {
-	const { page, limit } = req.query;
-	const total = await UserModel.find().countDocuments();
-	const pages = limit === undefined ? 1 : Math.ceil(total / limit);
-
-	await UserModel.find({ lastname: req.params.lastname }, (err, data) => {
-		if (err) {
-			next({ status: 404, message: err });
-		} else {
-			res.json({ total, pages, status: 200, data });
-		}
-	})
-		.limit(limit * 1)
-		.skip((page - 1) * limit)
-		.sort({ createdAt: -1 })
-		.populate('roleId', 'name')
-		.populate('mediaId', 'url title alt');
-};
-
-exports.getSingleUserByEmail = async (req, res, next) => {
-	await UserModel.find({ email: req.params.email }, (err, data) => {
-		if (err) {
-			next({ status: 404, message: err });
-		} else {
-			res.json({ status: 200, data });
-		}
-	})
-		.populate('roleId', 'name')
-		.populate('mediaId', 'url title alt');
-};
 
 exports.getSingleUserByRoleId = async (req, res, next) => {
 	if(mongoose.isValidObjectId(req.params.roleid)) {
@@ -309,7 +260,7 @@ exports.updateUser = async (req, res, next) => {
 				if(isExist === null) {
 					next({
 						status: 404,
-						message: 'This Id is not exist in Users Model.',
+						message: 'This Id does not exist in Users Model.',
 					})
 				} else {
 					if (req.files) {
@@ -339,11 +290,11 @@ exports.updateUser = async (req, res, next) => {
 									{ _id: req.params.id },
 									{
 										$set: {
-											firstname,
-											lastname,
-											email,
-											isActive: !req.body.isActive ? true : req.body.isActive,
-											isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
+											firstname:req.body.firstname ? req.body.firstname : user.firstname,
+											lastname:req.body.lastname ? req.body.lastname : user.lastname,
+											email:req.body.email ? req.body.email : user.email,
+											isActive: !req.body.isActive ? user.isActive : req.body.isActive,
+											isDeleted: !req.body.isDeleted ? user.isDeleted : req.body.isDeleted,
 											roleId: !req.body.roleId ? user.roleId : req.body.roleId,
 											mediaId: user.mediaId,
 										},
@@ -369,11 +320,11 @@ exports.updateUser = async (req, res, next) => {
 									{ _id: req.params.id },
 									{
 										$set: {
-											firstname,
-											lastname,
-											email,
-											isActive: !req.body.isActive ? true : req.body.isActive,
-											isDeleted: !req.body.isDeleted ? false : req.body.isDeleted,
+											firstname:req.body.firstname ? req.body.firstname : user.firstname,
+											lastname:req.body.lastname ? req.body.lastname : user.lastname,
+											email:req.body.email ? req.body.email : user.email,
+											isActive: !req.body.isActive ? user.isActive : req.body.isActive,
+											isDeleted: !req.body.isDeleted ? user.isDeleted : req.body.isDeleted,
 											roleId: !req.body.roleId ? user.roleId : req.body.roleId,
 											mediaId: !mediaId ? user.mediaId : mediaId,
 										},
