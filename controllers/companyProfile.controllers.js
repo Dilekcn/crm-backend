@@ -11,7 +11,7 @@ exports.getAll = async (req, res, next) => {
 			.limit(limit * 1)
 			.skip((page - 1) * limit)
 			.sort({ createdAt: -1 })
-			.populate('socialMediaId', 'title link')
+			.populate('socialMediaId', 'title link iconName')
 			.populate('logo', 'url title alt');
 		const total = await CompanyProfileModel.find().countDocuments();
 		const pages = limit === undefined ? 1 : Math.ceil(total / limit);
@@ -41,7 +41,7 @@ exports.getSingle = async (req, res, next) => {
 							}
 						}
 					)
-						.populate('socialMediaId', 'title link')
+					    .populate('socialMediaId', 'title link iconName')
 						.populate('logo', 'url title alt');
 				}
 			})
@@ -57,14 +57,16 @@ exports.create = async (req, res, next) => {
 			typeof req.body.socialMediaId === 'string'
 				? await JSON.parse(req.body.socialMediaId).map((sm) => {
 						return new SocialMediaModel({
-							title: sm.title || null,
-							link: sm.link || null,
+							title: sm.title ? sm.title : '',
+							link: sm.link ? sm.link : '',
+							iconName: sm.iconName ? sm.iconName : '',
 						});
 				  })
 				: req.body.socialMediaId.map((sm) => {
 						return new SocialMediaModel({
-							title: sm.title || null,
-							link: sm.link || null,
+							title: sm.title ? sm.title : '',
+							link: sm.link ? sm.link : '',
+							iconName: sm.iconName ? sm.iconName : '',
 						});
 				  });
 
@@ -432,7 +434,7 @@ exports.update = async (req, res, next) => {
 						message: 'This Id does not exist in Company Profile Model.',
 					});
 				} else {
-					if (req.files) {
+					if (req.files && req.body.socialMediaId) {
 						await CompanyProfileModel.findById({ _id: req.params.id })
 							.then(async (companyprofile) => {
 								await MediaModel.findById({
@@ -472,15 +474,17 @@ exports.update = async (req, res, next) => {
 										? await JSON.parse(req.body.socialMediaId).map(
 												(sm) => {
 													return new SocialMediaModel({
-														title: sm.title || null,
-														link: sm.link || null,
+														title: sm.title ? sm.title : '',
+							                            link: sm.link ? sm.link : '',
+							                            iconName: sm.iconName ? sm.iconName : '',
 													});
 												}
 										  )
 										: req.body.socialMediaId.map((sm) => {
 												return new SocialMediaModel({
-													title: sm.title || null,
-													link: sm.link || null,
+													title: sm.title ? sm.title : '',
+							                        link: sm.link ? sm.link : '',
+							                        iconName: sm.iconName ? sm.iconName : '',
 												});
 										  });
 
@@ -548,7 +552,100 @@ exports.update = async (req, res, next) => {
 									);
 							})
 							.catch((err) => res.json({ status: 404, message: err }));
-					} else {
+					} else if (req.files && !req.body.socialMediaId){
+						await CompanyProfileModel.findById({ _id: req.params.id })
+						.then(async (companyprofile) => {
+							await MediaModel.findById({
+								_id: companyprofile.logo,
+							}).then(async (media) => {
+								const data = async (data) => {
+									await MediaModel.findByIdAndUpdate(
+										{
+											_id: companyprofile.logo,
+										},
+										{
+											$set: {
+												url: data.Location || null,
+												title: 'company-logo',
+												mediaKey: data.Key,
+												alt: req.body.alt,
+											},
+										},
+										{ useFindAndModify: false, new: true }
+									).catch((err) =>
+										res.json({ status: 404, message: err })
+									);
+								};
+								await S3.updateLogo(req, res, media.mediaKey, data);
+							});
+
+
+
+							const {
+								name,
+								address,
+								email,
+								copyright,
+								baseColor,
+								mainColor,
+								baseFontColor,
+								mainFontColor,
+								secondaryColor,
+								secondaryFontColor,
+								googlemap_iframe,
+								slogan,
+							} = req.body;
+
+							await CompanyProfileModel.findByIdAndUpdate(
+								{ _id: req.params.id },
+								{
+									$set: {
+										name:req.body.name ? name : companyprofile.name,
+										logo: req.files
+											? companyprofile.logo
+											: req.body.logo,
+										phones:
+											typeof req.body.phones === 'string'
+												? JSON.parse(req.body.phones)
+												: req.body.phones,
+										address,
+										socialMediaId: companyprofile.socialMediaId,
+										email:req.body.email ? email : companyprofile.email,
+										copyright:req.body.copyright ? copyright : companyprofile.copyright,
+										baseColor:req.body.baseColor ? baseColor : companyprofile.baseColor,
+										mainColor:req.body.mainColor ? mainColor : companyprofile.mainColor,
+										baseFontColor:req.body.baseFontColor ? baseFontColor : companyprofile.baseFontColor,
+										mainFontColor:req.body.mainFontColor ? mainFontColor : companyprofile.mainFontColor,
+										secondaryColor:req.body.secondaryColor ? secondaryColor : companyprofile.secondaryColor,
+										secondaryFontColor:req.body.secondaryFontColor ? secondaryFontColor : companyprofile.secondaryFontColor,
+										slogan:req.body.slogan ? slogan : companyprofile.slogan,
+										isActive: req.body.isActive ? isActive : companyprofile.isActive,
+										isDeleted: req.body.isDeleted ? isDeleted : companyprofile.isDeleted,
+										googlemap_iframe:req.body.googlemap_iframe ? googlemap_iframe : companyprofile.googlemap_iframe,
+									},
+								},
+								{ useFindAndModify: false, new: true }
+							)
+								.then((companyprofile) =>
+									res.json({
+										status: 200,
+										message:
+											'Company profile is updated successfully',
+										companyprofile,
+									})
+								)
+								.catch((err) =>
+									res.json({ status: 404, message: err })
+								);
+						})
+						.catch((err) => res.json({ status: 404, message: err }));
+
+
+
+
+
+					}else {
+						
 						await CompanyProfileModel.findById({ _id: req.params.id })
 							.then(async (companyprofile) => {
 								if (companyprofile.socialMediaId.length !== 0) {
@@ -568,15 +665,17 @@ exports.update = async (req, res, next) => {
 										? await JSON.parse(req.body.socialMediaId).map(
 												(sm) => {
 													return new SocialMediaModel({
-														title: sm.title || null,
-														link: sm.link || null,
+														title: sm.title ? sm.title : '',
+							                            link: sm.link ? sm.link : '',
+							                            iconName: sm.iconName ? sm.iconName : '',
 													});
 												}
 										  )
 										: req.body.socialMediaId.map((sm) => {
 												return new SocialMediaModel({
-													title: sm.title || null,
-													link: sm.link || null,
+													title: sm.title ? sm.title : '',
+							                        link: sm.link ? sm.link : '',
+							                        iconName: sm.iconName ? sm.iconName : '',
 												});
 										  });
 
@@ -611,7 +710,7 @@ exports.update = async (req, res, next) => {
 													? JSON.parse(req.body.phones)
 													: req.body.phones,
 											address,
-											socialMediaId: socialMediaIds,
+											socialMediaId: req.body.socialMediaId ? socialMediaIds :companyprofile.socialMediaId ,
 											email:req.body.email ? email : companyprofile.email,
 											copyright:req.body.copyright ? copyright : companyprofile.copyright,
 											baseColor:req.body.baseColor ? baseColor : companyprofile.baseColor,
