@@ -639,13 +639,68 @@ exports.update = async (req, res, next) => {
 								);
 						})
 						.catch((err) => res.json({ status: 404, message: err }));
+					}else if(!req.files && !req.body.socialMediaId){
+                        await CompanyProfileModel.findById({ _id: req.params.id })
+							.then(async (companyprofile) => {
 
+								const {
+									name,
+									address,
+									email,
+									copyright,
+									logo,
+									baseColor,
+									mainColor,
+									baseFontColor,
+									mainFontColor,
+									secondaryColor,
+									secondaryFontColor,
+									googlemap_iframe,
+									slogan,
+								} = req.body;
 
-
-
-
-					}else {
-						
+								await CompanyProfileModel.findByIdAndUpdate(
+									{ _id: req.params.id },
+									{
+										$set: {
+											name:req.body.name ? name : companyprofile.name,
+											logo: !logo ? companyprofile.logo : logo,
+											phones:
+												typeof req.body.phones === 'string'
+													? JSON.parse(req.body.phones)
+													: req.body.phones,
+											address,
+											socialMediaId:companyprofile.socialMediaId ,
+											email:req.body.email ? email : companyprofile.email,
+											copyright:req.body.copyright ? copyright : companyprofile.copyright,
+											baseColor:req.body.baseColor ? baseColor : companyprofile.baseColor,
+											mainColor:req.body.mainColor ? mainColor : companyprofile.mainColor,
+											baseFontColor:req.body.baseFontColor ? baseFontColor : companyprofile.baseFontColor,
+											mainFontColor:req.body.mainFontColor ? mainFontColor : companyprofile.mainFontColor,
+											secondaryColor:req.body.secondaryColor ? secondaryColor : companyprofile.secondaryColor,
+											secondaryFontColor:req.body.secondaryFontColor ? secondaryFontColor : companyprofile.secondaryFontColor,
+											slogan:req.body.slogan ? slogan : companyprofile.slogan,
+											isActive: req.body.isActive ? isActive : companyprofile.isActive,
+											isDeleted: req.body.isDeleted ? isDeleted : companyprofile.isDeleted,
+											googlemap_iframe:req.body.googlemap_iframe ? googlemap_iframe : companyprofile.googlemap_iframe,
+										},
+									},
+									{ useFindAndModify: false, new: true }
+								)
+									.then((companyprofile) =>
+										res.json({
+											status: 200,
+											message:
+												'Company profile is updated successfully',
+											companyprofile,
+										})
+									)
+									.catch((err) =>
+										res.json({ status: 404, message: err })
+									);
+							})
+							.catch((err) => res.json({ status: 404, message: err }));
+					} else {
 						await CompanyProfileModel.findById({ _id: req.params.id })
 							.then(async (companyprofile) => {
 								if (companyprofile.socialMediaId.length !== 0) {

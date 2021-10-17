@@ -13,3 +13,4 @@ router.put('/menus/:id', menusControllers.updateMenu);
 router.delete('/menus/:id', menusControllers.removeSingleMenu);
 
 module.exports = router;
+ 
